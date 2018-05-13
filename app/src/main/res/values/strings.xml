@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Waypoint Mission</string>
+    <string name="google_app_id">AIzaSyBjNHgXwYQsc8bcw37Wc0H7YHK95H9DFhc</string>
+    <string name="sdk_version">DJI SDK Version: %1$s</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="product_information">Product Information</string>
+    <string name="connection_loose">Status: No Product Connected</string>
+</resources>
