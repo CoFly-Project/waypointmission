@@ -15,6 +15,7 @@ import dji.common.error.DJIError;
 import dji.common.error.DJISDKError;
 import dji.sdk.base.BaseComponent;
 import dji.sdk.base.BaseProduct;
+import dji.sdk.flightcontroller.FlightAssistant;
 import dji.sdk.sdkmanager.DJISDKManager;
 
 public class DJIApplication extends Application {
@@ -59,6 +60,8 @@ public class DJIApplication extends Application {
             }
 
         };
+
+
 
         baseProductListener = new BaseProduct.BaseProductListener() {
             @Override
