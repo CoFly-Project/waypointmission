@@ -8,8 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
-import android.os.PowerManager;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -33,8 +31,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -47,7 +43,7 @@ import dji.common.mission.waypoint.WaypointMissionFinishedAction;
 import dji.common.mission.waypoint.WaypointMissionFlightPathMode;
 import dji.common.mission.waypoint.WaypointMissionHeadingMode;
 import dji.common.mission.waypoint.WaypointMissionUploadEvent;
-import dji.common.useraccount.UserAccountState;
+
 import dji.common.util.CommonCallbacks;
 import dji.sdk.base.BaseProduct;
 import dji.sdk.flightcontroller.FlightAssistant;
@@ -57,7 +53,7 @@ import dji.sdk.mission.waypoint.WaypointMissionOperator;
 import dji.sdk.mission.waypoint.WaypointMissionOperatorListener;
 import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKManager;
-import dji.sdk.useraccount.UserAccountManager;
+
 
 public class MainActivity extends FragmentActivity implements View.OnClickListener,
         GoogleMap.OnMapClickListener, OnMapReadyCallback {
@@ -74,6 +70,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private boolean isAdd = false;
 
     private double droneLocationLat = 181, droneLocationLng = 181;
+    private float droneLocationAlt;
     private float droneRotation = 0f;
 
     private final Map<Integer, Marker> mMarkers = new ConcurrentHashMap<Integer, Marker>();
@@ -83,6 +80,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private float mSpeed = 10.0f;
 
     private Waypoint WP;
+    private LatLng point2D;
     public static WaypointMission.Builder waypointMissionBuilder;
     private FlightController mFlightController;
     private WaypointMissionOperator instance;
@@ -225,6 +223,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 public void onUpdate(FlightControllerState djiFlightControllerCurrentState) {
                     droneLocationLat = djiFlightControllerCurrentState.getAircraftLocation().getLatitude();
                     droneLocationLng = djiFlightControllerCurrentState.getAircraftLocation().getLongitude();
+                    droneLocationAlt = djiFlightControllerCurrentState.getAircraftLocation().getAltitude();
                     droneRotation = djiFlightControllerCurrentState.getAircraftHeadDirection();
                     updateDroneLocation();
                 }
@@ -287,22 +286,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     @Override
     public void onMapClick(LatLng point) {
-        /*if (isAdd){
-            markWaypoint(point);
-            Waypoint mWaypoint = new Waypoint(point.latitude, point.longitude, altitude);
-            //Add Waypoints to Waypoint arraylist;
-            if (waypointMissionBuilder != null) {
-                waypointList.add(mWaypoint);
-                waypointMissionBuilder.waypointList(waypointList).waypointCount(waypointList.size());
-            }else
-            {
-                waypointMissionBuilder = new WaypointMission.Builder();
-                waypointList.add(mWaypoint);
-                waypointMissionBuilder.waypointList(waypointList).waypointCount(waypointList.size());
-            }
-        }else{
-            setResultToToast("Cannot Add Waypoint");
-        }*/
+
     }
 
     public static boolean checkGpsCoordination(double latitude, double longitude) {
@@ -354,36 +338,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             case R.id.gotoc:{
                 showSettingDialog();
                 break;
-            }/*
-            case R.id.add:{
-                enableDisableAdd();
-                break;
             }
-            case R.id.clear:{
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        gMap.clear();
-                    }
-
-                });
-                waypointList.clear();
-                waypointMissionBuilder.waypointList(waypointList);
-                updateDroneLocation();
-                break;
-            }
-            case R.id.config:{
-                showSettingDialog();
-                break;
-            }
-            case R.id.upload:{
-                uploadWayPointMission();
-                break;
-            }
-            case R.id.start:{
-                startWaypointMission();
-                break;
-            }*/
             case R.id.stop:{
                 stopWaypointMission();
                 break;
@@ -485,11 +440,11 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                         double latitude = Double.parseDouble(wpLatitude_TV.getText().toString());
                         double longitude = Double.parseDouble(wpLongitude_TV.getText().toString());
 
-                        LatLng point = new LatLng(latitude, longitude);
-                        markWaypoint(point);
-                        WP = new Waypoint(point.latitude, point.longitude, altitude);
+                        point2D = new LatLng(latitude, longitude);
+                        markWaypoint(point2D);
+                        WP = new Waypoint(point2D.latitude, point2D.longitude, altitude);
 
-                        Log.e(TAG, "Point (2D) :"+point.toString());
+                        Log.e(TAG, "Point (2D) :"+point2D.toString());
                         Log.e(TAG,"altitude "+altitude);
                         Log.e(TAG,"speed "+mSpeed);
                         Log.e(TAG, "mFinishedAction "+mFinishedAction);
@@ -522,44 +477,19 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         return true;
     }
 
+
     private void configWayPointMission(){
 
-        List<Waypoint> waypointList = new ArrayList<>();
-        //Add Waypoints to Waypoint arraylist;
-        waypointList.add(WP);
+        Waypoint fakeWP = new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt);
+        waypointMissionBuilder = new WaypointMission.Builder().finishedAction(mFinishedAction)
+                .headingMode(mHeadingMode)
+                .autoFlightSpeed(mSpeed)
+                .maxFlightSpeed(mSpeed)
+                .flightPathMode(WaypointMissionFlightPathMode.NORMAL)
+                .addWaypoint(fakeWP)
+                .addWaypoint(WP)
+                .waypointCount(2);
 
-        if (waypointMissionBuilder == null){
-
-            waypointMissionBuilder = new WaypointMission.Builder().finishedAction(mFinishedAction)
-                    .headingMode(mHeadingMode)
-                    .autoFlightSpeed(mSpeed)
-                    .maxFlightSpeed(mSpeed)
-                    .flightPathMode(WaypointMissionFlightPathMode.NORMAL)
-                    .waypointList(waypointList)
-                    .waypointCount(waypointList.size());
-
-        }else
-        {
-            waypointMissionBuilder.finishedAction(mFinishedAction)
-                    .headingMode(mHeadingMode)
-                    .autoFlightSpeed(mSpeed)
-                    .maxFlightSpeed(mSpeed)
-                    .flightPathMode(WaypointMissionFlightPathMode.NORMAL)
-                    .waypointList(waypointList)
-                    .waypointCount(waypointList.size());
-
-        }
-
-        /*
-        if (waypointMissionBuilder.getWaypointList().size() > 0){
-
-            for (int i=0; i< waypointMissionBuilder.getWaypointList().size(); i++){
-                waypointMissionBuilder.getWaypointList().get(i).altitude = altitude;
-            }
-
-            setResultToToast("Set Waypoint attitude successfully");
-        }
-        */
 
         DJIError error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
         if (error == null) {
@@ -576,6 +506,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             public void onResult(DJIError error) {
                 if (error == null) {
                     setResultToToast("Mission upload successfully!");
+                    try { Thread.sleep(1000); }
+                    catch (InterruptedException ex) { android.util.Log.d("Waypoint Mission", ex.toString()); }
                     startWaypointMission();
                 } else {
                     setResultToToast("Mission upload failed, error: " + error.getDescription() + " retrying...");
