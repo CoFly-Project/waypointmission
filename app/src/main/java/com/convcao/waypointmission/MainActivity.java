@@ -28,19 +28,24 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import dji.common.flightcontroller.FlightControllerState;
+import dji.common.mission.hotpoint.HotpointHeading;
 import dji.common.mission.waypoint.Waypoint;
 import dji.common.mission.waypoint.WaypointMission;
 import dji.common.mission.waypoint.WaypointMissionDownloadEvent;
 import dji.common.mission.waypoint.WaypointMissionExecutionEvent;
 import dji.common.mission.waypoint.WaypointMissionFinishedAction;
 import dji.common.mission.waypoint.WaypointMissionFlightPathMode;
+import dji.common.mission.waypoint.WaypointMissionGotoWaypointMode;
 import dji.common.mission.waypoint.WaypointMissionHeadingMode;
 import dji.common.mission.waypoint.WaypointMissionUploadEvent;
 
@@ -49,6 +54,7 @@ import dji.sdk.base.BaseProduct;
 import dji.sdk.flightcontroller.FlightAssistant;
 import dji.sdk.flightcontroller.FlightController;
 import dji.common.error.DJIError;
+import dji.sdk.mission.hotpoint.HotpointMissionOperator;
 import dji.sdk.mission.waypoint.WaypointMissionOperator;
 import dji.sdk.mission.waypoint.WaypointMissionOperatorListener;
 import dji.sdk.products.Aircraft;
@@ -67,7 +73,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private Button locate, gotoc, add, clear;
     private Button config, upload, start, stop;
 
-    private boolean isAdd = false;
+    private boolean inOperation = false;
 
     private double droneLocationLat = 181, droneLocationLng = 181;
     private float droneLocationAlt;
@@ -75,6 +81,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     private final Map<Integer, Marker> mMarkers = new ConcurrentHashMap<Integer, Marker>();
     private Marker droneMarker = null;
+    private LatLngBounds bounds = null;
 
     //private float altitude = 100.0f;
     private float mSpeed = 10.0f;
@@ -86,6 +93,10 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private WaypointMissionOperator instance;
     private WaypointMissionFinishedAction mFinishedAction = WaypointMissionFinishedAction.NO_ACTION;
     private WaypointMissionHeadingMode mHeadingMode = WaypointMissionHeadingMode.AUTO;
+    private WaypointMissionFlightPathMode waypointMissionFlightPathMode = WaypointMissionFlightPathMode.NORMAL;
+
+    //private HotpointMissionOperator hotpointMissionOperator;
+    //private HotpointHeading hotpointHeading = HotpointHeading.
 
     @Override
     protected void onResume(){
@@ -96,6 +107,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     @Override
     protected void onPause(){
         super.onPause();
+
     }
 
     @Override
@@ -127,22 +139,11 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
         locate = (Button) findViewById(R.id.locate);
         gotoc = (Button) findViewById(R.id.gotoc);
-        //add = (Button) findViewById(R.id.add);
-        //clear = (Button) findViewById(R.id.clear);
-        //config = (Button) findViewById(R.id.config);
-        //upload = (Button) findViewById(R.id.upload);
-        //start = (Button) findViewById(R.id.start);
         stop = (Button) findViewById(R.id.stop);
 
         locate.setOnClickListener(this);
         gotoc.setOnClickListener(this);
-        //add.setOnClickListener(this);
-        //clear.setOnClickListener(this);
-        //config.setOnClickListener(this);
-        //upload.setOnClickListener(this);
-        //start.setOnClickListener(this);
         stop.setOnClickListener(this);
-
     }
 
 
@@ -268,7 +269,10 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         @Override
         public void onExecutionFinish(@Nullable final DJIError error) {
             setResultToToast("Execution finished: " + (error == null ? "Success!" : error.getDescription()));
+            //TODO take a picture or...
+            inOperation = false;
         }
+
     };
 
     public WaypointMissionOperator getWaypointMissionOperator() {
@@ -312,7 +316,10 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
                 if (checkGpsCoordination(droneLocationLat, droneLocationLng)) {
                     droneMarker = gMap.addMarker(markerOptions);
-                    cameraUpdate();
+                    if (inOperation)
+                        viewPointFitBounds(170);
+                    else
+                        viewPointUpdate();
                 }
             }
         });
@@ -332,7 +339,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         switch (v.getId()) {
             case R.id.locate:{
                 updateDroneLocation();
-                cameraUpdate(18.0f); // Locate the drone's place
+                viewPointUpdate(18.0f); // Locate the drone's place
                 break;
             }
             case R.id.gotoc:{
@@ -348,27 +355,24 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         }
     }
 
-    private void cameraUpdate(){
-        LatLng pos = new LatLng(droneLocationLat, droneLocationLng);
-        CameraUpdate cu = CameraUpdateFactory.newLatLng(pos); //CameraUpdateFactory.newLatLngZoom(pos, zoomlevel);
+    private void viewPointFitBounds(int padding){
+        //padding: offset from edges of the map in pixels
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
         gMap.moveCamera(cu);
     }
 
-    private void cameraUpdate(float zoomlevel){
+    private void viewPointUpdate(){
+        LatLng pos = new LatLng(droneLocationLat, droneLocationLng);
+        CameraUpdate cu = CameraUpdateFactory.newLatLng(pos);
+        gMap.moveCamera(cu);
+    }
+
+    private void viewPointUpdate(float zoomlevel){
         LatLng pos = new LatLng(droneLocationLat, droneLocationLng);
         CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(pos, zoomlevel);
         gMap.moveCamera(cu);
     }
 
-    private void enableDisableAdd(){
-        if (isAdd == false) {
-            isAdd = true;
-            add.setText("Exit");
-        }else{
-            isAdd = false;
-            add.setText("Add");
-        }
-    }
 
     private void showSettingDialog(){
         LinearLayout wayPointSettings = (LinearLayout)getLayoutInflater().inflate(R.layout.dialog_waypointsetting, null);
@@ -435,6 +439,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 .setPositiveButton("Start",new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int id) {
 
+                        inOperation = true;
+
                         String altitudeString = wpAltitude_TV.getText().toString();
                         int altitude = Integer.parseInt(nulltoIntegerDefalt(altitudeString));
                         double latitude = Double.parseDouble(wpLatitude_TV.getText().toString());
@@ -442,6 +448,15 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
                         point2D = new LatLng(latitude, longitude);
                         markWaypoint(point2D);
+
+                        bounds = null;
+                        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                        //Include current possition
+                        builder.include(new LatLng(droneLocationLat,droneLocationLng));
+                        //Include the desired waypoint location
+                        builder.include(point2D);
+                        bounds = builder.build();
+
                         WP = new Waypoint(point2D.latitude, point2D.longitude, altitude);
 
                         Log.e(TAG, "Point (2D) :"+point2D.toString());
@@ -479,6 +494,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
 
     private void configWayPointMission(){
+        FA.setCollisionAvoidanceEnabled(true, null);
+        FA.setActiveObstacleAvoidanceEnabled(true, null);
 
         Waypoint fakeWP = new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt);
         waypointMissionBuilder = new WaypointMission.Builder().finishedAction(mFinishedAction)
@@ -490,13 +507,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 .addWaypoint(WP)
                 .waypointCount(2);
 
-
         DJIError error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
         if (error == null) {
             setResultToToast("Waypoint loaded successfully");
             uploadWayPointMission();
         } else {
             setResultToToast("loadMission failed with:" + error.getDescription());
+            inOperation = false;
         }
     }
 
@@ -524,6 +541,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             @Override
             public void onResult(DJIError error) {
                 setResultToToast("Mission Start: " + (error == null ? "Successfully" : error.getDescription()));
+                if (error!=null){inOperation = false;}
             }
         });
     }
@@ -536,7 +554,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 setResultToToast("Mission Stop: " + (error == null ? "Successfully" : error.getDescription()));
             }
         });
-
+        inOperation = false;
     }
 
     @Override
