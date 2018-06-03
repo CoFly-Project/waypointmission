@@ -7,12 +7,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.SurfaceTexture;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.TextureView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -49,8 +52,12 @@ import dji.common.mission.waypoint.WaypointMissionGotoWaypointMode;
 import dji.common.mission.waypoint.WaypointMissionHeadingMode;
 import dji.common.mission.waypoint.WaypointMissionUploadEvent;
 
+import dji.common.product.Model;
 import dji.common.util.CommonCallbacks;
 import dji.sdk.base.BaseProduct;
+import dji.sdk.camera.Camera;
+import dji.sdk.camera.VideoFeeder;
+import dji.sdk.codec.DJICodecManager;
 import dji.sdk.flightcontroller.FlightAssistant;
 import dji.sdk.flightcontroller.FlightController;
 import dji.common.error.DJIError;
@@ -61,10 +68,14 @@ import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKManager;
 
 
-public class MainActivity extends FragmentActivity implements View.OnClickListener,
-        GoogleMap.OnMapClickListener, OnMapReadyCallback {
+public class MainActivity extends FragmentActivity implements TextureView.SurfaceTextureListener,
+        View.OnClickListener, OnMapReadyCallback {
 
     protected static final String TAG = "WaypointMissionActivity";
+    protected VideoFeeder.VideoDataCallback mReceivedVideoDataCallBack = null;
+    // Codec for video live view
+    protected DJICodecManager mCodecManager = null;
+    protected TextureView mVideoSurface = null;
 
     private GoogleMap gMap;
 
@@ -93,27 +104,25 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     private WaypointMissionOperator instance;
     private WaypointMissionFinishedAction mFinishedAction = WaypointMissionFinishedAction.NO_ACTION;
     private WaypointMissionHeadingMode mHeadingMode = WaypointMissionHeadingMode.AUTO;
-    private WaypointMissionFlightPathMode waypointMissionFlightPathMode = WaypointMissionFlightPathMode.NORMAL;
-
-    //private HotpointMissionOperator hotpointMissionOperator;
-    //private HotpointHeading hotpointHeading = HotpointHeading.
 
     @Override
     protected void onResume(){
         super.onResume();
         initFlightController();
+        initPreviewer();
     }
 
     @Override
     protected void onPause(){
+        uninitPreviewer();
         super.onPause();
-
     }
 
     @Override
     protected void onDestroy(){
         unregisterReceiver(mReceiver);
         removeListener();
+        uninitPreviewer();
         super.onDestroy();
     }
 
@@ -136,6 +145,12 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     private void initUI() {
         ScreenAlwaysOn_MaxBrightness();
+
+        // init mVideoSurface
+        mVideoSurface = (TextureView)findViewById(R.id.video_previewer_surface);
+        if (null != mVideoSurface) {
+            mVideoSurface.setSurfaceTextureListener(this);
+        }
 
         locate = (Button) findViewById(R.id.locate);
         gotoc = (Button) findViewById(R.id.gotoc);
@@ -178,12 +193,23 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
         setContentView(R.layout.activity_main);
 
-
         IntentFilter filter = new IntentFilter();
         filter.addAction(DJIApplication.FLAG_CONNECTION_CHANGE);
         registerReceiver(mReceiver, filter);
 
         initUI();
+
+        //First Person View
+        // The callback for receiving the raw H264 video data for camera live view
+        mReceivedVideoDataCallBack = new VideoFeeder.VideoDataCallback() {
+            @Override
+            public void onReceive(byte[] videoBuffer, int size) {
+                if (mCodecManager != null) {
+                    mCodecManager.sendDataToDecoder(videoBuffer, size);
+                }
+            }
+        };
+        //end of First Person View
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -192,6 +218,59 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         addListener();
 
     }
+
+    //First Person View
+    private void initPreviewer() {
+        BaseProduct product = DJIApplication.getProductInstance();
+        if (product == null || !product.isConnected()) {
+            setResultToToast(getString(R.string.disconnected));
+        } else {
+            if (null != mVideoSurface) {
+                mVideoSurface.setSurfaceTextureListener(this);
+            }
+            if (!product.getModel().equals(Model.UNKNOWN_AIRCRAFT)) {
+                VideoFeeder.getInstance().getPrimaryVideoFeed().setCallback(mReceivedVideoDataCallBack);
+            }
+        }
+    }
+    private void uninitPreviewer() {
+        Camera camera = DJIApplication.getCameraInstance();
+        if (camera != null){
+            // Reset the callback
+            VideoFeeder.getInstance().getPrimaryVideoFeed().setCallback(null);
+        }
+    }
+
+    @Override
+    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+        Log.e(TAG, "onSurfaceTextureAvailable");
+        if (mCodecManager == null) {
+            mCodecManager = new DJICodecManager(this, surface, width, height);
+        }
+    }
+
+    @Override
+    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+        Log.e(TAG, "onSurfaceTextureSizeChanged");
+    }
+
+    @Override
+    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+        Log.e(TAG,"onSurfaceTextureDestroyed");
+        if (mCodecManager != null) {
+            mCodecManager.cleanSurface();
+            mCodecManager = null;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+    }
+
+    //end of First Person View
+
 
     protected BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
@@ -203,6 +282,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
 
     private void onProductConnectionChange() {
         initFlightController();
+        initPreviewer();
         //loginAccount();
     }
 
@@ -284,14 +364,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         return instance;
     }
 
-    private void setUpMap() {
-        gMap.setOnMapClickListener(this);// add the listener for click for amap object
-    }
-
-    @Override
-    public void onMapClick(LatLng point) {
-
-    }
 
     public static boolean checkGpsCoordination(double latitude, double longitude) {
         return (latitude > -90 && latitude < 90 && longitude > -180 && longitude < 180) && (latitude != 0f && longitude != 0f);
@@ -317,7 +389,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 if (checkGpsCoordination(droneLocationLat, droneLocationLng)) {
                     droneMarker = gMap.addMarker(markerOptions);
                     if (inOperation)
-                        viewPointFitBounds(170);
+                        viewPointFitBounds(190);
                     else
                         viewPointUpdate();
                 }
@@ -561,15 +633,17 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     public void onMapReady(GoogleMap googleMap) {
         if (gMap == null) {
             gMap = googleMap;
-            setUpMap();
         }
 
-        LatLng xanthi = new LatLng(41.1348801, 24.8880005);
-        gMap.addMarker(new MarkerOptions().position(xanthi).title("Marker in Xanthi"));
-        gMap.moveCamera(CameraUpdateFactory.newLatLng(xanthi));
+        //LatLng xanthi = new LatLng(41.1348801, 24.8880005);
+        //gMap.addMarker(new MarkerOptions().position(xanthi).title("Marker in Xanthi"));
+        //gMap.moveCamera(CameraUpdateFactory.newLatLng(xanthi));
+
         gMap.getUiSettings().setZoomControlsEnabled(true);
         gMap.getUiSettings().setCompassEnabled(true);
         gMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+
+        viewPointUpdate(18.0f);
         //gMap.getUiSettings().setMyLocationButtonEnabled(true);
     }
 

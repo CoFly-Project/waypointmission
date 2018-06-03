@@ -15,7 +15,10 @@ import dji.common.error.DJIError;
 import dji.common.error.DJISDKError;
 import dji.sdk.base.BaseComponent;
 import dji.sdk.base.BaseProduct;
+import dji.sdk.camera.Camera;
 import dji.sdk.flightcontroller.FlightAssistant;
+import dji.sdk.products.Aircraft;
+import dji.sdk.products.HandHeld;
 import dji.sdk.sdkmanager.DJISDKManager;
 
 public class DJIApplication extends Application {
@@ -46,6 +49,25 @@ public class DJIApplication extends Application {
         }
         return product;
     }
+
+
+    public static synchronized Camera getCameraInstance() {
+
+        if (getProductInstance() == null) return null;
+
+        Camera camera = null;
+
+        if (getProductInstance() instanceof Aircraft){
+            camera = ((Aircraft) getProductInstance()).getCamera();
+
+        } else if (getProductInstance() instanceof HandHeld) {
+            camera = ((HandHeld) getProductInstance()).getCamera();
+        }
+
+        return camera;
+    }
+
+
 
     @Override
     public void onCreate() {

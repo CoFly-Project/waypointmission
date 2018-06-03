@@ -1,43 +1,153 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:custom="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
     android:orientation="vertical"
     android:screenOrientation="sensorLandscape"
-    android:background="#FFFFFF"
     tools:context=".MainActivity">
 
+
+    <!-- Widgets in top status bar -->
+    <!-- <LinearLayout
+        android:id="@+id/signal"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:background="@color/dark_gray"
+        android:orientation="horizontal">
+
+        <dji.ux.widget.PreFlightStatusWidget
+            android:layout_width="238dp"
+            android:layout_height="25dp"/>
+
+        <dji.ux.widget.FlightModeWidget
+            android:layout_width="103dp"
+            android:layout_height="22dp"/>
+
+        <dji.ux.widget.GPSSignalWidget
+            android:layout_width="44dp"
+            android:layout_height="22dp"/>
+
+        <dji.ux.widget.VisionWidget
+            android:layout_width="22dp"
+            android:layout_height="22dp"/>
+
+        <dji.ux.widget.RemoteControlSignalWidget
+            android:layout_width="38dp"
+            android:layout_height="22dp"/>
+
+        <dji.ux.widget.VideoSignalWidget
+            android:layout_width="38dp"
+            android:layout_height="22dp"/>
+
+        <dji.ux.widget.WiFiSignalWidget
+            android:layout_width="22dp"
+            android:layout_height="20dp"/>
+
+        <dji.ux.widget.BatteryWidget
+            android:layout_width="96dp"
+            android:layout_height="22dp"/>
+
+        <dji.ux.widget.ConnectionWidget
+            android:layout_marginTop="3dp"
+            android:layout_width="18dp"
+            android:layout_height="18dp"/>
+    </LinearLayout>
+    -->
+
+
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+
         <Button
             android:id="@+id/locate"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Locate"
-            android:layout_weight="1"/>
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Locate" />
+
         <Button
             android:id="@+id/gotoc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Go to"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:text="Go to" />
+
         <Button
             android:id="@+id/stop"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Abort"
             android:layout_weight="1"
-            android:clickable="false"/>
+            android:text="Abort" />
     </LinearLayout>
 
     <fragment
         android:id="@+id/map"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        class="com.google.android.gms.maps.SupportMapFragment" />
+        class="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="702dp"
+        android:layout_height="294dp"
+        android:layout_marginTop="6dp"
+        custom:layout_constraintBottom_toBottomOf="parent"
+        custom:layout_constraintStart_toStartOf="parent"
+        custom:layout_constraintTop_toTopOf="parent"
+        custom:layout_constraintVertical_bias="1.0" />
+
+    <TextureView
+        android:id="@+id/video_previewer_surface"
+        android:layout_width="179dp"
+        android:layout_height="92dp"
+        android:layout_marginBottom="24dp"
+        android:layout_marginStart="24dp"
+        custom:layout_constraintBottom_toBottomOf="parent"
+        custom:layout_constraintStart_toStartOf="parent" />
 
 
-</LinearLayout>
+    <!--
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextureView
+                android:id="@+id/video_previewer_surface"
+                android:layout_width="50dp"
+                android:layout_height="286dp"
+                android:layout_gravity="center" />
+
+            <fragment
+                android:id="@+id/map"
+                class="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+             -->
+
+        <!--
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextureView
+                    android:id="@+id/video_previewer_surface"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"/>
+
+                <fragment
+                    android:id="@+id/map"
+                    class="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </RelativeLayout>
+        -->
+
+
+
+    </android.support.constraint.ConstraintLayout>
