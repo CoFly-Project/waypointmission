@@ -1,4 +1,6 @@
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<!--<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:custom="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,9 +10,7 @@
     android:screenOrientation="sensorLandscape"
     tools:context=".MainActivity">
 
-
-    <!-- Widgets in top status bar -->
-    <!-- <LinearLayout
+    <LinearLayout
         android:id="@+id/signal"
         android:layout_width="match_parent"
         android:layout_height="25dp"
@@ -19,48 +19,47 @@
 
         <dji.ux.widget.PreFlightStatusWidget
             android:layout_width="238dp"
-            android:layout_height="25dp"/>
+            android:layout_height="25dp" />
 
         <dji.ux.widget.FlightModeWidget
             android:layout_width="103dp"
-            android:layout_height="22dp"/>
+            android:layout_height="22dp" />
 
         <dji.ux.widget.GPSSignalWidget
             android:layout_width="44dp"
-            android:layout_height="22dp"/>
+            android:layout_height="22dp" />
 
         <dji.ux.widget.VisionWidget
             android:layout_width="22dp"
-            android:layout_height="22dp"/>
+            android:layout_height="22dp" />
 
         <dji.ux.widget.RemoteControlSignalWidget
             android:layout_width="38dp"
-            android:layout_height="22dp"/>
+            android:layout_height="22dp" />
 
         <dji.ux.widget.VideoSignalWidget
             android:layout_width="38dp"
-            android:layout_height="22dp"/>
+            android:layout_height="22dp" />
 
         <dji.ux.widget.WiFiSignalWidget
             android:layout_width="22dp"
-            android:layout_height="20dp"/>
+            android:layout_height="20dp" />
 
         <dji.ux.widget.BatteryWidget
             android:layout_width="96dp"
-            android:layout_height="22dp"/>
+            android:layout_height="22dp" />
 
         <dji.ux.widget.ConnectionWidget
-            android:layout_marginTop="3dp"
             android:layout_width="18dp"
-            android:layout_height="18dp"/>
+            android:layout_height="18dp"
+            android:layout_marginTop="3dp" />
     </LinearLayout>
-    -->
-
 
     <LinearLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/buttons"
+        android:layout_below="@id/signal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:orientation="horizontal">
 
         <Button
@@ -78,6 +77,13 @@
             android:text="Go to" />
 
         <Button
+            android:id="@+id/adapter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Adapter" />
+
+        <Button
             android:id="@+id/stop"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -85,25 +91,84 @@
             android:text="Abort" />
     </LinearLayout>
 
+
     <fragment
         android:id="@+id/map"
         class="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="702dp"
-        android:layout_height="294dp"
-        android:layout_marginTop="6dp"
+        android:layout_below="@id/buttons"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         custom:layout_constraintBottom_toBottomOf="parent"
         custom:layout_constraintStart_toStartOf="parent"
-        custom:layout_constraintTop_toTopOf="parent"
-        custom:layout_constraintVertical_bias="1.0" />
+        custom:layout_constraintTop_toTopOf="parent" />
 
-    <TextureView
-        android:id="@+id/video_previewer_surface"
-        android:layout_width="179dp"
-        android:layout_height="92dp"
-        android:layout_marginBottom="24dp"
-        android:layout_marginStart="24dp"
-        custom:layout_constraintBottom_toBottomOf="parent"
-        custom:layout_constraintStart_toStartOf="parent" />
+    <dji.ux.widget.RemainingFlightTimeWidget
+        android:id="@+id/RemainingFlightTime"
+        android:layout_below="@id/buttons"
+        android:layout_width="match_parent"
+        android:background="@color/transparent"
+        android:layout_height="20dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:padding="12dp">
+
+        <dji.ux.widget.dashboard.DashboardWidget
+            android:id="@+id/Compass"
+            android:layout_width="405dp"
+            android:layout_height="91dp"
+            android:layout_marginRight="12dp"
+            tools:ignore="RtlHardcoded"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/RemainingFlightTime"
+        android:orientation="horizontal"
+        android:gravity="right"
+        android:padding="12dp">
+
+        <TextureView
+            android:id="@+id/video_previewer_surface"
+            android:layout_width="181dp"
+            android:layout_height="94dp" />
+    </LinearLayout>
+
+
+
+
+
+    <!--Take off and return home buttons on left -->
+    <LinearLayout
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="12dp"
+        android:orientation="vertical">
+
+        <dji.ux.widget.TakeOffWidget
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginBottom="12dp"/>
+
+        <dji.ux.widget.ReturnHomeWidget
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="12dp"/>
+    </LinearLayout>
+
+    <!-- Pre-flight checklist panel -->
+    <dji.ux.panel.PreFlightCheckListPanel
+        android:layout_width="400dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/signal"
+        custom:excludeItem="aircraftBatteryTemperature|ESCStatus"
+        android:visibility="gone"/>
 
 
     <!--
@@ -126,28 +191,26 @@
         </LinearLayout>
              -->
 
-        <!--
-            <RelativeLayout
+    <!--
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <TextureView
+                android:id="@+id/video_previewer_surface"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="15dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"/>
+
+            <fragment
+                android:id="@+id/map"
+                class="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <TextureView
-                    android:id="@+id/video_previewer_surface"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:layout_gravity="center"
-                    android:layout_marginBottom="15dp"
-                    android:layout_marginTop="15dp"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginRight="15dp"/>
+                android:layout_height="match_parent" />
+        </RelativeLayout>
+    -->
 
-                <fragment
-                    android:id="@+id/map"
-                    class="com.google.android.gms.maps.SupportMapFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-            </RelativeLayout>
-        -->
-
-
-
-    </android.support.constraint.ConstraintLayout>
+</RelativeLayout><!--< </android.support.constraint.ConstraintLayout> -->

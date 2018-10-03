@@ -1,0 +1,41 @@
+{
+  "namespace": "com.convcao.dji",
+  "name": "Location",
+  "type": "record",
+  "doc": "Geographic location",
+  "fields": [
+    {
+        "name": "sourceSystem",
+        "type": "string",
+        "doc": "Canonical name of the originating system"
+    },
+    {
+          "name": "time",
+          "type": "long",
+          "unit": "ms",
+          "doc": "Time elapsed since the Unix epoch"
+    },
+    {
+      "name": "latitude",
+      "type": "double",
+      "unit": "degrees",
+      "doc": "Latitude in the WGS 84 reference coordinate system",
+      "min": -90.0,
+      "max": 90.0
+    },
+    {
+      "name": "longitude",
+      "type": "double",
+      "doc": "Longitude in the WGS 84 reference coordinate system",
+      "unit": "degrees",
+      "min": -180.0,
+      "max": 180.0
+    },
+    {
+      "name": "altitude",
+      "type": ["float", "null"],
+      "unit": "m",
+      "doc": "Altitude"
+    }
+  ]
+}

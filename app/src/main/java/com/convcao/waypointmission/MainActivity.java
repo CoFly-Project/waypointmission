@@ -13,7 +13,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
@@ -35,20 +34,32 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericDatumReader;
+import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.io.BinaryDecoder;
+import org.apache.avro.io.DatumReader;
+import org.apache.avro.io.DecoderFactory;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Random;
 
 import dji.common.flightcontroller.FlightControllerState;
-import dji.common.mission.hotpoint.HotpointHeading;
 import dji.common.mission.waypoint.Waypoint;
 import dji.common.mission.waypoint.WaypointMission;
 import dji.common.mission.waypoint.WaypointMissionDownloadEvent;
 import dji.common.mission.waypoint.WaypointMissionExecutionEvent;
 import dji.common.mission.waypoint.WaypointMissionFinishedAction;
 import dji.common.mission.waypoint.WaypointMissionFlightPathMode;
-import dji.common.mission.waypoint.WaypointMissionGotoWaypointMode;
 import dji.common.mission.waypoint.WaypointMissionHeadingMode;
 import dji.common.mission.waypoint.WaypointMissionUploadEvent;
 
@@ -61,7 +72,6 @@ import dji.sdk.codec.DJICodecManager;
 import dji.sdk.flightcontroller.FlightAssistant;
 import dji.sdk.flightcontroller.FlightController;
 import dji.common.error.DJIError;
-import dji.sdk.mission.hotpoint.HotpointMissionOperator;
 import dji.sdk.mission.waypoint.WaypointMissionOperator;
 import dji.sdk.mission.waypoint.WaypointMissionOperatorListener;
 import dji.sdk.products.Aircraft;
@@ -81,8 +91,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     private FlightAssistant FA = new FlightAssistant();
 
-    private Button locate, gotoc, add, clear;
-    private Button config, upload, start, stop;
+    private Button locate, gotoc, stop, adapterB;
 
     private boolean inOperation = false;
 
@@ -90,7 +99,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private float droneLocationAlt;
     private float droneRotation = 0f;
 
-    private final Map<Integer, Marker> mMarkers = new ConcurrentHashMap<Integer, Marker>();
+    //private final Map<Integer, Marker> mMarkers = new ConcurrentHashMap<Integer, Marker>();
+    private Marker markerWP = null;
     private Marker droneMarker = null;
     private LatLngBounds bounds = null;
 
@@ -105,21 +115,28 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private WaypointMissionFinishedAction mFinishedAction = WaypointMissionFinishedAction.NO_ACTION;
     private WaypointMissionHeadingMode mHeadingMode = WaypointMissionHeadingMode.AUTO;
 
+
+    private SchemaLoader schemaLoader;
+    private Adapter adapter;
+    private DispatchMessage dispatchMessage;
+    private Schema schemaGoto;
+
+
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
         initFlightController();
         initPreviewer();
     }
 
     @Override
-    protected void onPause(){
+    protected void onPause() {
         uninitPreviewer();
         super.onPause();
     }
 
     @Override
-    protected void onDestroy(){
+    protected void onDestroy() {
         unregisterReceiver(mReceiver);
         removeListener();
         uninitPreviewer();
@@ -129,12 +146,12 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     /**
      * @Description : RETURN Button RESPONSE FUNCTION
      */
-    public void onReturn(View view){
+    public void onReturn(View view) {
         Log.d(TAG, "onReturn");
         this.finish();
     }
 
-    private void setResultToToast(final String string){
+    private void setResultToToast(final String string) {
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -147,17 +164,19 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         ScreenAlwaysOn_MaxBrightness();
 
         // init mVideoSurface
-        mVideoSurface = (TextureView)findViewById(R.id.video_previewer_surface);
+        mVideoSurface = (TextureView) findViewById(R.id.video_previewer_surface);
         if (null != mVideoSurface) {
             mVideoSurface.setSurfaceTextureListener(this);
         }
 
         locate = (Button) findViewById(R.id.locate);
         gotoc = (Button) findViewById(R.id.gotoc);
+        adapterB = (Button) findViewById(R.id.adapter);
         stop = (Button) findViewById(R.id.stop);
 
         locate.setOnClickListener(this);
         gotoc.setOnClickListener(this);
+        adapterB.setOnClickListener(this);
         stop.setOnClickListener(this);
     }
 
@@ -215,9 +234,16 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        addListener();
 
+        adapter = new Adapter();
+        Thread myThread = new Thread(new MyServerThread());
+        myThread.start();
+
+        schemaLoader = new SchemaLoader();
+        schemaLoader.load();
+        schemaGoto = schemaLoader.getSchema("goto");
     }
+
 
     //First Person View
     private void initPreviewer() {
@@ -233,9 +259,10 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             }
         }
     }
+
     private void uninitPreviewer() {
         Camera camera = DJIApplication.getCameraInstance();
-        if (camera != null){
+        if (camera != null) {
             // Reset the callback
             VideoFeeder.getInstance().getPrimaryVideoFeed().setCallback(null);
         }
@@ -256,7 +283,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        Log.e(TAG,"onSurfaceTextureDestroyed");
+        Log.e(TAG, "onSurfaceTextureDestroyed");
         if (mCodecManager != null) {
             mCodecManager.cleanSurface();
             mCodecManager = null;
@@ -307,14 +334,32 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     droneLocationAlt = djiFlightControllerCurrentState.getAircraftLocation().getAltitude();
                     droneRotation = djiFlightControllerCurrentState.getAircraftHeadDirection();
                     updateDroneLocation();
+
+                    if (!Double.isNaN(droneLocationLat) && !Double.isNaN(droneLocationLng) && !Double.isNaN(droneLocationAlt)) {
+                        publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt);
+                    }
                 }
             });
         }
     }
 
+
+    //Send GenericRecord location to the server
+    private void publishLocation(double locationLat, double locationLon, float alt){
+        GenericRecord location = schemaLoader.createGenericRecord("location");
+        location.put("sourceSystem", "dji.phantom.4.pro.hawk.1");
+        location.put("time", System.currentTimeMillis());
+        location.put("latitude", locationLat);
+        location.put("longitude", locationLon);
+        location.put("altitude", alt);
+
+        dispatchMessage = new DispatchMessage(schemaLoader.getSchema("location"));
+        dispatchMessage.execute(location);
+    }
+
     //Add Listener for WaypointMissionOperator
     private void addListener() {
-        if (getWaypointMissionOperator() != null){
+        if (getWaypointMissionOperator() != null) {
             getWaypointMissionOperator().addListener(eventNotificationListener);
         }
     }
@@ -349,7 +394,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         @Override
         public void onExecutionFinish(@Nullable final DJIError error) {
             setResultToToast("Execution finished: " + (error == null ? "Success!" : error.getDescription()));
-            //TODO take a picture or...
+            //if (markerWP != null) {
+            //    markerWP.remove();
+            //}
             inOperation = false;
         }
 
@@ -357,7 +404,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     public WaypointMissionOperator getWaypointMissionOperator() {
         if (instance == null) {
-            if (DJISDKManager.getInstance().getMissionControl() != null){
+            if (DJISDKManager.getInstance().getMissionControl() != null) {
                 instance = DJISDKManager.getInstance().getMissionControl().getWaypointMissionOperator();
             }
         }
@@ -370,7 +417,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     }
 
     // Update the drone location based on states from MCU.
-    private void updateDroneLocation(){
+    private void updateDroneLocation() {
 
         LatLng pos = new LatLng(droneLocationLat, droneLocationLng);
         //Create MarkerOptions object
@@ -397,29 +444,33 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         });
     }
 
-    private void markWaypoint(LatLng point){
+    private void markWaypoint(LatLng point) {
         //Create MarkerOptions object
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(point);
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-        Marker marker = gMap.addMarker(markerOptions);
-        mMarkers.put(mMarkers.size(), marker);
+        markerWP = gMap.addMarker(markerOptions);
+        //mMarkers.put(mMarkers.size(), marker);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.locate:{
+            case R.id.locate: {
                 updateDroneLocation();
                 viewPointUpdate(18.0f); // Locate the drone's place
                 break;
             }
-            case R.id.gotoc:{
+            case R.id.gotoc: {
                 showSettingDialog();
                 break;
             }
-            case R.id.stop:{
+            case R.id.stop: {
                 stopWaypointMission();
+                break;
+            }
+            case R.id.adapter: {
+                adapter.RunAdapter();
                 break;
             }
             default:
@@ -427,27 +478,27 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         }
     }
 
-    private void viewPointFitBounds(int padding){
+    private void viewPointFitBounds(int padding) {
         //padding: offset from edges of the map in pixels
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
         gMap.moveCamera(cu);
     }
 
-    private void viewPointUpdate(){
+    private void viewPointUpdate() {
         LatLng pos = new LatLng(droneLocationLat, droneLocationLng);
         CameraUpdate cu = CameraUpdateFactory.newLatLng(pos);
         gMap.moveCamera(cu);
     }
 
-    private void viewPointUpdate(float zoomlevel){
+    private void viewPointUpdate(float zoomlevel) {
         LatLng pos = new LatLng(droneLocationLat, droneLocationLng);
         CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(pos, zoomlevel);
         gMap.moveCamera(cu);
     }
 
 
-    private void showSettingDialog(){
-        LinearLayout wayPointSettings = (LinearLayout)getLayoutInflater().inflate(R.layout.dialog_waypointsetting, null);
+    private void showSettingDialog() {
+        LinearLayout wayPointSettings = (LinearLayout) getLayoutInflater().inflate(R.layout.dialog_waypointsetting, null);
 
         final TextView wpAltitude_TV = (TextView) wayPointSettings.findViewById(R.id.altitude);
         final TextView wpLatitude_TV = (TextView) wayPointSettings.findViewById(R.id.latitude);
@@ -456,15 +507,15 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         RadioGroup actionAfterFinished_RG = (RadioGroup) wayPointSettings.findViewById(R.id.actionAfterFinished);
         RadioGroup heading_RG = (RadioGroup) wayPointSettings.findViewById(R.id.heading);
 
-        speed_RG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
+        speed_RG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId == R.id.lowSpeed){
+                if (checkedId == R.id.lowSpeed) {
                     mSpeed = 3.0f;
-                } else if (checkedId == R.id.MidSpeed){
+                } else if (checkedId == R.id.MidSpeed) {
                     mSpeed = 5.0f;
-                } else if (checkedId == R.id.HighSpeed){
+                } else if (checkedId == R.id.HighSpeed) {
                     mSpeed = 10.0f;
                 }
             }
@@ -476,13 +527,13 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 Log.d(TAG, "Select finish action");
-                if (checkedId == R.id.finishNone){
+                if (checkedId == R.id.finishNone) {
                     mFinishedAction = WaypointMissionFinishedAction.NO_ACTION;
-                } else if (checkedId == R.id.finishGoHome){
+                } else if (checkedId == R.id.finishGoHome) {
                     mFinishedAction = WaypointMissionFinishedAction.GO_HOME;
-                } else if (checkedId == R.id.finishAutoLanding){
+                } else if (checkedId == R.id.finishAutoLanding) {
                     mFinishedAction = WaypointMissionFinishedAction.AUTO_LAND;
-                } else if (checkedId == R.id.finishToFirst){
+                } else if (checkedId == R.id.finishToFirst) {
                     mFinishedAction = WaypointMissionFinishedAction.GO_FIRST_WAYPOINT;
                 }
             }
@@ -508,35 +559,16 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         new AlertDialog.Builder(this)
                 .setTitle("")
                 .setView(wayPointSettings)
-                .setPositiveButton("Start",new DialogInterface.OnClickListener(){
+                .setPositiveButton("Start", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
 
-                        inOperation = true;
-
                         String altitudeString = wpAltitude_TV.getText().toString();
-                        int altitude = Integer.parseInt(nulltoIntegerDefalt(altitudeString));
+
                         double latitude = Double.parseDouble(wpLatitude_TV.getText().toString());
                         double longitude = Double.parseDouble(wpLongitude_TV.getText().toString());
+                        int altitude = Integer.parseInt(nulltoIntegerDefalt(altitudeString));
 
-                        point2D = new LatLng(latitude, longitude);
-                        markWaypoint(point2D);
-
-                        bounds = null;
-                        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-                        //Include current possition
-                        builder.include(new LatLng(droneLocationLat,droneLocationLng));
-                        //Include the desired waypoint location
-                        builder.include(point2D);
-                        bounds = builder.build();
-
-                        WP = new Waypoint(point2D.latitude, point2D.longitude, altitude);
-
-                        Log.e(TAG, "Point (2D) :"+point2D.toString());
-                        Log.e(TAG,"altitude "+altitude);
-                        Log.e(TAG,"speed "+mSpeed);
-                        Log.e(TAG, "mFinishedAction "+mFinishedAction);
-                        Log.e(TAG, "mHeadingMode "+mHeadingMode);
-                        configWayPointMission();
+                        Goto(latitude, longitude, altitude);
                     }
 
                 })
@@ -550,22 +582,49 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                 .show();
     }
 
-    String nulltoIntegerDefalt(String value){
-        if(!isIntValue(value)) value="0";
+    String nulltoIntegerDefalt(String value) {
+        if (!isIntValue(value)) value = "0";
         return value;
     }
 
-    boolean isIntValue(String val)
-    {
+    boolean isIntValue(String val) {
         try {
-            val=val.replace(" ","");
+            val = val.replace(" ", "");
             Integer.parseInt(val);
-        } catch (Exception e) {return false;}
+        } catch (Exception e) {
+            return false;
+        }
         return true;
     }
 
 
-    private void configWayPointMission(){
+    private void Goto(double lat, double lon, float alt) {
+        setResultToToast("GOTO: [" + lat + ", " + lon + "] with altitude: " + alt);
+        inOperation = true;
+
+        point2D = new LatLng(lat, lon);
+        markWaypoint(point2D);
+
+        bounds = null;
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        //Include current possition
+        builder.include(new LatLng(droneLocationLat, droneLocationLng));
+        //Include the desired waypoint location
+        builder.include(point2D);
+        bounds = builder.build();
+
+        WP = new Waypoint(point2D.latitude, point2D.longitude, alt);
+
+        Log.e(TAG, "Point (2D) :" + point2D.toString());
+        Log.e(TAG, "altitude " + alt);
+        Log.e(TAG, "speed " + mSpeed);
+        Log.e(TAG, "mFinishedAction " + mFinishedAction);
+        Log.e(TAG, "mHeadingMode " + mHeadingMode);
+        configWayPointMission();
+    }
+
+
+    private void configWayPointMission() {
         FA.setCollisionAvoidanceEnabled(true, null);
         FA.setActiveObstacleAvoidanceEnabled(true, null);
 
@@ -589,14 +648,17 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         }
     }
 
-    private void uploadWayPointMission(){
+    private void uploadWayPointMission() {
         getWaypointMissionOperator().uploadMission(new CommonCallbacks.CompletionCallback() {
             @Override
             public void onResult(DJIError error) {
                 if (error == null) {
                     setResultToToast("Mission upload successfully!");
-                    try { Thread.sleep(1000); }
-                    catch (InterruptedException ex) { android.util.Log.d("Waypoint Mission", ex.toString()); }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        android.util.Log.d("Waypoint Mission", ex.toString());
+                    }
                     startWaypointMission();
                 } else {
                     setResultToToast("Mission upload failed, error: " + error.getDescription() + " retrying...");
@@ -604,21 +666,22 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                 }
             }
         });
-
     }
 
-    private void startWaypointMission(){
-
+    private void startWaypointMission() {
+        addListener();
         getWaypointMissionOperator().startMission(new CommonCallbacks.CompletionCallback() {
             @Override
             public void onResult(DJIError error) {
                 setResultToToast("Mission Start: " + (error == null ? "Successfully" : error.getDescription()));
-                if (error!=null){inOperation = false;}
+                if (error != null) {
+                    inOperation = false;
+                }
             }
         });
     }
 
-    private void stopWaypointMission(){
+    private void stopWaypointMission() {
 
         getWaypointMissionOperator().stopMission(new CommonCallbacks.CompletionCallback() {
             @Override
@@ -626,6 +689,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                 setResultToToast("Mission Stop: " + (error == null ? "Successfully" : error.getDescription()));
             }
         });
+        //if (markerWP!=null) {
+        //    markerWP.remove();
+        //}
         inOperation = false;
     }
 
@@ -645,6 +711,88 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
         viewPointUpdate(18.0f);
         //gMap.getUiSettings().setMyLocationButtonEnabled(true);
+    }
+
+
+    public class Adapter {
+
+        private ArrayList<double[]> WPs;
+        private final double accuracyThres = 10.0;
+        private Random random;
+
+        public Adapter() {
+            WPs = new ArrayList<>();
+            WPs.add(new double[]{41.142332, 24.883128, 15.0});
+            WPs.add(new double[]{41.137933, 24.879673, 15.0});
+            WPs.add(new double[]{41.139505, 24.886830, 15.0});
+            WPs.add(new double[]{41.140531, 24.889845, 15.0});
+            WPs.add(new double[]{41.140070, 24.893010, 15.0});
+            random = new Random();
+        }
+
+        public void RunAdapter() {
+            int randomNum = random.nextInt(WPs.size());
+            Goto(WPs.get(randomNum)[0], WPs.get(randomNum)[1], (float) WPs.get(randomNum)[2]);
+        }
+
+    }
+
+
+    class MyServerThread implements Runnable {
+        Socket s;
+        int portAndroid = 7801;
+        ServerSocket ss;
+        String message;
+
+
+        @Override
+        public void run() {
+            try {
+                ss = new ServerSocket(portAndroid);
+                while (true) {
+                    s = ss.accept();
+                    DatumReader datumReader = new GenericDatumReader(schemaGoto);
+                    GenericRecord gotoRecord = new GenericData.Record(schemaGoto);
+                    InputStream inputStream = s.getInputStream();
+                    DecoderFactory decoderFactory = new DecoderFactory();
+                    BinaryDecoder binaryDecoder = decoderFactory.binaryDecoder(inputStream, null);
+                    datumReader.read(gotoRecord, binaryDecoder);
+
+                    Goto((double) gotoRecord.get("latitude"), (double) gotoRecord.get("longitude"),
+                            (float) gotoRecord.get("altitude"));
+                }
+            } catch (IOException e) {
+                setResultToToast("Error in reading GOTO commands");
+            }
+        }
+    }
+
+    public class SchemaLoader {
+
+        private final Map<String, Schema> schemaMap = new HashMap<>();
+        private final Schema.Parser parser = new Schema.Parser();
+
+        public void load() {
+            try {
+                String[] schemasNames = getAssets().list("schemas");
+                for (String name: schemasNames) {
+                    String schemaIdWithOutExt = name.split("\\.")[0]; //remove extension
+                    Schema schema = parser.parse(getAssets().open("schemas/" +name));
+                    schemaMap.put(schemaIdWithOutExt, schema);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public GenericRecord createGenericRecord(final String schemaId) {
+            return new GenericData.Record(getSchema(schemaId));
+        }
+
+        private Schema getSchema(final String schemaId) {
+            return schemaMap.get(schemaId);
+        }
+
     }
 
 }
