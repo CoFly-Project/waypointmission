@@ -1,6 +1,7 @@
 package com.convcao.waypointmission;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -8,7 +9,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.SurfaceTexture;
+import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -42,13 +46,10 @@ import org.apache.avro.io.BinaryDecoder;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.DecoderFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -82,6 +83,7 @@ import dji.sdk.sdkmanager.DJISDKManager;
 public class MainActivity extends FragmentActivity implements TextureView.SurfaceTextureListener,
         View.OnClickListener, OnMapReadyCallback {
 
+    Handler handler = new Handler();
     protected static final String TAG = "WaypointMissionActivity";
     protected VideoFeeder.VideoDataCallback mReceivedVideoDataCallBack = null;
     // Codec for video live view
@@ -94,7 +96,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     private Button locate, gotoc, stop, adapterB;
 
-    private boolean inOperation = false;
+    public boolean inOperation = false;
 
     private double droneLocationLat = 181, droneLocationLng = 181;
     private float droneLocationAlt;
@@ -239,17 +241,13 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
 
         adapter = new Adapter();
-
-        Thread myThread = new Thread(new MyServerThread());
-        myThread.start();
-
+        Thread gotoThread = new Thread(new GoToListener());
+        gotoThread.start();
 
         schemaLoader = new SchemaLoader();
         schemaLoader.load();
         schemaGoto = schemaLoader.getSchema("goto");
         lastPublishLocationOn = System.currentTimeMillis();
-
-
     }
 
 
@@ -614,8 +612,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     private void Goto(double lat, double lon, float alt) {
         setResultToToast("GOTO: [" + lat + ", " + lon + "] with altitude: " + alt);
+        Log.d(TAG, "edw eimaste");
         inOperation = true;
-
         point2D = new LatLng(lat, lon);
         markWaypoint(point2D);
 
@@ -634,7 +632,29 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         Log.e(TAG, "speed " + mSpeed);
         Log.e(TAG, "mFinishedAction " + mFinishedAction);
         Log.e(TAG, "mHeadingMode " + mHeadingMode);
-        configWayPointMission();
+
+        FA.setCollisionAvoidanceEnabled(true, null);
+        FA.setActiveObstacleAvoidanceEnabled(true, null);
+
+        Waypoint fakeWP = new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt);
+        waypointMissionBuilder = new WaypointMission.Builder().finishedAction(mFinishedAction)
+                .headingMode(mHeadingMode)
+                .autoFlightSpeed(mSpeed)
+                .maxFlightSpeed(mSpeed)
+                .flightPathMode(WaypointMissionFlightPathMode.NORMAL).addWaypoint(fakeWP).addWaypoint(WP);
+                //.addWaypoint(fakeWP)
+                //.waypointCount(2);
+
+        //setResultToToast();
+
+        DJIError error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
+        if (error == null) {
+            setResultToToast("Waypoint loaded successfully");
+            uploadWayPointMission();
+        } else {
+            setResultToToast("loadMission failed with:" + error.getDescription());
+            inOperation = false;
+        }
     }
 
 
@@ -752,38 +772,12 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     }
 
 
-    class MyServerThread implements Runnable {
+    class GoToListener implements Runnable {
         Socket s;
         int portAndroid = 7801;
         ServerSocket ss;
         String message;
 
-        /*
-        InputStreamReader isr;
-        BufferedReader bufferedReader;
-
-        @Override
-        public void run() {
-            try {
-                ss = new ServerSocket(portAndroid);
-                while (true) {
-                    s = ss.accept();
-                    isr = new InputStreamReader(s.getInputStream());
-                    bufferedReader = new BufferedReader(isr);
-                    message = bufferedReader.readLine();
-
-                    double gotoLat = Double.parseDouble(message.split(",")[0].split("\\[")[1]);
-                    double gotoLon = Double.parseDouble(message.split(",")[1]);
-                    float gotoAlt = Float.parseFloat(message.split(",")[2].split("\\]")[0]);
-
-                    setResultToToast(message);
-                    Goto(gotoLat, gotoLon, gotoAlt);
-                }
-            } catch (IOException e) {
-                setResultToToast("Error in reading GOTO commands");
-            }
-        }
-        */
 
         @Override
         public void run() {
@@ -799,6 +793,26 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     datumReader.read(gotoRecord, binaryDecoder);
 
                     setResultToToast(gotoRecord.toString());
+
+                    double gotoLat = (double) gotoRecord.get("latitude");
+                    double gotoLon = (double) gotoRecord.get("longitude");
+                    float gotoAlt = (float) gotoRecord.get("altitude");
+
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            stopWaypointMission();
+                            try {
+                                Thread.sleep(2000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            Goto(gotoLat, gotoLon, gotoAlt);
+                        }
+                    });
+
+
+                    //Goto(gotoLat, gotoLon, gotoAlt);
                     //Goto((double) gotoRecord.get("latitude"), (double) gotoRecord.get("longitude"),
                     //        (float) gotoRecord.get("altitude"));
                 }
