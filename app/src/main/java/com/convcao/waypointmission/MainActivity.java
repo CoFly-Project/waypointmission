@@ -48,6 +48,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -121,6 +122,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private DispatchMessage dispatchMessage;
     private Schema schemaGoto;
 
+    private final long publishPeriod = 1000;
+    private long lastPublishLocationOn;
 
     @Override
     protected void onResume() {
@@ -236,12 +239,17 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
 
         adapter = new Adapter();
+
         Thread myThread = new Thread(new MyServerThread());
         myThread.start();
+
 
         schemaLoader = new SchemaLoader();
         schemaLoader.load();
         schemaGoto = schemaLoader.getSchema("goto");
+        lastPublishLocationOn = System.currentTimeMillis();
+
+
     }
 
 
@@ -335,8 +343,11 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     droneRotation = djiFlightControllerCurrentState.getAircraftHeadDirection();
                     updateDroneLocation();
 
-                    if (!Double.isNaN(droneLocationLat) && !Double.isNaN(droneLocationLng) && !Double.isNaN(droneLocationAlt)) {
-                        publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt);
+                    long currentTime = System.currentTimeMillis();
+                    if (!Double.isNaN(droneLocationLat) && !Double.isNaN(droneLocationLng) && !Double.isNaN(droneLocationAlt) &&
+                            (currentTime - lastPublishLocationOn) >= publishPeriod) {
+                        lastPublishLocationOn = currentTime;
+                        publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt, currentTime);
                     }
                 }
             });
@@ -345,16 +356,19 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
 
     //Send GenericRecord location to the server
-    private void publishLocation(double locationLat, double locationLon, float alt){
+    private void publishLocation(double locationLat, double locationLon, float alt, long time) {
         GenericRecord location = schemaLoader.createGenericRecord("location");
         location.put("sourceSystem", "dji.phantom.4.pro.hawk.1");
-        location.put("time", System.currentTimeMillis());
+        location.put("time", time);
         location.put("latitude", locationLat);
         location.put("longitude", locationLon);
         location.put("altitude", alt);
 
         dispatchMessage = new DispatchMessage(schemaLoader.getSchema("location"));
         dispatchMessage.execute(location);
+
+        //dispatchMessage = new DispatchMessage();
+        //dispatchMessage.execute("Location: [" + locationLat + "," + locationLon + "," + alt + "]");
     }
 
     //Add Listener for WaypointMissionOperator
@@ -744,6 +758,32 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         ServerSocket ss;
         String message;
 
+        /*
+        InputStreamReader isr;
+        BufferedReader bufferedReader;
+
+        @Override
+        public void run() {
+            try {
+                ss = new ServerSocket(portAndroid);
+                while (true) {
+                    s = ss.accept();
+                    isr = new InputStreamReader(s.getInputStream());
+                    bufferedReader = new BufferedReader(isr);
+                    message = bufferedReader.readLine();
+
+                    double gotoLat = Double.parseDouble(message.split(",")[0].split("\\[")[1]);
+                    double gotoLon = Double.parseDouble(message.split(",")[1]);
+                    float gotoAlt = Float.parseFloat(message.split(",")[2].split("\\]")[0]);
+
+                    setResultToToast(message);
+                    Goto(gotoLat, gotoLon, gotoAlt);
+                }
+            } catch (IOException e) {
+                setResultToToast("Error in reading GOTO commands");
+            }
+        }
+        */
 
         @Override
         public void run() {
@@ -758,13 +798,15 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     BinaryDecoder binaryDecoder = decoderFactory.binaryDecoder(inputStream, null);
                     datumReader.read(gotoRecord, binaryDecoder);
 
-                    Goto((double) gotoRecord.get("latitude"), (double) gotoRecord.get("longitude"),
-                            (float) gotoRecord.get("altitude"));
+                    setResultToToast(gotoRecord.toString());
+                    //Goto((double) gotoRecord.get("latitude"), (double) gotoRecord.get("longitude"),
+                    //        (float) gotoRecord.get("altitude"));
                 }
             } catch (IOException e) {
                 setResultToToast("Error in reading GOTO commands");
             }
         }
+
     }
 
     public class SchemaLoader {
@@ -775,9 +817,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         public void load() {
             try {
                 String[] schemasNames = getAssets().list("schemas");
-                for (String name: schemasNames) {
+                for (String name : schemasNames) {
                     String schemaIdWithOutExt = name.split("\\.")[0]; //remove extension
-                    Schema schema = parser.parse(getAssets().open("schemas/" +name));
+                    Schema schema = parser.parse(getAssets().open("schemas/" + name));
                     schemaMap.put(schemaIdWithOutExt, schema);
                 }
             } catch (IOException e) {
