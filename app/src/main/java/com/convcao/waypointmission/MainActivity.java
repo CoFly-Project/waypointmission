@@ -46,6 +46,7 @@ import org.apache.avro.io.BinaryDecoder;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.DecoderFactory;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
@@ -53,6 +54,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Random;
 
 import dji.common.flightcontroller.FlightControllerState;
@@ -126,6 +128,11 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     private final long publishPeriod = 1000;
     private long lastPublishLocationOn;
+
+    private String server_ip;
+    private int server_port;
+    private int android_port;
+    private String droneCanonicalName;
 
     @Override
     protected void onResume() {
@@ -241,7 +248,35 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
 
         adapter = new Adapter();
-        Thread gotoThread = new Thread(new GoToListener());
+
+
+        Properties props = new Properties();
+        InputStream input = null;
+        try {
+
+            input = getAssets().open("properties/Parameters.properties");
+
+            // load a properties file
+            props.load(input);
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        server_ip = props.getProperty("server_ip");
+        server_port = Integer.parseInt(props.getProperty("server_port"));
+        android_port = Integer.parseInt(props.getProperty("port"));
+        droneCanonicalName = props.getProperty("canonical_name");
+
+        Thread gotoThread = new Thread(new GoToListener(Integer.parseInt(props.getProperty("port"))));
         gotoThread.start();
 
         schemaLoader = new SchemaLoader();
@@ -356,13 +391,13 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     //Send GenericRecord location to the server
     private void publishLocation(double locationLat, double locationLon, float alt, long time) {
         GenericRecord location = schemaLoader.createGenericRecord("location");
-        location.put("sourceSystem", "dji.phantom.4.pro.hawk.1");
+        location.put("sourceSystem", droneCanonicalName);
         location.put("time", time);
         location.put("latitude", locationLat);
         location.put("longitude", locationLon);
         location.put("altitude", alt);
 
-        dispatchMessage = new DispatchMessage(schemaLoader.getSchema("location"));
+        dispatchMessage = new DispatchMessage(schemaLoader.getSchema("location"), server_ip, server_port);
         dispatchMessage.execute(location);
 
         //dispatchMessage = new DispatchMessage();
@@ -612,7 +647,6 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     private void Goto(double lat, double lon, float alt) {
         setResultToToast("GOTO: [" + lat + ", " + lon + "] with altitude: " + alt);
-        Log.d(TAG, "edw eimaste");
         inOperation = true;
         point2D = new LatLng(lat, lon);
         markWaypoint(point2D);
@@ -642,45 +676,19 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                 .autoFlightSpeed(mSpeed)
                 .maxFlightSpeed(mSpeed)
                 .flightPathMode(WaypointMissionFlightPathMode.NORMAL).addWaypoint(fakeWP).addWaypoint(WP);
-                //.addWaypoint(fakeWP)
-                //.waypointCount(2);
-
-        //setResultToToast();
+        //.addWaypoint(fakeWP)
+        //.waypointCount(2);
 
         DJIError error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
-        if (error == null) {
+        if (error == null){
             setResultToToast("Waypoint loaded successfully");
             uploadWayPointMission();
-        } else {
+        }else {
             setResultToToast("loadMission failed with:" + error.getDescription());
             inOperation = false;
         }
     }
 
-
-    private void configWayPointMission() {
-        FA.setCollisionAvoidanceEnabled(true, null);
-        FA.setActiveObstacleAvoidanceEnabled(true, null);
-
-        Waypoint fakeWP = new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt);
-        waypointMissionBuilder = new WaypointMission.Builder().finishedAction(mFinishedAction)
-                .headingMode(mHeadingMode)
-                .autoFlightSpeed(mSpeed)
-                .maxFlightSpeed(mSpeed)
-                .flightPathMode(WaypointMissionFlightPathMode.NORMAL)
-                .addWaypoint(fakeWP)
-                .addWaypoint(WP)
-                .waypointCount(2);
-
-        DJIError error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
-        if (error == null) {
-            setResultToToast("Waypoint loaded successfully");
-            uploadWayPointMission();
-        } else {
-            setResultToToast("loadMission failed with:" + error.getDescription());
-            inOperation = false;
-        }
-    }
 
     private void uploadWayPointMission() {
         getWaypointMissionOperator().uploadMission(new CommonCallbacks.CompletionCallback() {
@@ -774,10 +782,13 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     class GoToListener implements Runnable {
         Socket s;
-        int portAndroid = 7801;
+        int portAndroid;
         ServerSocket ss;
         String message;
 
+        GoToListener(int portAndroid) {
+            this.portAndroid = portAndroid;
+        }
 
         @Override
         public void run() {
@@ -793,6 +804,12 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     datumReader.read(gotoRecord, binaryDecoder);
 
                     setResultToToast(gotoRecord.toString());
+
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
 
                     double gotoLat = (double) gotoRecord.get("latitude");
                     double gotoLon = (double) gotoRecord.get("longitude");

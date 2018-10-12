@@ -5,6 +5,11 @@
   "doc": "Command a system to move to a given location at a given speed",
   "fields": [
       {
+              "name": "destinationSystem",
+              "type": "string",
+              "doc": "Canonical name of the destination system"
+      },
+      {
           "name": "sourceSystem",
           "type": "string",
           "doc": "Canonical name of the originating system"

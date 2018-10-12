@@ -16,13 +16,15 @@ import java.net.Socket;
 public class DispatchMessage extends AsyncTask<GenericRecord, Void, Void> {
 
     private Socket client;
-    private static final String server_ip = "192.168.1.130";
-    private static final int port = 7800;
+    private String server_ip;
+    private int port;
     private DatumWriter datumWriter;
 
 
-    public DispatchMessage(Schema schema) {
-        datumWriter = new GenericDatumWriter(schema);
+    public DispatchMessage(Schema schema, String server_ip, int port) {
+        this.datumWriter = new GenericDatumWriter(schema);
+        this.server_ip = server_ip;
+        this.port = port;
     }
 
 
