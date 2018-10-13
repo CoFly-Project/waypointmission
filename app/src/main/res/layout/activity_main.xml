@@ -57,18 +57,32 @@
     <LinearLayout
         android:id="@+id/buttons"
         android:layout_width="match_parent"
-        android:layout_height="41dp"
+        android:layout_height="53dp"
         android:layout_below="@id/signal"
         android:orientation="horizontal"
-        android:background="@color/dark_gray">
+        android:background="@color/dark_gray"
+        android:padding="7dp">
+
+
+
+        <dji.ux.widget.TakeOffWidget
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp" />
+
+        <dji.ux.widget.ReturnHomeWidget
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="12dp" />
 
         <Switch
             android:id="@+id/adapter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
-            android:text="Arm" />
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:text="ARM" />
 
         <Button
             android:id="@+id/gotoc"
@@ -97,8 +111,8 @@
             android:cropToPadding="false"
             android:scaleType="fitXY"
             android:contentDescription="Locate"
-            android:layout_marginEnd="4dp"
-            android:layout_marginStart="4dp"/>
+            android:layout_marginEnd="10dp"
+            android:layout_marginStart="10dp"/>
     </LinearLayout>
 
 
@@ -149,25 +163,6 @@
             android:layout_height="94dp" />
     </LinearLayout>
 
-
-    <!--Take off and return home buttons on left -->
-    <LinearLayout
-        android:layout_width="40dp"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="12dp"
-        android:orientation="vertical">
-
-        <dji.ux.widget.TakeOffWidget
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginBottom="12dp" />
-
-        <dji.ux.widget.ReturnHomeWidget
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="12dp" />
-    </LinearLayout>
 
     <!-- Pre-flight checklist panel -->
     <dji.ux.panel.PreFlightCheckListPanel
