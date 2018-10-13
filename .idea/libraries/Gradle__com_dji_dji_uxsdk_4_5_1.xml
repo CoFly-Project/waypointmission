@@ -1,11 +1,11 @@
 <component name="libraryTable">
   <library name="Gradle: com.dji:dji-uxsdk-4.5.1">
     <ANNOTATIONS>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/dji-uxsdk-4.5.1.aar/92178e93f79819d79cba6b15da6ad8be/annotations.zip!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/dji-uxsdk-4.5.1.aar/9dde80cbb5239f7669f94f957eea03a4/annotations.zip!/" />
     </ANNOTATIONS>
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/dji-uxsdk-4.5.1.aar/92178e93f79819d79cba6b15da6ad8be/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/dji-uxsdk-4.5.1.aar/92178e93f79819d79cba6b15da6ad8be/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/dji-uxsdk-4.5.1.aar/9dde80cbb5239f7669f94f957eea03a4/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/dji-uxsdk-4.5.1.aar/9dde80cbb5239f7669f94f957eea03a4/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

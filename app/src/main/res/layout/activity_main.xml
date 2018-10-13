@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" -->
+<?xml version="1.0" encoding="utf-8"?><!--<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:custom="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -57,57 +56,68 @@
 
     <LinearLayout
         android:id="@+id/buttons"
-        android:layout_below="@id/signal"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:orientation="horizontal">
+        android:layout_height="41dp"
+        android:layout_below="@id/signal"
+        android:orientation="horizontal"
+        android:background="@color/dark_gray">
 
-        <Button
-            android:id="@+id/locate"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="Locate" />
+        <Switch
+            android:id="@+id/adapter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:text="Arm" />
 
         <Button
             android:id="@+id/gotoc"
+            android:clickable="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Go to" />
 
         <Button
-            android:id="@+id/adapter"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Adapter" />
-
-        <Button
             android:id="@+id/stop"
+            android:clickable="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Abort" />
+            android:text="Abort"
+            android:theme="@style/AppTheme.StopButton" />
+
+        <ImageButton
+            android:id="@+id/locate"
+            android:layout_width="41dp"
+            android:layout_height="41dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/gps_position_target"
+            android:adjustViewBounds="true"
+            android:cropToPadding="false"
+            android:scaleType="fitXY"
+            android:contentDescription="Locate"
+            android:layout_marginEnd="4dp"
+            android:layout_marginStart="4dp"/>
     </LinearLayout>
 
 
     <fragment
         android:id="@+id/map"
         class="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_below="@id/buttons"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/buttons"
         custom:layout_constraintBottom_toBottomOf="parent"
         custom:layout_constraintStart_toStartOf="parent"
         custom:layout_constraintTop_toTopOf="parent" />
 
     <dji.ux.widget.RemainingFlightTimeWidget
         android:id="@+id/RemainingFlightTime"
-        android:layout_below="@id/buttons"
         android:layout_width="match_parent"
-        android:background="@color/transparent"
-        android:layout_height="20dp"/>
+        android:layout_height="20dp"
+        android:layout_below="@id/buttons"
+        android:background="@color/transparent" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -121,7 +131,7 @@
             android:layout_width="405dp"
             android:layout_height="91dp"
             android:layout_marginRight="12dp"
-            tools:ignore="RtlHardcoded"/>
+            tools:ignore="RtlHardcoded" />
 
     </LinearLayout>
 
@@ -129,8 +139,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/RemainingFlightTime"
-        android:orientation="horizontal"
         android:gravity="right"
+        android:orientation="horizontal"
         android:padding="12dp">
 
         <TextureView
@@ -138,9 +148,6 @@
             android:layout_width="181dp"
             android:layout_height="94dp" />
     </LinearLayout>
-
-
-
 
 
     <!--Take off and return home buttons on left -->
@@ -154,12 +161,12 @@
         <dji.ux.widget.TakeOffWidget
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="12dp" />
 
         <dji.ux.widget.ReturnHomeWidget
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginTop="12dp"/>
+            android:layout_marginTop="12dp" />
     </LinearLayout>
 
     <!-- Pre-flight checklist panel -->
@@ -167,8 +174,8 @@
         android:layout_width="400dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/signal"
-        custom:excludeItem="aircraftBatteryTemperature|ESCStatus"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        custom:excludeItem="aircraftBatteryTemperature|ESCStatus" />
 
 
     <!--

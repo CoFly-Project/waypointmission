@@ -12,7 +12,6 @@ import android.graphics.SurfaceTexture;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -22,8 +21,11 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,16 +48,13 @@ import org.apache.avro.io.BinaryDecoder;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.DecoderFactory;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Random;
 
 import dji.common.flightcontroller.FlightControllerState;
 import dji.common.mission.waypoint.Waypoint;
@@ -96,11 +95,13 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     private FlightAssistant FA = new FlightAssistant();
 
-    private Button locate, gotoc, stop, adapterB;
+    private Switch adapterB;
+    private ImageButton locate;
+    private Button gotoc, stop;
 
     public boolean inOperation = false;
 
-    private double droneLocationLat = 181, droneLocationLng = 181;
+    private double droneLocationLat = 181, droneLocationLng = 181, minimumArmHeight;
     private float droneLocationAlt;
     private float droneRotation = 0f;
 
@@ -108,6 +109,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private Marker markerWP = null;
     private Marker droneMarker = null;
     private LatLngBounds bounds = null;
+    LatLngBounds.Builder builder;
 
     //private float altitude = 100.0f;
     private float mSpeed = 10.0f;
@@ -122,12 +124,12 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
 
     private SchemaLoader schemaLoader;
-    private Adapter adapter;
     private DispatchMessage dispatchMessage;
     private Schema schemaGoto;
 
-    private final long publishPeriod = 1000;
+    private long publishPeriod;
     private long lastPublishLocationOn;
+    private int mapPadding;
 
     private String server_ip;
     private int server_port;
@@ -181,15 +183,32 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             mVideoSurface.setSurfaceTextureListener(this);
         }
 
-        locate = (Button) findViewById(R.id.locate);
+        locate = (ImageButton) findViewById(R.id.locate);
         gotoc = (Button) findViewById(R.id.gotoc);
-        adapterB = (Button) findViewById(R.id.adapter);
+        adapterB = (Switch) findViewById(R.id.adapter);
         stop = (Button) findViewById(R.id.stop);
 
         locate.setOnClickListener(this);
         gotoc.setOnClickListener(this);
-        adapterB.setOnClickListener(this);
         stop.setOnClickListener(this);
+
+
+        gotoc.setEnabled(false);
+        adapterB.setEnabled(false);
+        stop.setEnabled(false);
+
+        adapterB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    gotoc.setEnabled(true);
+                    stop.setEnabled(true);
+                } else {
+                    gotoc.setEnabled(false);
+                    stop.setEnabled(false);
+                }
+            }
+        });
+
     }
 
 
@@ -247,9 +266,6 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         mapFragment.getMapAsync(this);
 
 
-        adapter = new Adapter();
-
-
         Properties props = new Properties();
         InputStream input = null;
         try {
@@ -271,10 +287,15 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             }
         }
 
+        builder = new LatLngBounds.Builder();
+
         server_ip = props.getProperty("server_ip");
         server_port = Integer.parseInt(props.getProperty("server_port"));
         android_port = Integer.parseInt(props.getProperty("port"));
         droneCanonicalName = props.getProperty("canonical_name");
+        minimumArmHeight = Double.parseDouble(props.getProperty("minimum_height_to_arm"));
+        mapPadding = Integer.parseInt(props.getProperty("map_padding"));
+        publishPeriod = Long.parseLong(props.getProperty("publish_location_period"));
 
         Thread gotoThread = new Thread(new GoToListener(Integer.parseInt(props.getProperty("port"))));
         gotoThread.start();
@@ -377,8 +398,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     updateDroneLocation();
 
                     long currentTime = System.currentTimeMillis();
-                    if (!Double.isNaN(droneLocationLat) && !Double.isNaN(droneLocationLng) && !Double.isNaN(droneLocationAlt) &&
-                            (currentTime - lastPublishLocationOn) >= publishPeriod) {
+                    if (adapterB.isChecked() && (currentTime - lastPublishLocationOn) >= publishPeriod) {
                         lastPublishLocationOn = currentTime;
                         publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt, currentTime);
                     }
@@ -399,9 +419,6 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
         dispatchMessage = new DispatchMessage(schemaLoader.getSchema("location"), server_ip, server_port);
         dispatchMessage.execute(location);
-
-        //dispatchMessage = new DispatchMessage();
-        //dispatchMessage.execute("Location: [" + locationLat + "," + locationLon + "," + alt + "]");
     }
 
     //Add Listener for WaypointMissionOperator
@@ -440,7 +457,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
         @Override
         public void onExecutionFinish(@Nullable final DJIError error) {
-            setResultToToast("Execution finished: " + (error == null ? "Success!" : error.getDescription()));
+            //setResultToToast("Execution finished: " + (error == null ? "Success!" : error.getDescription()));
             //if (markerWP != null) {
             //    markerWP.remove();
             //}
@@ -476,6 +493,13 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                if (droneLocationAlt >= minimumArmHeight) {
+                    adapterB.setEnabled(true);
+                }else{
+                    adapterB.setChecked(false);
+                    adapterB.setEnabled(false);
+                }
+
                 if (droneMarker != null) {
                     droneMarker.remove();
                 }
@@ -483,7 +507,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                 if (checkGpsCoordination(droneLocationLat, droneLocationLng)) {
                     droneMarker = gMap.addMarker(markerOptions);
                     if (inOperation)
-                        viewPointFitBounds(190);
+                        viewPointFitBounds(mapPadding);
                     else
                         viewPointUpdate();
                 }
@@ -514,10 +538,6 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             }
             case R.id.stop: {
                 stopWaypointMission();
-                break;
-            }
-            case R.id.adapter: {
-                adapter.RunAdapter();
                 break;
             }
             default:
@@ -652,7 +672,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         markWaypoint(point2D);
 
         bounds = null;
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        //LatLngBounds.Builder builder = new LatLngBounds.Builder();
         //Include current possition
         builder.include(new LatLng(droneLocationLat, droneLocationLng));
         //Include the desired waypoint location
@@ -680,11 +700,11 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         //.waypointCount(2);
 
         DJIError error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
-        if (error == null){
-            setResultToToast("Waypoint loaded successfully");
+        if (error == null) {
+            //setResultToToast("Waypoint loaded successfully");
             uploadWayPointMission();
-        }else {
-            setResultToToast("loadMission failed with:" + error.getDescription());
+        } else {
+            //setResultToToast("loadMission failed with:" + error.getDescription());
             inOperation = false;
         }
     }
@@ -695,7 +715,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             @Override
             public void onResult(DJIError error) {
                 if (error == null) {
-                    setResultToToast("Mission upload successfully!");
+                    //setResultToToast("Mission upload successfully!");
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException ex) {
@@ -703,7 +723,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     }
                     startWaypointMission();
                 } else {
-                    setResultToToast("Mission upload failed, error: " + error.getDescription() + " retrying...");
+                    //setResultToToast("Mission upload failed, error: " + error.getDescription() + " retrying...");
                     getWaypointMissionOperator().retryUploadMission(null);
                 }
             }
@@ -715,7 +735,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         getWaypointMissionOperator().startMission(new CommonCallbacks.CompletionCallback() {
             @Override
             public void onResult(DJIError error) {
-                setResultToToast("Mission Start: " + (error == null ? "Successfully" : error.getDescription()));
+                //setResultToToast("Mission Start: " + (error == null ? "Successfully" : error.getDescription()));
                 if (error != null) {
                     inOperation = false;
                 }
@@ -728,7 +748,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         getWaypointMissionOperator().stopMission(new CommonCallbacks.CompletionCallback() {
             @Override
             public void onResult(DJIError error) {
-                setResultToToast("Mission Stop: " + (error == null ? "Successfully" : error.getDescription()));
+                //setResultToToast("Mission Stop: " + (error == null ? "Successfully" : error.getDescription()));
             }
         });
         //if (markerWP!=null) {
@@ -755,31 +775,6 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         //gMap.getUiSettings().setMyLocationButtonEnabled(true);
     }
 
-
-    public class Adapter {
-
-        private ArrayList<double[]> WPs;
-        private final double accuracyThres = 10.0;
-        private Random random;
-
-        public Adapter() {
-            WPs = new ArrayList<>();
-            WPs.add(new double[]{41.142332, 24.883128, 15.0});
-            WPs.add(new double[]{41.137933, 24.879673, 15.0});
-            WPs.add(new double[]{41.139505, 24.886830, 15.0});
-            WPs.add(new double[]{41.140531, 24.889845, 15.0});
-            WPs.add(new double[]{41.140070, 24.893010, 15.0});
-            random = new Random();
-        }
-
-        public void RunAdapter() {
-            int randomNum = random.nextInt(WPs.size());
-            Goto(WPs.get(randomNum)[0], WPs.get(randomNum)[1], (float) WPs.get(randomNum)[2]);
-        }
-
-    }
-
-
     class GoToListener implements Runnable {
         Socket s;
         int portAndroid;
@@ -803,32 +798,34 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     BinaryDecoder binaryDecoder = decoderFactory.binaryDecoder(inputStream, null);
                     datumReader.read(gotoRecord, binaryDecoder);
 
-                    setResultToToast(gotoRecord.toString());
+                    //setResultToToast(gotoRecord.toString());
 
                     try {
-                        Thread.sleep(3000);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
 
-                    double gotoLat = (double) gotoRecord.get("latitude");
-                    double gotoLon = (double) gotoRecord.get("longitude");
-                    float gotoAlt = (float) gotoRecord.get("altitude");
+                    if (adapterB.isChecked()) { //Check if the drone is armed
 
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            stopWaypointMission();
-                            try {
-                                Thread.sleep(2000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
+                        double gotoLat = (double) gotoRecord.get("latitude");
+                        double gotoLon = (double) gotoRecord.get("longitude");
+                        float gotoAlt = (float) gotoRecord.get("altitude");
+
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                stopWaypointMission();
+                                try {
+                                    Thread.sleep(2000);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                                Goto(gotoLat, gotoLon, gotoAlt);
                             }
-                            Goto(gotoLat, gotoLon, gotoAlt);
-                        }
-                    });
+                        });
 
-
+                    }
                     //Goto(gotoLat, gotoLon, gotoAlt);
                     //Goto((double) gotoRecord.get("latitude"), (double) gotoRecord.get("longitude"),
                     //        (float) gotoRecord.get("altitude"));

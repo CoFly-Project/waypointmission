@@ -8,4 +8,13 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="AppTheme.StopButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="colorButtonNormal">@color/red_dark</item>
+    </style>
+
+    <style name="AppTheme.ArmButton" parent="Widget.AppCompat.CompoundButton.Switch">
+        <item name="colorAccent">@color/colorPrimaryDark</item>
+    </style>
+
+
 </resources>
