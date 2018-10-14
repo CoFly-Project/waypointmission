@@ -95,7 +95,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     private FlightAssistant FA = new FlightAssistant();
 
-    private Switch adapterB;
+    private Switch switchB;
     private ImageButton locate;
     private Button gotoc, stop;
 
@@ -135,6 +135,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private int server_port;
     private int android_port;
     private String droneCanonicalName;
+
+    //private WaypointNavigation adapter;
 
     @Override
     protected void onResume() {
@@ -185,7 +187,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
         locate = (ImageButton) findViewById(R.id.locate);
         gotoc = (Button) findViewById(R.id.gotoc);
-        adapterB = (Switch) findViewById(R.id.adapter);
+        switchB = (Switch) findViewById(R.id.arm);
         stop = (Button) findViewById(R.id.stop);
 
         locate.setOnClickListener(this);
@@ -194,10 +196,10 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
 
         gotoc.setEnabled(false);
-        adapterB.setEnabled(false);
+        switchB.setEnabled(false);
         stop.setEnabled(false);
 
-        adapterB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        switchB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     gotoc.setEnabled(true);
@@ -304,6 +306,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         schemaLoader.load();
         schemaGoto = schemaLoader.getSchema("goto");
         lastPublishLocationOn = System.currentTimeMillis();
+
+        //adapter = new WaypointNavigation();
     }
 
 
@@ -398,7 +402,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     updateDroneLocation();
 
                     long currentTime = System.currentTimeMillis();
-                    if (adapterB.isChecked() && (currentTime - lastPublishLocationOn) >= publishPeriod) {
+                    if (switchB.isChecked() && (currentTime - lastPublishLocationOn) >= publishPeriod) {
                         lastPublishLocationOn = currentTime;
                         publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt, currentTime);
                     }
@@ -494,10 +498,10 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             @Override
             public void run() {
                 if (droneLocationAlt >= minimumArmHeight) {
-                    adapterB.setEnabled(true);
+                    switchB.setEnabled(true);
                 }else{
-                    adapterB.setChecked(false);
-                    adapterB.setEnabled(false);
+                    switchB.setChecked(false);
+                    switchB.setEnabled(false);
                 }
 
                 if (droneMarker != null) {
@@ -537,6 +541,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                 break;
             }
             case R.id.stop: {
+                //adapter.stopWaypointMission();
                 stopWaypointMission();
                 break;
             }
@@ -635,6 +640,10 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                         double longitude = Double.parseDouble(wpLongitude_TV.getText().toString());
                         int altitude = Integer.parseInt(nulltoIntegerDefalt(altitudeString));
 
+                        PrepareMap(latitude, longitude);
+                        //adapter.stopWaypointMission();
+                        //adapter.Goto(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
+                        //        new Waypoint(latitude, longitude, altitude), mSpeed);
                         Goto(latitude, longitude, altitude);
                     }
 
@@ -664,9 +673,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         return true;
     }
 
-
-    private void Goto(double lat, double lon, float alt) {
-        setResultToToast("GOTO: [" + lat + ", " + lon + "] with altitude: " + alt);
+    private void PrepareMap(double lat, double lon) {
         inOperation = true;
         point2D = new LatLng(lat, lon);
         markWaypoint(point2D);
@@ -678,8 +685,13 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         //Include the desired waypoint location
         builder.include(point2D);
         bounds = builder.build();
+    }
 
-        WP = new Waypoint(point2D.latitude, point2D.longitude, alt);
+
+    private void Goto(double lat, double lon, float alt) {
+        setResultToToast("GOTO: [" + lat + ", " + lon + "] with altitude: " + alt);
+
+        WP = new Waypoint(lat, lon, alt);
 
         Log.e(TAG, "Point (2D) :" + point2D.toString());
         Log.e(TAG, "altitude " + alt);
@@ -806,7 +818,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                         e.printStackTrace();
                     }
 
-                    if (adapterB.isChecked()) { //Check if the drone is armed
+                    if (switchB.isChecked()) { //Check if the drone is armed
 
                         double gotoLat = (double) gotoRecord.get("latitude");
                         double gotoLon = (double) gotoRecord.get("longitude");
@@ -816,11 +828,17 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                             @Override
                             public void run() {
                                 stopWaypointMission();
+                                //adapter.stopWaypointMission();
                                 try {
                                     Thread.sleep(2000);
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
+
+                                PrepareMap(gotoLat, gotoLon);
+
+                                //adapter.Goto(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
+                                //        new Waypoint(gotoLat, gotoLon, gotoAlt), mSpeed);
                                 Goto(gotoLat, gotoLon, gotoAlt);
                             }
                         });
