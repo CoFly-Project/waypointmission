@@ -12,6 +12,7 @@ import android.graphics.SurfaceTexture;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -136,7 +137,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private int android_port;
     private String droneCanonicalName;
 
-    //private WaypointNavigation adapter;
+    private WaypointNavigation WPAdapter;
+
+    private boolean not_started, not_stopped;
 
     @Override
     protected void onResume() {
@@ -154,7 +157,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     @Override
     protected void onDestroy() {
         unregisterReceiver(mReceiver);
-        removeListener();
+        //removeListener();
         uninitPreviewer();
         super.onDestroy();
     }
@@ -307,7 +310,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         schemaGoto = schemaLoader.getSchema("goto");
         lastPublishLocationOn = System.currentTimeMillis();
 
-        //adapter = new WaypointNavigation();
+        WPAdapter = new WaypointNavigation();
+
     }
 
 
@@ -425,6 +429,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         dispatchMessage.execute(location);
     }
 
+
+    /*
     //Add Listener for WaypointMissionOperator
     private void addListener() {
         if (getWaypointMissionOperator() != null) {
@@ -437,6 +443,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             getWaypointMissionOperator().removeListener(eventNotificationListener);
         }
     }
+
 
     private WaypointMissionOperatorListener eventNotificationListener = new WaypointMissionOperatorListener() {
         @Override
@@ -459,6 +466,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
         }
 
+
         @Override
         public void onExecutionFinish(@Nullable final DJIError error) {
             //setResultToToast("Execution finished: " + (error == null ? "Success!" : error.getDescription()));
@@ -468,7 +476,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             inOperation = false;
         }
 
-    };
+    };*/
 
     public WaypointMissionOperator getWaypointMissionOperator() {
         if (instance == null) {
@@ -499,7 +507,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             public void run() {
                 if (droneLocationAlt >= minimumArmHeight) {
                     switchB.setEnabled(true);
-                }else{
+                } else {
                     switchB.setChecked(false);
                     switchB.setEnabled(false);
                 }
@@ -644,6 +652,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                         //adapter.stopWaypointMission();
                         //adapter.Goto(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
                         //        new Waypoint(latitude, longitude, altitude), mSpeed);
+                        stopWaypointMission();
                         Goto(latitude, longitude, altitude);
                     }
 
@@ -674,7 +683,10 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     }
 
     private void PrepareMap(double lat, double lon) {
-        inOperation = true;
+        if (markerWP != null) {
+            markerWP.remove();
+        }
+
         point2D = new LatLng(lat, lon);
         markWaypoint(point2D);
 
@@ -690,7 +702,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     private void Goto(double lat, double lon, float alt) {
         setResultToToast("GOTO: [" + lat + ", " + lon + "] with altitude: " + alt);
-
+        inOperation = true;
         WP = new Waypoint(lat, lon, alt);
 
         Log.e(TAG, "Point (2D) :" + point2D.toString());
@@ -710,8 +722,16 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                 .flightPathMode(WaypointMissionFlightPathMode.NORMAL).addWaypoint(fakeWP).addWaypoint(WP);
         //.addWaypoint(fakeWP)
         //.waypointCount(2);
+        DJIError error = DJIError.COMMON_UNKNOWN;
+        while (error != null) {
+            error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
-        DJIError error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
         if (error == null) {
             //setResultToToast("Waypoint loaded successfully");
             uploadWayPointMission();
@@ -733,7 +753,15 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     } catch (InterruptedException ex) {
                         android.util.Log.d("Waypoint Mission", ex.toString());
                     }
-                    startWaypointMission();
+                    not_started = true;
+                    while (not_started) {
+                        startWaypointMission();
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException ex) {
+                            android.util.Log.d("Waypoint Mission", ex.toString());
+                        }
+                    }
                 } else {
                     //setResultToToast("Mission upload failed, error: " + error.getDescription() + " retrying...");
                     getWaypointMissionOperator().retryUploadMission(null);
@@ -743,30 +771,51 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     }
 
     private void startWaypointMission() {
-        addListener();
+        //addListener();
         getWaypointMissionOperator().startMission(new CommonCallbacks.CompletionCallback() {
             @Override
             public void onResult(DJIError error) {
                 //setResultToToast("Mission Start: " + (error == null ? "Successfully" : error.getDescription()));
                 if (error != null) {
                     inOperation = false;
+                }else{
+                    not_started = false;
                 }
             }
         });
     }
 
     private void stopWaypointMission() {
+        if (inOperation) {
 
+            not_stopped = true;
+            while(not_stopped){
+                stopExecution();
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ex) {
+                    android.util.Log.d("Waypoint Mission", ex.toString());
+                }
+            }
+
+            if (markerWP != null) {
+                markerWP.remove();
+            }
+        }
+        inOperation = false;
+    }
+
+
+    private void stopExecution(){
         getWaypointMissionOperator().stopMission(new CommonCallbacks.CompletionCallback() {
             @Override
             public void onResult(DJIError error) {
                 //setResultToToast("Mission Stop: " + (error == null ? "Successfully" : error.getDescription()));
+                if (error==null){
+                    not_stopped = false;
+                }
             }
         });
-        //if (markerWP!=null) {
-        //    markerWP.remove();
-        //}
-        inOperation = false;
     }
 
     @Override
@@ -793,6 +842,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         ServerSocket ss;
         String message;
 
+
         GoToListener(int portAndroid) {
             this.portAndroid = portAndroid;
         }
@@ -812,36 +862,49 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
                     //setResultToToast(gotoRecord.toString());
 
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
                     if (switchB.isChecked()) { //Check if the drone is armed
 
                         double gotoLat = (double) gotoRecord.get("latitude");
                         double gotoLon = (double) gotoRecord.get("longitude");
                         float gotoAlt = (float) gotoRecord.get("altitude");
 
+
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                // this will run in the main thread
+                                WPAdapter.stopWaypointMission();
+                                stopWaypointMission();
+
+                                //try{
+                                //    Thread.sleep(5000);
+                                //}catch (InterruptedException e){
+                                //    e.printStackTrace();
+                                //}
+
+                                PrepareMap(gotoLat, gotoLon);
+                                Goto(gotoLat, gotoLon, gotoAlt);
+                                //WPAdapter.Goto(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
+                                //                new Waypoint(gotoLat, gotoLon, gotoAlt), mSpeed);
+                            }
+                        });
+
+                        /*
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                stopWaypointMission();
-                                //adapter.stopWaypointMission();
-                                try {
-                                    Thread.sleep(2000);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
+                                while (true) {
+
+                                    stopWaypointMission();
+                                    PrepareMap(gotoLat, gotoLon);
+
+                                    //adapter.Goto(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
+                                    //        new Waypoint(gotoLat, gotoLon, gotoAlt), mSpeed);
+                                    Goto(gotoLat, gotoLon, gotoAlt);
                                 }
-
-                                PrepareMap(gotoLat, gotoLon);
-
-                                //adapter.Goto(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
-                                //        new Waypoint(gotoLat, gotoLon, gotoAlt), mSpeed);
-                                Goto(gotoLat, gotoLon, gotoAlt);
                             }
-                        });
+                        });*/
 
                     }
                     //Goto(gotoLat, gotoLon, gotoAlt);

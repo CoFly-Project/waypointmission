@@ -6,7 +6,7 @@
     </shared>
   </component>
   <component name="AndroidLogFilters">
-    <option name="TOOL_WINDOW_LOG_LEVEL" value="error" />
+    <option name="TOOL_WINDOW_LOG_LEVEL" value="assert" />
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="No Filters" />
   </component>
   <component name="CMakeSettings">
@@ -17,9 +17,8 @@
   <component name="ChangeListManager">
     <list default="true" id="589e5def-51b5-448b-88cf-451b8ab0d27c" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/assets/properties/Parameters.properties" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/assets/properties/Parameters.properties" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/WaypointNavigation.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/WaypointNavigation.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -45,8 +44,8 @@
       <file leaf-file-name="activity_main.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="304">
-              <caret line="77" selection-start-line="77" selection-end-line="77" />
+            <state relative-caret-position="326">
+              <caret line="78" selection-start-line="78" selection-end-line="78" />
             </state>
           </provider>
           <provider editor-type-id="android-designer2">
@@ -66,8 +65,8 @@
       <file leaf-file-name="styles.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/res/values/styles.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="352">
-              <caret line="16" column="12" selection-start-line="16" selection-start-column="12" selection-end-line="16" selection-end-column="12" />
+            <state relative-caret-position="220">
+              <caret line="19" column="12" selection-start-line="19" selection-start-column="12" selection-end-line="19" selection-end-column="12" />
             </state>
           </provider>
         </entry>
@@ -82,8 +81,8 @@
       <file leaf-file-name="DispatchMessage.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DispatchMessage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="682">
-              <caret line="31" column="57" selection-start-line="31" selection-start-column="57" selection-end-line="31" selection-end-column="57" />
+            <state relative-caret-position="913">
+              <caret line="44" column="33" selection-start-line="44" selection-start-column="33" selection-end-line="44" selection-end-column="33" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -91,22 +90,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Parameters.properties" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app/src/main/assets/properties/Parameters.properties">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="220">
-              <caret line="10" column="30" selection-start-line="10" selection-start-column="30" selection-end-line="10" selection-end-column="30" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="MainActivity.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="415">
-              <caret line="640" column="93" selection-start-line="640" selection-start-column="93" selection-end-line="640" selection-end-column="93" />
+            <state relative-caret-position="163">
+              <caret line="731" column="13" lean-forward="true" selection-start-line="731" selection-start-column="13" selection-end-line="731" selection-end-column="13" />
               <folding>
-                <element signature="imports" expanded="true" />
+                <element signature="e#11286#11318#0" expanded="true" />
+                <element signature="e#12822#12987#0" expanded="true" />
+                <element signature="e#12986#12987#0" expanded="true" />
+                <element signature="e#24246#24247#0" expanded="true" />
+                <element signature="e#24309#24310#0" expanded="true" />
+                <element signature="e#29206#29207#0" expanded="true" />
+                <element signature="e#29260#29261#0" expanded="true" />
+                <element signature="e#32701#32702#0" expanded="true" />
+                <element signature="e#32755#32756#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -115,13 +113,31 @@
       <file leaf-file-name="WaypointNavigation.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/WaypointNavigation.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="453">
-              <caret line="41" column="63" selection-start-line="41" selection-start-column="63" selection-end-line="41" selection-end-column="63" />
+            <state relative-caret-position="193">
+              <caret line="66" column="17" selection-start-line="66" selection-start-column="17" selection-end-line="66" selection-end-column="17" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#4519#4520#0" expanded="true" />
-                <element signature="e#4548#4549#0" expanded="true" />
+                <element signature="e#5005#5006#0" expanded="true" />
+                <element signature="e#5034#5035#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="goto.avsc" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/assets/schemas/goto.avsc">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="968">
+              <caret line="44" column="7" selection-start-line="44" selection-start-column="7" selection-end-line="44" selection-end-column="7" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="location.avsc" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/app/src/main/assets/schemas/location.avsc">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="242">
+              <caret line="11" column="5" selection-start-line="11" selection-start-column="5" selection-end-line="11" selection-end-column="5" />
             </state>
           </provider>
         </entry>
@@ -137,11 +153,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>TAG</find>
-      <find>onSurfaceTextureAvailable</find>
-      <find>stop</find>
-      <find>loadMission</find>
-      <find>setResultToToast</find>
       <find>color</find>
       <find>AppTheme</find>
       <find>Button</find>
@@ -162,11 +173,16 @@
       <find>point2D</find>
       <find>goto</find>
       <find>adapter</find>
-      <find>stopWaypointMission</find>
       <find>JISDKManager.getInstance().getMissionControl().getWaypointMissionOperator();</find>
       <find>instance</find>
       <find>inOperation</find>
+      <find>execute</find>
+      <find>WPAdapter</find>
+      <find>stop</find>
+      <find>stopWaypointMission</find>
       <find>Goto</find>
+      <find>mSpeed</find>
+      <find>not_started</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -2457,6 +2473,7 @@
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DispatchMessage.java" />
         <option value="$PROJECT_DIR$/app/src/main/assets/properties/Parameters.properties" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/HandleGoToCommands.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/WaypointNavigation.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java" />
       </list>
@@ -2549,15 +2566,6 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="assets" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="WaypointMission" type="b2602c69:ProjectViewProjectNode" />
-              <item name="WaypointMission" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="app" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="assets" type="462c0819:PsiDirectoryNode" />
-              <item name="properties" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="WaypointMission" type="b2602c69:ProjectViewProjectNode" />
@@ -2822,39 +2830,62 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info anchor="bottom" id="Android Profiler" order="7" />
-      <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49946696" weight="0.23506744" />
+      <window_info anchor="bottom" id="Android Profiler" order="7" sideWeight="0.49946696" weight="0.32947975" />
+      <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49840087" weight="0.23988439" />
       <window_info anchor="right" id="Palette&#9;" order="7" />
       <window_info id="Image Layers" order="7" />
       <window_info id="Build Variants" order="2" side_tool="true" />
       <window_info anchor="right" id="Capture Analysis" order="4" />
-      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.1119403" side_tool="true" visible="true" weight="0.24759153" />
+      <window_info active="true" anchor="bottom" id="Event Log" order="12" sideWeight="0.21108742" side_tool="true" visible="true" weight="0.2707129" />
       <window_info anchor="right" id="Preview" order="8" weight="0.31629702" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.673774" weight="0.30154142" />
-      <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49840087" weight="0.26493257" />
-      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.4968017" weight="0.22447014" />
-      <window_info anchor="bottom" id="Logcat" order="8" sideWeight="0.76759064" weight="0.1840077" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.6711087" weight="0.28612718" />
+      <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49733475" weight="0.26493257" />
+      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.49573562" weight="0.22447014" />
+      <window_info anchor="bottom" id="Logcat" order="8" sideWeight="0.7638593" weight="0.38921002" />
       <window_info id="Captures" order="5" weight="0.25" />
       <window_info id="Capture Tool" order="3" />
       <window_info id="Designer" order="4" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.15938166" />
-      <window_info active="true" anchor="bottom" id="Build" order="10" sideWeight="0.8880597" visible="true" weight="0.24759153" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.72919416" visible="true" weight="0.16257995" />
+      <window_info anchor="bottom" id="Build" order="10" sideWeight="0.88646054" weight="0.5211946" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32851636" />
       <window_info anchor="right" id="Gradle" order="5" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Structure" order="1" sideWeight="0.2708058" side_tool="true" visible="true" weight="0.16257995" />
       <window_info anchor="right" id="Device File Explorer" order="3" side_tool="true" />
       <window_info anchor="right" id="Theme Preview" order="6" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.79371" weight="0.33429673" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.7889126" weight="0.48265895" />
       <window_info id="Favorites" order="6" side_tool="true" />
-      <window_info anchor="right" id="Assistant" order="8" weight="0.32995737" />
-      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info id="Designer" order="4" />
+      <window_info id="Build Variants" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.1119403" side_tool="true" visible="true" weight="0.24759153" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.15938166" />
+      <window_info id="Favorites" order="6" side_tool="true" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" id="Preview" order="8" weight="0.31629702" />
+      <window_info anchor="bottom" id="Logcat" order="8" sideWeight="0.76759064" weight="0.1840077" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info anchor="right" id="Palette&#9;" order="7" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.79371" weight="0.33429673" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info id="Image Layers" order="7" />
+      <window_info anchor="right" id="Theme Preview" order="6" />
+      <window_info anchor="bottom" id="Android Profiler" order="7" />
+      <window_info id="Capture Tool" order="3" />
+      <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49840087" weight="0.26493257" />
+      <window_info anchor="right" id="Capture Analysis" order="4" />
+      <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49946696" weight="0.23506744" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32851636" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Device File Explorer" order="3" side_tool="true" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.673774" weight="0.30154142" />
+      <window_info active="true" anchor="bottom" id="Build" order="10" sideWeight="0.8880597" visible="true" weight="0.24759153" />
+      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.4968017" weight="0.22447014" />
+      <window_info id="Captures" order="5" weight="0.25" />
+      <window_info anchor="right" id="Gradle" order="5" />
+      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
+      <window_info anchor="right" id="Assistant" order="8" weight="0.32995737" />
     </layout>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -2888,11 +2919,31 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="150" />
+      <option name="time" value="210" />
     </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateExpression">
+      <expression>
+        <expression-string>error.getDescription()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>WPAdapter.getStatus()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>WPAdapter.isCancelled()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>WPAdapter.</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>getAssets().open(&quot;properties/Parameters.properties&quot;)</expression-string>
         <language-id>JAVA</language-id>
@@ -2918,34 +2969,9 @@
         <language-id>JAVA</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
-      <expression>
-        <expression-string>schemasNames[i]</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>schemaId</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>schemaId.split(&quot;.&quot;)</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>schemaLoader.getSchema(&quot;location&quot;)</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/.idea/gradle.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.idea/codeStyles/Project.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="550">
@@ -3076,15 +3102,8 @@
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/GoToTask.java" />
     <entry file="file://$PROJECT_DIR$/app/src/main/assets/schemas/goto.avsc">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="10" column="8" lean-forward="true" selection-start-line="10" selection-start-column="8" selection-end-line="10" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-27/android/os/AsyncTask.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="787">
-          <caret line="179" column="32" selection-start-line="179" selection-start-column="32" selection-end-line="179" selection-end-column="32" />
+        <state relative-caret-position="968">
+          <caret line="44" column="7" selection-start-line="44" selection-start-column="7" selection-end-line="44" selection-end-column="7" />
         </state>
       </provider>
     </entry>
@@ -3161,8 +3180,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/values/styles.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
-          <caret line="16" column="12" selection-start-line="16" selection-start-column="12" selection-end-line="16" selection-end-column="12" />
+        <state relative-caret-position="220">
+          <caret line="19" column="12" selection-start-line="19" selection-start-column="12" selection-end-line="19" selection-end-column="12" />
         </state>
       </provider>
     </entry>
@@ -3181,16 +3200,6 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DispatchMessage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="682">
-          <caret line="31" column="57" selection-start-line="31" selection-start-column="57" selection-end-line="31" selection-end-column="57" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/assets/properties/Parameters.properties">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="220">
@@ -3200,8 +3209,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="304">
-          <caret line="77" selection-start-line="77" selection-end-line="77" />
+        <state relative-caret-position="326">
+          <caret line="78" selection-start-line="78" selection-end-line="78" />
         </state>
       </provider>
       <provider editor-type-id="android-designer2">
@@ -3215,24 +3224,61 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/WaypointNavigation.java">
+    <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-27/android/os/AsyncTask.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="453">
-          <caret line="41" column="63" selection-start-line="41" selection-start-column="63" selection-end-line="41" selection-end-column="63" />
+        <state relative-caret-position="-302">
+          <caret line="593" column="53" selection-start-line="593" selection-start-column="53" selection-end-line="593" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/HandleGoToCommands.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="294">
+          <caret line="17" column="5" selection-start-line="17" selection-start-column="5" selection-end-line="18" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#4519#4520#0" expanded="true" />
-            <element signature="e#4548#4549#0" expanded="true" />
+            <element signature="e#897#898#0" expanded="true" />
+            <element signature="e#923#924#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/WaypointNavigation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="193">
+          <caret line="66" column="17" selection-start-line="66" selection-start-column="17" selection-end-line="66" selection-end-column="17" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#5005#5006#0" expanded="true" />
+            <element signature="e#5034#5035#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DispatchMessage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="913">
+          <caret line="44" column="33" selection-start-line="44" selection-start-column="33" selection-end-line="44" selection-end-column="33" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="415">
-          <caret line="640" column="93" selection-start-line="640" selection-start-column="93" selection-end-line="640" selection-end-column="93" />
+        <state relative-caret-position="163">
+          <caret line="731" column="13" lean-forward="true" selection-start-line="731" selection-start-column="13" selection-end-line="731" selection-end-column="13" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="e#11286#11318#0" expanded="true" />
+            <element signature="e#12822#12987#0" expanded="true" />
+            <element signature="e#12986#12987#0" expanded="true" />
+            <element signature="e#24246#24247#0" expanded="true" />
+            <element signature="e#24309#24310#0" expanded="true" />
+            <element signature="e#29206#29207#0" expanded="true" />
+            <element signature="e#29260#29261#0" expanded="true" />
+            <element signature="e#32701#32702#0" expanded="true" />
+            <element signature="e#32755#32756#0" expanded="true" />
           </folding>
         </state>
       </provider>
