@@ -1,22 +1,14 @@
 package com.convcao.waypointmission;
 
-
-import android.os.AsyncTask;
-import android.support.annotation.Nullable;
-
 import dji.common.error.DJIError;
 import dji.common.mission.waypoint.Waypoint;
 import dji.common.mission.waypoint.WaypointMission;
-import dji.common.mission.waypoint.WaypointMissionDownloadEvent;
-import dji.common.mission.waypoint.WaypointMissionExecutionEvent;
 import dji.common.mission.waypoint.WaypointMissionFinishedAction;
 import dji.common.mission.waypoint.WaypointMissionFlightPathMode;
 import dji.common.mission.waypoint.WaypointMissionHeadingMode;
-import dji.common.mission.waypoint.WaypointMissionUploadEvent;
 import dji.common.util.CommonCallbacks;
 import dji.sdk.flightcontroller.FlightAssistant;
 import dji.sdk.mission.waypoint.WaypointMissionOperator;
-import dji.sdk.mission.waypoint.WaypointMissionOperatorListener;
 import dji.sdk.sdkmanager.DJISDKManager;
 
 public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
@@ -48,7 +40,7 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
 
 
     public void Goto(Waypoint WPc, Waypoint WPe, float speed) {
-        status = WaypointMissionStatus.READY;
+
 
         FA.setCollisionAvoidanceEnabled(true, null);
         FA.setActiveObstacleAvoidanceEnabled(true, null);
@@ -65,12 +57,16 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
         while (error != null) {
             error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
             try {
-                Thread.sleep(100);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+        uploadWayPointMission();
+    }
 
+
+    private void uploadWayPointMission() {
         getWaypointMissionOperator().uploadMission(new CommonCallbacks.CompletionCallback() {
             @Override
             public void onResult(DJIError error) {
@@ -81,38 +77,65 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
                     } catch (InterruptedException ex) {
                         android.util.Log.d("Waypoint Mission", ex.toString());
                     }
-                    //getWaypointMissionOperator().addListener(eventNotificationListener);
-                    getWaypointMissionOperator().startMission(new CommonCallbacks.CompletionCallback() {
-                        @Override
-                        public void onResult(DJIError error) {
-                            //setResultToToast("Mission Start: " + (error == null ? "Successfully" : error.getDescription()));
-                            if (error != null) {
-                                status = WaypointMissionStatus.FAIL_TO_START;
-                            }
+                    status = WaypointMissionStatus.FAIL_TO_START;
+                    while (status == WaypointMissionStatus.FAIL_TO_START) {
+                        startWaypointMission();
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException ex) {
+                            android.util.Log.d("Waypoint Mission", ex.toString());
                         }
-                    });
+                    }
                 } else {
                     //setResultToToast("Mission upload failed, error: " + error.getDescription() + " retrying...");
                     getWaypointMissionOperator().retryUploadMission(null);
                 }
             }
         });
-
     }
 
+    private void startWaypointMission() {
+        //addListener();
+        getWaypointMissionOperator().startMission(new CommonCallbacks.CompletionCallback() {
+            @Override
+            public void onResult(DJIError error) {
+                //setResultToToast("Mission Start: " + (error == null ? "Successfully" : error.getDescription()));
+                if (error == null) {
+                    status = WaypointMissionStatus.ACTIVE;
+                } else {
+                    status = WaypointMissionStatus.FAIL_TO_START;
+                }
+            }
+        });
+    }
+
+
     public void stopWaypointMission() {
-        //getWaypointMissionOperator().removeListener(eventNotificationListener);
+        if (status == WaypointMissionStatus.ACTIVE) {
+            while (status != WaypointMissionStatus.STOPPED) {
+                stopExecution();
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ex) {
+                    android.util.Log.d("Waypoint Mission", ex.toString());
+                }
+            }
+        }
+    }
+
+    private void stopExecution() {
+
         getWaypointMissionOperator().stopMission(new CommonCallbacks.CompletionCallback() {
             @Override
             public void onResult(DJIError error) {
                 //setResultToToast("Mission Stop: " + (error == null ? "Successfully" : error.getDescription()));
+                if (error == null) {
+                    status = WaypointMissionStatus.STOPPED;
+                }
             }
         });
-        //if (markerWP!=null) {
-        //    markerWP.remove();
-        //}
-        status = WaypointMissionStatus.STOPPED;
     }
+
 
     public WaypointMissionStatus getStatus() {
         return status;

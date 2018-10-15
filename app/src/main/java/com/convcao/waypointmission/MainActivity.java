@@ -648,12 +648,16 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                         double longitude = Double.parseDouble(wpLongitude_TV.getText().toString());
                         int altitude = Integer.parseInt(nulltoIntegerDefalt(altitudeString));
 
+                        //stopWaypointMission();
+                        WPAdapter.stopWaypointMission();
                         PrepareMap(latitude, longitude);
                         //adapter.stopWaypointMission();
                         //adapter.Goto(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
                         //        new Waypoint(latitude, longitude, altitude), mSpeed);
-                        stopWaypointMission();
-                        Goto(latitude, longitude, altitude);
+
+                        WPAdapter.Goto(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
+                                        new Waypoint(latitude, longitude, altitude), mSpeed);
+                        //Goto(latitude, longitude, altitude);
                     }
 
                 })
@@ -875,7 +879,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                             public void run() {
                                 // this will run in the main thread
                                 WPAdapter.stopWaypointMission();
-                                stopWaypointMission();
+                                //stopWaypointMission();
 
                                 //try{
                                 //    Thread.sleep(5000);
@@ -884,9 +888,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                 //}
 
                                 PrepareMap(gotoLat, gotoLon);
-                                Goto(gotoLat, gotoLon, gotoAlt);
-                                //WPAdapter.Goto(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
-                                //                new Waypoint(gotoLat, gotoLon, gotoAlt), mSpeed);
+                                //Goto(gotoLat, gotoLon, gotoAlt);
+                                WPAdapter.Goto(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
+                                                new Waypoint(gotoLat, gotoLon, gotoAlt), mSpeed);
                             }
                         });
 
