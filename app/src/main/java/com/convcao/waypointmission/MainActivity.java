@@ -890,7 +890,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                 // this will run in the main thread
 
 
-                                WPAdapter.stopWaypointMission();
+
                                 //adapter.cancel(true);
                                 PrepareMap(gotoLat, gotoLon);
                                 //adapter.stopWaypointMission();
@@ -900,9 +900,24 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                 //adapter = new StartDJIGotoMission(mSpeed);
                                 //adapter.execute(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
                                 //        new Waypoint(gotoLat, gotoLon, gotoAlt));
+
+
+                                while (WPAdapter.getStatus() != WaypointNavigation.WaypointMissionStatus.READY &&
+                                        WPAdapter.getStatus() != WaypointNavigation.WaypointMissionStatus.ACTIVE){
+                                    try {
+                                        Thread.sleep(500);
+                                    } catch (InterruptedException ex) {
+                                        Log.d(TAG, ex.toString());
+                                    }
+                                }
+
+                                WPAdapter.stopWaypointMission();
                                 WPAdapter.Goto(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
                                        new Waypoint(gotoLat, gotoLon, gotoAlt), mSpeed);
 
+
+                                //WPAdapter.startMission(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
+                                //        new Waypoint(gotoLat, gotoLon, gotoAlt), mSpeed);
                             }
                         });
 

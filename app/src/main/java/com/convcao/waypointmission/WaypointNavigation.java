@@ -24,13 +24,13 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
     protected static final String TAG = "WaypointNavigationClass";
 
 
-    protected enum WaypointMissionStatus {ACTIVE, READY, FINISHED, INACTIVE, STOPPED, FAIL_TO_UPLOAD, FAIL_TO_START}
+    protected enum WaypointMissionStatus {ACTIVE, READY, FINISHED, INACTIVE, STOPPED, FAIL_TO_STOP, FAIL_TO_UPLOAD, FAIL_TO_START}
 
     public WaypointNavigation() {
         mFinishedAction = WaypointMissionFinishedAction.NO_ACTION;
         mHeadingMode = WaypointMissionHeadingMode.AUTO; //TODO fix me in the future
         FA = new FlightAssistant();
-        status = WaypointMissionStatus.INACTIVE;
+        status = WaypointMissionStatus.READY;
     }
 
     public WaypointMissionOperator getWaypointMissionOperator() {
@@ -43,8 +43,9 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
     }
 
 
+
     public void Goto(Waypoint WPc, Waypoint WPe, float speed) {
-        Log.i(TAG, "GOTO --> "+WPc.coordinate.toString());
+        Log.i(TAG, "GOTO --> " + WPc.coordinate.toString());
         FA.setCollisionAvoidanceEnabled(true, null);
         FA.setActiveObstacleAvoidanceEnabled(true, null);
 
@@ -57,6 +58,7 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
         //.waypointCount(2);
 
         DJIError error = DJIError.COMMON_UNKNOWN;
+        status = WaypointMissionStatus.FAIL_TO_UPLOAD;
         while (error != null) {
             error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
             try {
@@ -67,6 +69,7 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
         }
         Log.i(TAG, "(1/3) Mission loaded successfully!");
         uploadWayPointMission();
+
     }
 
 
@@ -139,6 +142,8 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
                 if (error == null) {
                     status = WaypointMissionStatus.STOPPED;
                     Log.i(TAG, "(1/1) Mission stopped successfully!");
+                }else{
+                    status = WaypointMissionStatus.FAIL_TO_STOP;
                 }
             }
         });
