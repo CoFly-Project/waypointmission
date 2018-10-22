@@ -56,6 +56,7 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import dji.common.flightcontroller.FlightControllerState;
 import dji.common.mission.waypoint.Waypoint;
@@ -77,9 +78,9 @@ import dji.sdk.flightcontroller.FlightAssistant;
 import dji.sdk.flightcontroller.FlightController;
 import dji.common.error.DJIError;
 import dji.sdk.mission.waypoint.WaypointMissionOperator;
-import dji.sdk.mission.waypoint.WaypointMissionOperatorListener;
 import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKManager;
+
 
 
 public class MainActivity extends FragmentActivity implements TextureView.SurfaceTextureListener,
@@ -902,8 +903,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                 //        new Waypoint(gotoLat, gotoLon, gotoAlt));
 
 
-                                while (WPAdapter.getStatus() != WaypointNavigation.WaypointMissionStatus.READY &&
-                                        WPAdapter.getStatus() != WaypointNavigation.WaypointMissionStatus.ACTIVE){
+                                while (WPAdapter.getLocked().get()){
                                     try {
                                         Thread.sleep(500);
                                     } catch (InterruptedException ex) {
@@ -911,9 +911,25 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                     }
                                 }
 
-                                WPAdapter.stopWaypointMission();
-                                WPAdapter.Goto(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
-                                       new Waypoint(gotoLat, gotoLon, gotoAlt), mSpeed);
+                                WPAdapter.setStatus(WaypointNavigation.WaypointMissionStatus.INACTIVE);
+
+                                while (WPAdapter.getStatus() != WaypointNavigation.WaypointMissionStatus.ACTIVE) {
+
+                                    WPAdapter.stopWaypointMission();
+                                    if (WPAdapter.getStatus()== WaypointNavigation.WaypointMissionStatus.STOPPED) {
+                                        WPAdapter.Goto(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
+                                                new Waypoint(gotoLat, gotoLon, gotoAlt), mSpeed);
+                                    }
+
+                                    while (WPAdapter.getLocked().get()){
+                                        try {
+                                            Thread.sleep(1000);
+                                        } catch (InterruptedException ex) {
+                                            Log.d(TAG, ex.toString());
+                                        }
+                                    }
+
+                                }
 
 
                                 //WPAdapter.startMission(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),

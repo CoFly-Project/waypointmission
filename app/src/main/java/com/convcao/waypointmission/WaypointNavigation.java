@@ -2,6 +2,8 @@ package com.convcao.waypointmission;
 
 import android.util.Log;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import dji.common.error.DJIError;
 import dji.common.mission.waypoint.Waypoint;
 import dji.common.mission.waypoint.WaypointMission;
@@ -21,8 +23,11 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
     private FlightAssistant FA;
     private WaypointMissionStatus status;
 
+    private final int attempts = 10;
+
     protected static final String TAG = "WaypointNavigationClass";
 
+    protected AtomicBoolean locked = new AtomicBoolean(false);
 
     protected enum WaypointMissionStatus {ACTIVE, READY, FINISHED, INACTIVE, STOPPED, FAIL_TO_STOP, FAIL_TO_UPLOAD, FAIL_TO_START}
 
@@ -31,6 +36,7 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
         mHeadingMode = WaypointMissionHeadingMode.AUTO; //TODO fix me in the future
         FA = new FlightAssistant();
         status = WaypointMissionStatus.READY;
+        locked.set(false);
     }
 
     public WaypointMissionOperator getWaypointMissionOperator() {
@@ -45,6 +51,7 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
 
 
     public void Goto(Waypoint WPc, Waypoint WPe, float speed) {
+        locked.set(true);
         Log.i(TAG, "GOTO --> " + WPc.coordinate.toString());
         FA.setCollisionAvoidanceEnabled(true, null);
         FA.setActiveObstacleAvoidanceEnabled(true, null);
@@ -59,17 +66,18 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
 
         DJIError error = DJIError.COMMON_UNKNOWN;
         status = WaypointMissionStatus.FAIL_TO_UPLOAD;
-        while (error != null) {
+        int current_attempt = 1;
+        while (error != null && current_attempt<=attempts) {
             error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            current_attempt++;
         }
         Log.i(TAG, "(1/3) Mission loaded successfully!");
         uploadWayPointMission();
-
     }
 
 
@@ -81,19 +89,22 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
                     //setResultToToast("Mission upload successfully!");
                     Log.i(TAG, "(2/3) Mission uploaded successfully!");
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(100);
                     } catch (InterruptedException ex) {
                         android.util.Log.d("Waypoint Mission", ex.toString());
                     }
                     status = WaypointMissionStatus.FAIL_TO_START;
-                    while (status == WaypointMissionStatus.FAIL_TO_START) {
+                    int current_attempt = 1;
+                    while (status == WaypointMissionStatus.FAIL_TO_START && current_attempt<=attempts) {
                         startWaypointMission();
                         try {
-                            Thread.sleep(1000);
+                            Thread.sleep(500);
                         } catch (InterruptedException ex) {
                             android.util.Log.d("Waypoint Mission", ex.toString());
                         }
+                        current_attempt++;
                     }
+                    locked.set(false);
                 } else {
                     //setResultToToast("Mission upload failed, error: " + error.getDescription() + " retrying...");
                     getWaypointMissionOperator().retryUploadMission(null);
@@ -120,16 +131,20 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
 
 
     public void stopWaypointMission() {
+        locked.set(true);
         if (status != WaypointMissionStatus.STOPPED) {
             Log.i(TAG, "Stop previous mission");
-            while (status != WaypointMissionStatus.STOPPED) {
+            int current_attempt = 1;
+            while (status != WaypointMissionStatus.STOPPED && current_attempt<=attempts) {
                 stopExecution();
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException ex) {
                     android.util.Log.d("Waypoint Mission", ex.toString());
                 }
+                current_attempt++;
             }
+            locked.set(false);
         }
     }
 
@@ -154,6 +169,11 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
         return status;
     }
 
+    public void setStatus(WaypointMissionStatus status){
+        this.status = status;
+    }
+
+    public AtomicBoolean getLocked(){ return locked;}
     /*
 
     private WaypointMissionOperatorListener eventNotificationListener = new WaypointMissionOperatorListener() {
