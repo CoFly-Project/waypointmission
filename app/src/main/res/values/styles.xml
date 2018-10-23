@@ -16,5 +16,10 @@
         <item name="colorAccent">@color/colorPrimaryDark</item>
     </style>
 
+    <style  name="AppTheme.InfoButton" parent="Widget.AppCompat.ImageButton">
+        <!-- <item android:state_pressed="true" android:drawable="@drawable/icon_pressed"/>
+        <item android:state_pressed="false" android:drawable="@drawable/icon_unpressed"/> -->
+    </style>
+
 
 </resources>

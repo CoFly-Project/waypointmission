@@ -1,7 +1,6 @@
 package com.convcao.waypointmission;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,11 +8,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.SurfaceTexture;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -23,6 +20,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
@@ -56,27 +54,20 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import dji.common.flightcontroller.FlightControllerState;
 import dji.common.mission.waypoint.Waypoint;
 import dji.common.mission.waypoint.WaypointMission;
-import dji.common.mission.waypoint.WaypointMissionDownloadEvent;
-import dji.common.mission.waypoint.WaypointMissionExecutionEvent;
 import dji.common.mission.waypoint.WaypointMissionFinishedAction;
-import dji.common.mission.waypoint.WaypointMissionFlightPathMode;
 import dji.common.mission.waypoint.WaypointMissionHeadingMode;
-import dji.common.mission.waypoint.WaypointMissionUploadEvent;
 
 import dji.common.product.Model;
-import dji.common.util.CommonCallbacks;
 import dji.sdk.base.BaseProduct;
 import dji.sdk.camera.Camera;
 import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
 import dji.sdk.flightcontroller.FlightAssistant;
 import dji.sdk.flightcontroller.FlightController;
-import dji.common.error.DJIError;
 import dji.sdk.mission.waypoint.WaypointMissionOperator;
 import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKManager;
@@ -98,7 +89,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private FlightAssistant FA = new FlightAssistant();
 
     private Switch switchB;
-    private ImageButton locate;
+    private ImageButton locate, infoB;
     private Button gotoc, stop;
 
     public boolean inOperation = false;
@@ -139,8 +130,6 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private String droneCanonicalName;
 
     private WaypointNavigation WPAdapter;
-
-    private boolean not_started, not_stopped;
 
     private StartDJIGotoMission adapter;
 
@@ -191,15 +180,16 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             mVideoSurface.setSurfaceTextureListener(this);
         }
 
+        infoB = (ImageButton) findViewById(R.id.connection_info);
         locate = (ImageButton) findViewById(R.id.locate);
         gotoc = (Button) findViewById(R.id.gotoc);
         switchB = (Switch) findViewById(R.id.arm);
         stop = (Button) findViewById(R.id.stop);
 
+        infoB.setOnClickListener(this);
         locate.setOnClickListener(this);
         gotoc.setOnClickListener(this);
         stop.setOnClickListener(this);
-
 
         gotoc.setEnabled(false);
         switchB.setEnabled(false);
@@ -297,10 +287,32 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
         builder = new LatLngBounds.Builder();
 
+        droneCanonicalName = props.getProperty("canonical_name");
+        android_port = Integer.parseInt(props.getProperty("port"));
         server_ip = props.getProperty("server_ip");
         server_port = Integer.parseInt(props.getProperty("server_port"));
-        android_port = Integer.parseInt(props.getProperty("port"));
-        droneCanonicalName = props.getProperty("canonical_name");
+
+
+        LinearLayout connectionSettings = (LinearLayout) getLayoutInflater().inflate(
+                R.layout.dialog_info, null);
+
+        ((EditText)connectionSettings.findViewById(R.id.canonical_name)).setText(droneCanonicalName,
+                TextView.BufferType.EDITABLE);
+        ((EditText)connectionSettings.findViewById(R.id.port)).setText(Integer.toString(android_port),
+                TextView.BufferType.EDITABLE);
+        ((EditText)connectionSettings.findViewById(R.id.ip1)).setText(server_ip.split("\\.")[0],
+                TextView.BufferType.EDITABLE);
+        ((EditText)connectionSettings.findViewById(R.id.ip2)).setText(server_ip.split("\\.")[1],
+                TextView.BufferType.EDITABLE);
+        ((EditText)connectionSettings.findViewById(R.id.ip3)).setText(server_ip.split("\\.")[2],
+                TextView.BufferType.EDITABLE);
+        ((EditText)connectionSettings.findViewById(R.id.ip4)).setText(server_ip.split("\\.")[3],
+                TextView.BufferType.EDITABLE);
+        ((EditText)connectionSettings.findViewById(R.id.server_port)).setText(Integer.toString(server_port),
+                TextView.BufferType.EDITABLE);
+
+
+
         minimumArmHeight = Double.parseDouble(props.getProperty("minimum_height_to_arm"));
         mapPadding = Integer.parseInt(props.getProperty("map_padding"));
         publishPeriod = Long.parseLong(props.getProperty("publish_location_period"));
@@ -432,7 +444,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         dispatchMessage = new DispatchMessage(schemaLoader.getSchema("location"), server_ip, server_port);
         dispatchMessage.execute(location);
     }
-    
+
 
     public WaypointMissionOperator getWaypointMissionOperator() {
         if (instance == null) {
@@ -495,6 +507,10 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.connection_info:{
+                showConnectionDialog();
+                break;
+            }
             case R.id.locate: {
                 updateDroneLocation();
                 viewPointUpdate(18.0f); // Locate the drone's place
@@ -532,6 +548,43 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         LatLng pos = new LatLng(droneLocationLat, droneLocationLng);
         CameraUpdate cu = CameraUpdateFactory.newLatLngZoom(pos, zoomlevel);
         gMap.moveCamera(cu);
+    }
+
+    private void showConnectionDialog(){
+        LinearLayout connectionSettings = (LinearLayout) getLayoutInflater().inflate(
+                R.layout.dialog_info, null);
+
+        new AlertDialog.Builder(this)
+                .setTitle("")
+                .setView(connectionSettings)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //TODO pass the parameters
+                        droneCanonicalName = ((TextView) connectionSettings.findViewById(R.id.canonical_name))
+                                .getText().toString();
+                        android_port = Integer.parseInt(((TextView) connectionSettings.findViewById(R.id.port))
+                                .getText().toString());
+                        server_ip = ((TextView) connectionSettings.findViewById(R.id.ip1))
+                                .getText().toString() + "." +
+                                ((TextView) connectionSettings.findViewById(R.id.ip2))
+                                        .getText().toString() + "." +
+                                ((TextView) connectionSettings.findViewById(R.id.ip3))
+                                        .getText().toString() + "." +
+                                ((TextView) connectionSettings.findViewById(R.id.ip4))
+                                        .getText().toString();
+                        server_port = Integer.parseInt(((TextView) connectionSettings.findViewById(R.id.server_port))
+                                .getText().toString());
+                    }
+
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+
+                })
+                .create()
+                .show();
     }
 
 

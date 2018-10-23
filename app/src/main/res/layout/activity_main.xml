@@ -76,6 +76,18 @@
             android:layout_height="40dp"
             android:layout_marginEnd="12dp" />
 
+        <ImageButton
+            android:id="@+id/connection_info"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="12dp"
+            android:background="@android:color/transparent"
+            android:adjustViewBounds="true"
+            android:cropToPadding="false"
+            android:scaleType="fitXY"
+            android:contentDescription="info"
+            android:src="@drawable/info_button"/>
+
         <Switch
             android:id="@+id/arm"
             android:layout_width="wrap_content"
@@ -103,16 +115,16 @@
 
         <ImageButton
             android:id="@+id/locate"
-            android:layout_width="41dp"
-            android:layout_height="41dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/gps_position_target"
             android:adjustViewBounds="true"
             android:cropToPadding="false"
             android:scaleType="fitXY"
-            android:contentDescription="Locate"
-            android:layout_marginEnd="10dp"
-            android:layout_marginStart="10dp"/>
+            android:src="@drawable/locate_button"
+            android:contentDescription="Locate" />
     </LinearLayout>
 
 
