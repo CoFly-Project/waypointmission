@@ -2,5 +2,7 @@
 <selector  xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="true"
         android:drawable="@drawable/info_button_pressed" /> <!-- pressed -->
+    <item android:state_enabled="false"
+        android:drawable="@drawable/info_button_disabled" /> <!-- deactivated -->
     <item android:drawable="@drawable/info_button_normal" /> <!-- default -->
 </selector>

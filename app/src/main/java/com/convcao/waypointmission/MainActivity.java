@@ -54,6 +54,7 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import dji.common.flightcontroller.FlightControllerState;
 import dji.common.mission.waypoint.Waypoint;
@@ -104,6 +105,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private LatLngBounds bounds = null;
     LatLngBounds.Builder builder;
 
+    private float zoomLevel;
+
     //private float altitude = 100.0f;
     private float mSpeed = 10.0f;
 
@@ -132,6 +135,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private WaypointNavigation WPAdapter;
 
     private StartDJIGotoMission adapter;
+
+    private GoToListener gotoRun;
 
     @Override
     protected void onResume() {
@@ -193,14 +198,17 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
         gotoc.setEnabled(false);
         switchB.setEnabled(false);
+        infoB.setEnabled(true);
         stop.setEnabled(false);
 
         switchB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
+                    infoB.setEnabled(false);
                     gotoc.setEnabled(true);
                     stop.setEnabled(true);
                 } else {
+                    infoB.setEnabled(true);
                     gotoc.setEnabled(false);
                     stop.setEnabled(false);
                 }
@@ -296,29 +304,17 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         LinearLayout connectionSettings = (LinearLayout) getLayoutInflater().inflate(
                 R.layout.dialog_info, null);
 
-        ((EditText)connectionSettings.findViewById(R.id.canonical_name)).setText(droneCanonicalName,
-                TextView.BufferType.EDITABLE);
-        ((EditText)connectionSettings.findViewById(R.id.port)).setText(Integer.toString(android_port),
-                TextView.BufferType.EDITABLE);
-        ((EditText)connectionSettings.findViewById(R.id.ip1)).setText(server_ip.split("\\.")[0],
-                TextView.BufferType.EDITABLE);
-        ((EditText)connectionSettings.findViewById(R.id.ip2)).setText(server_ip.split("\\.")[1],
-                TextView.BufferType.EDITABLE);
-        ((EditText)connectionSettings.findViewById(R.id.ip3)).setText(server_ip.split("\\.")[2],
-                TextView.BufferType.EDITABLE);
-        ((EditText)connectionSettings.findViewById(R.id.ip4)).setText(server_ip.split("\\.")[3],
-                TextView.BufferType.EDITABLE);
-        ((EditText)connectionSettings.findViewById(R.id.server_port)).setText(Integer.toString(server_port),
-                TextView.BufferType.EDITABLE);
-
-
 
         minimumArmHeight = Double.parseDouble(props.getProperty("minimum_height_to_arm"));
         mapPadding = Integer.parseInt(props.getProperty("map_padding"));
         publishPeriod = Long.parseLong(props.getProperty("publish_location_period"));
+        zoomLevel = Float.parseFloat(props.getProperty("zoomlevel"));
 
-        Thread gotoThread = new Thread(new GoToListener(Integer.parseInt(props.getProperty("port"))));
+
+        gotoRun = new GoToListener();
+        Thread gotoThread = new Thread(gotoRun);
         gotoThread.start();
+
 
         schemaLoader = new SchemaLoader();
         schemaLoader.load();
@@ -513,7 +509,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             }
             case R.id.locate: {
                 updateDroneLocation();
-                viewPointUpdate(18.0f); // Locate the drone's place
+                viewPointUpdate(zoomLevel); // Locate the drone's place
                 break;
             }
             case R.id.gotoc: {
@@ -521,9 +517,6 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                 break;
             }
             case R.id.stop: {
-                //adapter.stopWaypointMission();
-                //stopWaypointMission();
-                //adapter.cancel(true);
                 WPAdapter.stopWaypointMission();
                 break;
             }
@@ -554,6 +547,27 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         LinearLayout connectionSettings = (LinearLayout) getLayoutInflater().inflate(
                 R.layout.dialog_info, null);
 
+        EditText canonical_name_ET = ((EditText)connectionSettings.findViewById(R.id.canonical_name));
+        canonical_name_ET.setText(droneCanonicalName, TextView.BufferType.EDITABLE);
+
+        EditText android_port_ET = ((EditText)connectionSettings.findViewById(R.id.port));
+        android_port_ET.setText(Integer.toString(android_port), TextView.BufferType.EDITABLE);
+
+        EditText ip1_ET = ((EditText)connectionSettings.findViewById(R.id.ip1));
+        ip1_ET.setText(server_ip.split("\\.")[0], TextView.BufferType.EDITABLE);
+
+        EditText ip2_ET = ((EditText)connectionSettings.findViewById(R.id.ip2));
+        ip2_ET.setText(server_ip.split("\\.")[1], TextView.BufferType.EDITABLE);
+
+        EditText ip3_ET = ((EditText)connectionSettings.findViewById(R.id.ip3));
+        ip3_ET.setText(server_ip.split("\\.")[2], TextView.BufferType.EDITABLE);
+
+        EditText ip4_ET = ((EditText)connectionSettings.findViewById(R.id.ip4));
+        ip4_ET.setText(server_ip.split("\\.")[3], TextView.BufferType.EDITABLE);
+
+        EditText server_port_ET = ((EditText)connectionSettings.findViewById(R.id.server_port));
+        server_port_ET.setText(Integer.toString(server_port), TextView.BufferType.EDITABLE);
+
         new AlertDialog.Builder(this)
                 .setTitle("")
                 .setView(connectionSettings)
@@ -574,6 +588,11 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                         .getText().toString();
                         server_port = Integer.parseInt(((TextView) connectionSettings.findViewById(R.id.server_port))
                                 .getText().toString());
+
+                        gotoRun.terminate();
+                        gotoRun = new GoToListener();
+                        Thread gotoThread = new Thread(gotoRun);
+                        gotoThread.start();
                     }
 
                 })
@@ -734,26 +753,29 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         gMap.getUiSettings().setCompassEnabled(true);
         gMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
 
-        viewPointUpdate(18.0f);
+        viewPointUpdate(zoomLevel);
         //gMap.getUiSettings().setMyLocationButtonEnabled(true);
     }
 
     class GoToListener implements Runnable {
         Socket s;
-        int portAndroid;
         ServerSocket ss;
-        String message;
+        AtomicBoolean isAlive = new AtomicBoolean(true);
 
 
-        GoToListener(int portAndroid) {
-            this.portAndroid = portAndroid;
+        GoToListener() {
+            isAlive.set(true);
+        }
+
+        public void terminate(){
+            isAlive.set(false);
         }
 
         @Override
         public void run() {
             try {
-                ss = new ServerSocket(portAndroid);
-                while (true) {
+                ss = new ServerSocket(android_port);
+                while (isAlive.get()) {
                     s = ss.accept();
                     DatumReader datumReader = new GenericDatumReader(schemaGoto);
                     GenericRecord gotoRecord = new GenericData.Record(schemaGoto);
