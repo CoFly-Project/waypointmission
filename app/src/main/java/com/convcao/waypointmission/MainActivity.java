@@ -74,7 +74,6 @@ import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKManager;
 
 
-
 public class MainActivity extends FragmentActivity implements TextureView.SurfaceTextureListener,
         View.OnClickListener, OnMapReadyCallback {
 
@@ -311,10 +310,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         zoomLevel = Float.parseFloat(props.getProperty("zoomlevel"));
 
 
-        gotoRun = new GoToListener();
-        Thread gotoThread = new Thread(gotoRun);
-        gotoThread.start();
-
+        gotoRun = new GoToListener(android_port);
+        gotoRun.stop();
+        gotoRun.start();
 
         schemaLoader = new SchemaLoader();
         schemaLoader.load();
@@ -503,7 +501,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.connection_info:{
+            case R.id.connection_info: {
                 showConnectionDialog();
                 break;
             }
@@ -543,29 +541,29 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         gMap.moveCamera(cu);
     }
 
-    private void showConnectionDialog(){
+    private void showConnectionDialog() {
         LinearLayout connectionSettings = (LinearLayout) getLayoutInflater().inflate(
                 R.layout.dialog_info, null);
 
-        EditText canonical_name_ET = ((EditText)connectionSettings.findViewById(R.id.canonical_name));
+        EditText canonical_name_ET = ((EditText) connectionSettings.findViewById(R.id.canonical_name));
         canonical_name_ET.setText(droneCanonicalName, TextView.BufferType.EDITABLE);
 
-        EditText android_port_ET = ((EditText)connectionSettings.findViewById(R.id.port));
+        EditText android_port_ET = ((EditText) connectionSettings.findViewById(R.id.port));
         android_port_ET.setText(Integer.toString(android_port), TextView.BufferType.EDITABLE);
 
-        EditText ip1_ET = ((EditText)connectionSettings.findViewById(R.id.ip1));
+        EditText ip1_ET = ((EditText) connectionSettings.findViewById(R.id.ip1));
         ip1_ET.setText(server_ip.split("\\.")[0], TextView.BufferType.EDITABLE);
 
-        EditText ip2_ET = ((EditText)connectionSettings.findViewById(R.id.ip2));
+        EditText ip2_ET = ((EditText) connectionSettings.findViewById(R.id.ip2));
         ip2_ET.setText(server_ip.split("\\.")[1], TextView.BufferType.EDITABLE);
 
-        EditText ip3_ET = ((EditText)connectionSettings.findViewById(R.id.ip3));
+        EditText ip3_ET = ((EditText) connectionSettings.findViewById(R.id.ip3));
         ip3_ET.setText(server_ip.split("\\.")[2], TextView.BufferType.EDITABLE);
 
-        EditText ip4_ET = ((EditText)connectionSettings.findViewById(R.id.ip4));
+        EditText ip4_ET = ((EditText) connectionSettings.findViewById(R.id.ip4));
         ip4_ET.setText(server_ip.split("\\.")[3], TextView.BufferType.EDITABLE);
 
-        EditText server_port_ET = ((EditText)connectionSettings.findViewById(R.id.server_port));
+        EditText server_port_ET = ((EditText) connectionSettings.findViewById(R.id.server_port));
         server_port_ET.setText(Integer.toString(server_port), TextView.BufferType.EDITABLE);
 
         new AlertDialog.Builder(this)
@@ -576,7 +574,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                         //TODO pass the parameters
                         droneCanonicalName = ((TextView) connectionSettings.findViewById(R.id.canonical_name))
                                 .getText().toString();
-                        android_port = Integer.parseInt(((TextView) connectionSettings.findViewById(R.id.port))
+                        int android_port_temp = Integer.parseInt(((TextView) connectionSettings.findViewById(R.id.port))
                                 .getText().toString());
                         server_ip = ((TextView) connectionSettings.findViewById(R.id.ip1))
                                 .getText().toString() + "." +
@@ -589,10 +587,12 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                         server_port = Integer.parseInt(((TextView) connectionSettings.findViewById(R.id.server_port))
                                 .getText().toString());
 
-                        gotoRun.terminate();
-                        gotoRun = new GoToListener();
-                        Thread gotoThread = new Thread(gotoRun);
-                        gotoThread.start();
+                        if (android_port_temp != android_port) {
+                            android_port = android_port_temp;
+                            gotoRun.stop();
+                            gotoRun = new GoToListener(android_port);
+                            gotoRun.start();
+                        }
                     }
 
                 })
@@ -691,7 +691,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                         //adapter.execute(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
                         //        new Waypoint(latitude, longitude, altitude));
                         WPAdapter.Goto(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
-                                        new Waypoint(latitude, longitude, altitude), mSpeed);
+                                new Waypoint(latitude, longitude, altitude), mSpeed);
                         //Goto(latitude, longitude, altitude);
                     }
 
@@ -757,24 +757,33 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         //gMap.getUiSettings().setMyLocationButtonEnabled(true);
     }
 
+
     class GoToListener implements Runnable {
-        Socket s;
-        ServerSocket ss;
-        AtomicBoolean isAlive = new AtomicBoolean(true);
+        private Socket s;
+        private ServerSocket ss;
+        private AtomicBoolean isAlive = new AtomicBoolean(true);
+        private Thread worker;
+        private int consumerPort;
 
-
-        GoToListener() {
+        GoToListener(int port) {
             isAlive.set(true);
+            consumerPort = port;
         }
 
-        public void terminate(){
+        public void start() {
+            worker = new Thread(this);
+            worker.start();
+        }
+
+        public void stop() {
             isAlive.set(false);
         }
 
         @Override
         public void run() {
+            isAlive.set(true);
             try {
-                ss = new ServerSocket(android_port);
+                ss = new ServerSocket(consumerPort);
                 while (isAlive.get()) {
                     s = ss.accept();
                     DatumReader datumReader = new GenericDatumReader(schemaGoto);
@@ -800,7 +809,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                 // this will run in the main thread
                                 PrepareMap(gotoLat, gotoLon);
 
-                                while (WPAdapter.getLocked().get()){
+                                while (WPAdapter.getLocked().get()) {
                                     try {
                                         Thread.sleep(500);
                                     } catch (InterruptedException ex) {
@@ -813,12 +822,12 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                 while (WPAdapter.getStatus() != WaypointNavigation.WaypointMissionStatus.ACTIVE) {
 
                                     WPAdapter.stopWaypointMission();
-                                    if (WPAdapter.getStatus()== WaypointNavigation.WaypointMissionStatus.STOPPED) {
+                                    if (WPAdapter.getStatus() == WaypointNavigation.WaypointMissionStatus.STOPPED) {
                                         WPAdapter.Goto(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
                                                 new Waypoint(gotoLat, gotoLon, gotoAlt), mSpeed);
                                     }
 
-                                    while (WPAdapter.getLocked().get()){
+                                    while (WPAdapter.getLocked().get()) {
                                         try {
                                             Thread.sleep(1000);
                                         } catch (InterruptedException ex) {
@@ -831,33 +840,39 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                             }
                         });
 
-                        /*
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                while (true) {
 
-                                    stopWaypointMission();
-                                    PrepareMap(gotoLat, gotoLon);
+                        //handler.post(new Runnable() {
+                        //    @Override
+                        //    public void run() {
+                        //       while (true) {
 
-                                    //adapter.Goto(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
-                                    //        new Waypoint(gotoLat, gotoLon, gotoAlt), mSpeed);
-                                    Goto(gotoLat, gotoLon, gotoAlt);
-                                }
-                            }
-                        });*/
+                        //            stopWaypointMission();
+                        //            PrepareMap(gotoLat, gotoLon);
+
+                        //adapter.Goto(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
+                        //        new Waypoint(gotoLat, gotoLon, gotoAlt), mSpeed);
+                        //            Goto(gotoLat, gotoLon, gotoAlt);
+                        //        }
+                        //    }
+                        //});
 
                     }
                     //Goto(gotoLat, gotoLon, gotoAlt);
                     //Goto((double) gotoRecord.get("latitude"), (double) gotoRecord.get("longitude"),
                     //        (float) gotoRecord.get("altitude"));
                 }
+                s.close();
+                ss.close();
             } catch (IOException e) {
                 setResultToToast("Error in reading GOTO commands");
+                Log.d(TAG, e.toString());
             }
+
+
         }
 
     }
+
 
     public class SchemaLoader {
 
