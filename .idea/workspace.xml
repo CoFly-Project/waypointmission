@@ -17,7 +17,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="589e5def-51b5-448b-88cf-451b8ab0d27c" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/WaypointNavigation.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/WaypointNavigation.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -40,7 +39,7 @@
     </system>
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.12935954">
+    <splitter split-orientation="horizontal" split-proportion="0.3572711">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="activity_main.xml" pinned="false" current-in-tab="false">
@@ -67,7 +66,7 @@
           <file leaf-file-name="MainActivity.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="9636">
+                <state relative-caret-position="8844">
                   <caret line="440" selection-start-line="440" selection-end-line="440" />
                   <folding>
                     <element signature="imports" expanded="true" />
@@ -133,14 +132,14 @@
           <file leaf-file-name="WaypointNavigation.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/WaypointNavigation.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="622">
-                  <caret line="78" column="9" lean-forward="true" selection-start-line="78" selection-start-column="9" selection-end-line="78" selection-end-column="9" />
+                <state relative-caret-position="1152">
+                  <caret line="114" column="24" lean-forward="true" selection-start-line="114" selection-start-column="24" selection-end-line="114" selection-end-column="24" />
                   <folding>
                     <element signature="imports" expanded="true" />
-                    <element signature="e#6975#6976#0" expanded="true" />
-                    <element signature="e#7004#7005#0" expanded="true" />
-                    <element signature="e#7062#7063#0" expanded="true" />
-                    <element signature="e#7098#7099#0" expanded="true" />
+                    <element signature="e#6920#6921#0" expanded="true" />
+                    <element signature="e#6949#6950#0" expanded="true" />
+                    <element signature="e#7007#7008#0" expanded="true" />
+                    <element signature="e#7043#7044#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -2881,15 +2880,15 @@
       <window_info id="Image Layers" order="7" />
       <window_info id="Build Variants" order="2" side_tool="true" />
       <window_info anchor="right" id="Capture Analysis" order="4" />
-      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.07835821" side_tool="true" visible="true" weight="0.21579961" />
+      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.07835821" side_tool="true" visible="true" weight="0.09922928" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.8160981" weight="0.4682081" />
       <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49733475" weight="0.26493257" />
       <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.4968017" weight="0.22447014" />
-      <window_info active="true" anchor="bottom" id="Logcat" order="8" sideWeight="0.92164177" visible="true" weight="0.21579961" />
+      <window_info active="true" anchor="bottom" id="Logcat" order="8" sideWeight="0.92164177" visible="true" weight="0.09922928" />
       <window_info id="Captures" order="5" weight="0.25" />
       <window_info id="Capture Tool" order="3" />
       <window_info id="Designer" order="4" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.15938166" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.10927505" />
       <window_info anchor="bottom" id="Build" order="10" sideWeight="0.8187633" weight="0.21579961" />
       <window_info anchor="right" id="Gradle" order="5" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -3272,7 +3271,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="9636">
+        <state relative-caret-position="8844">
           <caret line="440" selection-start-line="440" selection-end-line="440" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -3284,14 +3283,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/WaypointNavigation.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="622">
-          <caret line="78" column="9" lean-forward="true" selection-start-line="78" selection-start-column="9" selection-end-line="78" selection-end-column="9" />
+        <state relative-caret-position="1152">
+          <caret line="114" column="24" lean-forward="true" selection-start-line="114" selection-start-column="24" selection-end-line="114" selection-end-column="24" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#6975#6976#0" expanded="true" />
-            <element signature="e#7004#7005#0" expanded="true" />
-            <element signature="e#7062#7063#0" expanded="true" />
-            <element signature="e#7098#7099#0" expanded="true" />
+            <element signature="e#6920#6921#0" expanded="true" />
+            <element signature="e#6949#6950#0" expanded="true" />
+            <element signature="e#7007#7008#0" expanded="true" />
+            <element signature="e#7043#7044#0" expanded="true" />
           </folding>
         </state>
       </provider>

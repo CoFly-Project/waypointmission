@@ -81,6 +81,8 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
 
         if (current_attempt<attempts) {
             uploadWayPointMission();
+        }else{
+            locked.set(false);
         }
     }
 
