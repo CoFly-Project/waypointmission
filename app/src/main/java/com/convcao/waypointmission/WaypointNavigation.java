@@ -76,6 +76,7 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
             }
             current_attempt++;
         }
+        Log.i(TAG, (current_attempt-1)+" were needed for this operation");
         Log.i(TAG, "(1/3) Mission loaded successfully!");
         uploadWayPointMission();
     }
@@ -104,6 +105,7 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
                         }
                         current_attempt++;
                     }
+                    Log.i(TAG, (current_attempt-1)+" were needed for this operation");
                     locked.set(false);
                 } else {
                     //setResultToToast("Mission upload failed, error: " + error.getDescription() + " retrying...");
@@ -144,6 +146,7 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
                 }
                 current_attempt++;
             }
+            Log.i(TAG, (current_attempt-1)+" were needed for this operation");
             locked.set(false);
         }
     }
