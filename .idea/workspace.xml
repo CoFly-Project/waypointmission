@@ -40,7 +40,7 @@
     </system>
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.31959417">
+    <splitter split-orientation="horizontal" split-proportion="0.12935954">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="activity_main.xml" pinned="false" current-in-tab="false">
@@ -133,10 +133,14 @@
           <file leaf-file-name="WaypointNavigation.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/WaypointNavigation.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="217">
-                  <caret line="97" column="44" lean-forward="true" selection-start-line="97" selection-start-column="44" selection-end-line="97" selection-end-column="44" />
+                <state relative-caret-position="622">
+                  <caret line="78" column="9" lean-forward="true" selection-start-line="78" selection-start-column="9" selection-end-line="78" selection-end-column="9" />
                   <folding>
                     <element signature="imports" expanded="true" />
+                    <element signature="e#6975#6976#0" expanded="true" />
+                    <element signature="e#7004#7005#0" expanded="true" />
+                    <element signature="e#7062#7063#0" expanded="true" />
+                    <element signature="e#7098#7099#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -196,7 +200,6 @@
       <find>handler</find>
       <find>INACTI</find>
       <find>INACTIVE</find>
-      <find>current_attempt&lt;=attempts</find>
       <find>startWaypointMission</find>
       <find>locate</find>
       <find>canonical_name</find>
@@ -206,6 +209,7 @@
       <find>switchB</find>
       <find>location</find>
       <find>gotoRun</find>
+      <find>current_attempt&lt;=attempts</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -2877,11 +2881,11 @@
       <window_info id="Image Layers" order="7" />
       <window_info id="Build Variants" order="2" side_tool="true" />
       <window_info anchor="right" id="Capture Analysis" order="4" />
-      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.18603411" side_tool="true" visible="true" weight="0.2947977" />
+      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.07835821" side_tool="true" visible="true" weight="0.21579961" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.8160981" weight="0.4682081" />
       <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49733475" weight="0.26493257" />
       <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.4968017" weight="0.22447014" />
-      <window_info active="true" anchor="bottom" id="Logcat" order="8" sideWeight="0.81396586" visible="true" weight="0.2947977" />
+      <window_info active="true" anchor="bottom" id="Logcat" order="8" sideWeight="0.92164177" visible="true" weight="0.21579961" />
       <window_info id="Captures" order="5" weight="0.25" />
       <window_info id="Capture Tool" order="3" />
       <window_info id="Designer" order="4" />
@@ -3280,10 +3284,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/WaypointNavigation.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="217">
-          <caret line="97" column="44" lean-forward="true" selection-start-line="97" selection-start-column="44" selection-end-line="97" selection-end-column="44" />
+        <state relative-caret-position="622">
+          <caret line="78" column="9" lean-forward="true" selection-start-line="78" selection-start-column="9" selection-end-line="78" selection-end-column="9" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#6975#6976#0" expanded="true" />
+            <element signature="e#7004#7005#0" expanded="true" />
+            <element signature="e#7062#7063#0" expanded="true" />
+            <element signature="e#7098#7099#0" expanded="true" />
           </folding>
         </state>
       </provider>
