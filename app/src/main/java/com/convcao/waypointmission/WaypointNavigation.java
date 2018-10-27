@@ -23,7 +23,7 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
     private FlightAssistant FA;
     private WaypointMissionStatus status;
 
-    private final int attempts = 25;
+    private final int attempts = 15;
 
     protected static final String TAG = "WaypointNavigationClass";
 

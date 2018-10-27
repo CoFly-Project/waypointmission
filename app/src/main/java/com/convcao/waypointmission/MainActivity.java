@@ -320,7 +320,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         lastPublishLocationOn = System.currentTimeMillis();
 
         WPAdapter = new WaypointNavigation();
-        adapter = new StartDJIGotoMission(mSpeed);
+
 
     }
 
@@ -809,6 +809,12 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                 // this will run in the main thread
                                 PrepareMap(gotoLat, gotoLon);
 
+                                adapter = new StartDJIGotoMission(mSpeed);
+                                adapter.execute(new Waypoint(droneLocationLat, droneLocationLng,
+                                        droneLocationAlt), new Waypoint(gotoLat, gotoLon, gotoAlt));
+
+
+                                /*
                                 while (WPAdapter.getLocked().get()) {
                                     try {
                                         Thread.sleep(500);
@@ -836,6 +842,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                     }
 
                                 }
+
+                                */
 
                             }
                         });
