@@ -1,6 +1,7 @@
 package com.convcao.waypointmission;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumWriter;
@@ -19,6 +20,7 @@ public class DispatchMessage extends AsyncTask<GenericRecord, Void, Void> {
     private String server_ip;
     private int port;
     private DatumWriter datumWriter;
+    protected static final String TAG = "DispatchMessage";
 
 
     public DispatchMessage(Schema schema, String server_ip, int port) {
@@ -32,7 +34,7 @@ public class DispatchMessage extends AsyncTask<GenericRecord, Void, Void> {
     protected Void doInBackground(GenericRecord... record) {
 
         GenericRecord recordToSend = record[0];
-
+        Log.i(TAG,"Send location to "+server_ip+":"+port);
         try {
             client = new Socket(server_ip, port);
             OutputStream outToServer = client.getOutputStream();
