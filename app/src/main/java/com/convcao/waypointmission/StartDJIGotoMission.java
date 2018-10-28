@@ -26,7 +26,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
     private WaypointMissionHeadingMode mHeadingMode;
     private FlightAssistant FA;
     private float speed;
-    private final int attempts = 15;
+    private final int attempts = 20;
     private WaypointMissionStatus status;
 
     protected static final String TAG = "StartDJIGotoMission";
@@ -95,8 +95,10 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
         Log.i(TAG, (current_attempt - 1) + " attempts were needed for this operation");
         Log.i(TAG, "(1/3) Mission loaded successfully!");
 
-        if (current_attempt < attempts) {
+        if (error == null) {
             uploadWayPointMission();
+        }else{
+            Log.i(TAG, error.getDescription());
         }
     }
 
@@ -142,6 +144,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
                     status = WaypointMissionStatus.ACTIVE;
                     Log.i(TAG, "(3/3) Mission started successfully!");
                 } else {
+                    Log.i(TAG, error.getDescription());
                     status = WaypointMissionStatus.FAIL_TO_START;
                 }
             }
