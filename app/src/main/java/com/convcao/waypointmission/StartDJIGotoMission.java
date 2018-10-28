@@ -93,9 +93,9 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
             current_attempt++;
         }
         Log.i(TAG, (current_attempt - 1) + " attempts were needed for this operation");
-        Log.i(TAG, "(1/3) Mission loaded successfully!");
 
         if (error == null) {
+            Log.i(TAG, "(1/3) Mission loaded successfully!");
             uploadWayPointMission();
         }else{
             Log.i(TAG, error.getDescription());
