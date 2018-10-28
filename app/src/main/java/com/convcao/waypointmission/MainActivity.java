@@ -129,6 +129,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private String server_ip;
     private int server_port;
     private int android_port;
+    private int connection_time_out;
     private String droneCanonicalName;
 
     private WaypointNavigation WPAdapter;
@@ -298,10 +299,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         android_port = Integer.parseInt(props.getProperty("port"));
         server_ip = props.getProperty("server_ip");
         server_port = Integer.parseInt(props.getProperty("server_port"));
-
-
-        LinearLayout connectionSettings = (LinearLayout) getLayoutInflater().inflate(
-                R.layout.dialog_info, null);
+        connection_time_out = Integer.parseInt(props.getProperty("connection_time_out"));
 
 
         minimumArmHeight = Double.parseDouble(props.getProperty("minimum_height_to_arm"));
@@ -435,7 +433,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         location.put("longitude", locationLon);
         location.put("altitude", alt);
 
-        dispatchMessage = new DispatchMessage(schemaLoader.getSchema("location"), server_ip, server_port);
+        dispatchMessage = new DispatchMessage(schemaLoader.getSchema("location"), server_ip,
+                server_port, connection_time_out);
         dispatchMessage.execute(location);
     }
 
@@ -566,6 +565,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         EditText server_port_ET = ((EditText) connectionSettings.findViewById(R.id.server_port));
         server_port_ET.setText(Integer.toString(server_port), TextView.BufferType.EDITABLE);
 
+        EditText timeout_ET = ((EditText) connectionSettings.findViewById(R.id.timeout));
+        timeout_ET.setText(Integer.toString(connection_time_out), TextView.BufferType.EDITABLE);
+
         new AlertDialog.Builder(this)
                 .setTitle("")
                 .setView(connectionSettings)
@@ -585,6 +587,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                 ((TextView) connectionSettings.findViewById(R.id.ip4))
                                         .getText().toString();
                         server_port = Integer.parseInt(((TextView) connectionSettings.findViewById(R.id.server_port))
+                                .getText().toString());
+
+                        connection_time_out = Integer.parseInt(((TextView) connectionSettings.findViewById(R.id.timeout))
                                 .getText().toString());
 
                         if (android_port_temp != android_port) {
