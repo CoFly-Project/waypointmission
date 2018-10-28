@@ -4,21 +4,28 @@ package com.convcao.waypointmission;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import dji.common.error.DJIError;
 import dji.common.mission.waypoint.Waypoint;
 import dji.common.mission.waypoint.WaypointMission;
 import dji.common.mission.waypoint.WaypointMissionFinishedAction;
 import dji.common.mission.waypoint.WaypointMissionFlightPathMode;
 import dji.common.mission.waypoint.WaypointMissionHeadingMode;
+import dji.common.mission.waypoint.WaypointMissionState;
 import dji.common.util.CommonCallbacks;
 import dji.sdk.flightcontroller.FlightAssistant;
+import dji.sdk.mission.MissionControl;
 import dji.sdk.mission.waypoint.WaypointMissionOperator;
 import dji.sdk.sdkmanager.DJISDKManager;
 
 public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
 
 
-    protected enum WaypointMissionStatus {ACTIVE, READY, FINISHED, INACTIVE, STOPPED, FAIL_TO_STOP, FAIL_TO_UPLOAD, FAIL_TO_START}
+    protected enum WaypointMissionStatus {
+        ACTIVE, READY, FINISHED, INACTIVE, STOPPED, LOADED, UPLOADED,
+        FAIL_TO_STOP, FAIL_TO_LOAD, FAIL_TO_UPLOAD, FAIL_TO_START
+    }
 
 
     private WaypointMissionOperator instance;
@@ -26,6 +33,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
     private WaypointMissionHeadingMode mHeadingMode;
     private FlightAssistant FA;
     private float speed;
+    protected boolean locked = false;
     private final int attempts = 20;
     private WaypointMissionStatus status;
 
@@ -42,7 +50,8 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
     public WaypointMissionOperator getWaypointMissionOperator() {
         if (instance == null) {
             if (DJISDKManager.getInstance().getMissionControl() != null) {
-                instance = DJISDKManager.getInstance().getMissionControl().getWaypointMissionOperator();
+                instance = MissionControl.getInstance().getWaypointMissionOperator();
+                //DJISDKManager.getInstance().getMissionControl().getWaypointMissionOperator();
             }
         }
         return instance;
@@ -51,24 +60,39 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
     @Override
     protected Void doInBackground(Waypoint... WPS) {
 
-        while(status!=WaypointMissionStatus.ACTIVE) {
+        while (status != WaypointMissionStatus.ACTIVE) {
             stopWaypointMission();
-            Goto(WPS[0], WPS[1], speed);
+            while (locked) { //Wait to stop the mission
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException ex) {
+                    Log.d(TAG, ex.toString());
+                }
+            }
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                Log.d(TAG, ex.toString());
+            if (status == WaypointMissionStatus.STOPPED) { //If it stopped successfully
+                Goto(WPS[0], WPS[1], speed);
+
+                while (locked) { //Wait to start the mission
+                    try {
+                        Thread.sleep(200);
+                    } catch (InterruptedException ex) {
+                        Log.d(TAG, ex.toString());
+                    }
+                }
             }
         }
         return null;
     }
 
 
-
-
     public void Goto(Waypoint WPc, Waypoint WPe, float speed) {
-        Log.i(TAG, "GOTO --> " + WPc.coordinate.toString());
+        locked = true;
+        Log.i(TAG, "GOTO --> " + WPe.coordinate.toString());
+        double dist = CalculateDistanceLatLon(WPc.coordinate.getLatitude(),
+                WPe.coordinate.getLatitude(), WPc.coordinate.getLongitude(), WPe.coordinate.getLongitude(),
+                WPc.altitude, WPe.altitude);
+        Log.i(TAG, "Distance between WPs --> " + dist + " meters");
         FA.setCollisionAvoidanceEnabled(true, null);
         FA.setActiveObstacleAvoidanceEnabled(true, null);
 
@@ -80,13 +104,67 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
         //.addWaypoint(fakeWP)
         //.waypointCount(2);
 
-        DJIError error = DJIError.COMMON_UNKNOWN;
+
+        getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
+
         status = WaypointMissionStatus.FAIL_TO_UPLOAD;
+        while (status.equals(WaypointMissionStatus.FAIL_TO_UPLOAD) ) {
+            if (WaypointMissionState.READY_TO_RETRY_UPLOAD.equals(getWaypointMissionOperator().getCurrentState
+                    ()) || WaypointMissionState.READY_TO_UPLOAD.equals(getWaypointMissionOperator().
+                    getCurrentState())) {
+                getWaypointMissionOperator().uploadMission(new CommonCallbacks.CompletionCallback() {
+                    @Override
+                    public void onResult(DJIError djiError) {
+                        if (djiError==null){
+                            status = WaypointMissionStatus.UPLOADED;
+                        }else {
+                            status = WaypointMissionStatus.FAIL_TO_UPLOAD;
+                            Log.i(TAG, djiError.toString());
+                        }
+                    }
+                });
+            }
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        status = WaypointMissionStatus.FAIL_TO_START;
+        while (status.equals(WaypointMissionStatus.FAIL_TO_START) ) {
+            if (WaypointMissionState.READY_TO_EXECUTE.equals(getWaypointMissionOperator().getCurrentState())) {
+                getWaypointMissionOperator().startMission(new CommonCallbacks.CompletionCallback() {
+                    @Override
+                    public void onResult(DJIError djiError) {
+                        if (djiError == null) {
+                            status = WaypointMissionStatus.ACTIVE;
+                            Log.i(TAG, "(3/3) Mission started successfully!");
+                        } else {
+                            Log.i(TAG, djiError.getDescription());
+                            status = WaypointMissionStatus.FAIL_TO_START;
+                        }
+                    }
+                });
+            }
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        locked = false;
+
+        /*
+        DJIError error = DJIError.COMMON_UNKNOWN;
+        status = WaypointMissionStatus.FAIL_TO_LOAD;
         int current_attempt = 1;
         while (error != null && current_attempt <= attempts) {
             error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
             try {
-                Thread.sleep(500);
+                Thread.sleep(300);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -99,7 +177,30 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
             uploadWayPointMission();
         }else{
             Log.i(TAG, error.getDescription());
+            locked = false;
         }
+        */
+
+    }
+
+    private double CalculateDistanceLatLon(double lat1, double lat2, double lon1,
+                                           double lon2, double el1, double el2) {
+
+        final int R = 6371; // Radius of the earth
+
+        Double latDistance = Math.toRadians(lat2 - lat1);
+        Double lonDistance = Math.toRadians(lon2 - lon1);
+        Double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = R * c * 1000; // convert to meters
+
+        double height = el1 - el2;
+
+        distance = Math.pow(distance, 2) + Math.pow(height, 2);
+
+        return Math.sqrt(distance);
     }
 
     private void uploadWayPointMission() {
@@ -108,9 +209,10 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
             public void onResult(DJIError error) {
                 if (error == null) {
                     //setResultToToast("Mission upload successfully!");
+                    status = WaypointMissionStatus.UPLOADED;
                     Log.i(TAG, "(2/3) Mission uploaded successfully!");
                     try {
-                        Thread.sleep(100);
+                        Thread.sleep(50);
                     } catch (InterruptedException ex) {
                         android.util.Log.d("Waypoint Mission", ex.toString());
                     }
@@ -126,9 +228,19 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
                         current_attempt++;
                     }
                     Log.i(TAG, (current_attempt - 1) + " attempts were needed for this operation");
+                    locked = false;
                 } else {
                     //setResultToToast("Mission upload failed, error: " + error.getDescription() + " retrying...");
-                    getWaypointMissionOperator().retryUploadMission(null);
+                    status = WaypointMissionStatus.FAIL_TO_UPLOAD;
+                    Log.i(TAG, "Mission upload failed, error: " + error.getDescription() + " retrying...");
+                    getWaypointMissionOperator().retryUploadMission(new CommonCallbacks.CompletionCallback() {
+                        @Override
+                        public void onResult(DJIError error) {
+                            if (error != null) {
+                                locked = false;
+                            }
+                        }
+                    });
                 }
             }
         });
@@ -144,7 +256,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
                     status = WaypointMissionStatus.ACTIVE;
                     Log.i(TAG, "(3/3) Mission started successfully!");
                 } else {
-                    Log.i(TAG, error.getDescription());
+                    //Log.i(TAG, error.getDescription());
                     status = WaypointMissionStatus.FAIL_TO_START;
                 }
             }
@@ -154,6 +266,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
 
     public void stopWaypointMission() {
         if (status != WaypointMissionStatus.STOPPED) {
+            locked = true;
             Log.i(TAG, "Stop previous mission");
             int current_attempt = 1;
             while (status != WaypointMissionStatus.STOPPED && current_attempt <= attempts) {
@@ -166,6 +279,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
                 current_attempt++;
             }
             Log.i(TAG, (current_attempt - 1) + " attempts were needed for this operation");
+            locked = false;
         }
     }
 
