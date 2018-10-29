@@ -125,13 +125,12 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
         //.addWaypoint(fakeWP)
         //.waypointCount(2);
 
-        WaypointMission builtMission = waypointMissionBuilder.build();
-        DJIError error = builtMission.checkParameters();
+
+        DJIError error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
         int attempts = 1;
         while (error != null && attempts <= MAX_ATTEMPTS) {
-            builtMission = waypointMissionBuilder.build();
-            error = builtMission.checkParameters();
             Log.i(TAG, "Error with the parameters of the mission: " + error.toString());
+            error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
             try {
                 Thread.sleep(300);
             } catch (InterruptedException e) {
@@ -139,11 +138,9 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
             }
             attempts++;
         }
-        getWaypointMissionOperator().loadMission(builtMission);
-        Log.i(TAG, "(1/3) Mission loaded successfully!");
-        Log.i(TAG, "No. attempts: " + (attempts - 1));
 
-        if (error != null) {
+        if (error == null) {
+            Log.i(TAG, "(1/3) Mission loaded successfully! No. attempts: " + attempts );
             attempts = 1;
             status = WaypointMissionStatus.FAIL_TO_UPLOAD;
             while (status.equals(WaypointMissionStatus.FAIL_TO_UPLOAD) && attempts <= MAX_ATTEMPTS) {
