@@ -127,69 +127,79 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
 
         WaypointMission builtMission = waypointMissionBuilder.build();
         DJIError error = builtMission.checkParameters();
-        while (error != null) {
+        int attempts = 1;
+        while (error != null && attempts <= MAX_ATTEMPTS) {
             builtMission = waypointMissionBuilder.build();
             error = builtMission.checkParameters();
-            Log.i(TAG, "Error with the parameters of the mission: "+error.toString());
+            Log.i(TAG, "Error with the parameters of the mission: " + error.toString());
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            attempts++;
         }
         getWaypointMissionOperator().loadMission(builtMission);
         Log.i(TAG, "(1/3) Mission loaded successfully!");
-
-        int attempts = 1;
-        status = WaypointMissionStatus.FAIL_TO_UPLOAD;
-        while (status.equals(WaypointMissionStatus.FAIL_TO_UPLOAD) && attempts <= MAX_ATTEMPTS) {
-            if (WaypointMissionState.READY_TO_RETRY_UPLOAD.equals(getWaypointMissionOperator().getCurrentState
-                    ()) || WaypointMissionState.READY_TO_UPLOAD.equals(getWaypointMissionOperator().
-                    getCurrentState())) {
-                getWaypointMissionOperator().uploadMission(new CommonCallbacks.CompletionCallback() {
-                    @Override
-                    public void onResult(DJIError djiError) {
-                        if (djiError == null) {
-                            status = WaypointMissionStatus.UPLOADED;
-                            Log.i(TAG, "(2/3) Mission uploaded successfully!");
-                        } else {
-                            status = WaypointMissionStatus.FAIL_TO_UPLOAD;
-                            Log.i(TAG, djiError.toString());
-                        }
-                    }
-                });
-            }
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            attempts++;
-        }
         Log.i(TAG, "No. attempts: " + (attempts - 1));
 
-
-        attempts = 1;
-        status = WaypointMissionStatus.FAIL_TO_START;
-        while (status.equals(WaypointMissionStatus.FAIL_TO_START) && attempts <= MAX_ATTEMPTS) {
-            if (WaypointMissionState.READY_TO_EXECUTE.equals(getWaypointMissionOperator().getCurrentState())) {
-                getWaypointMissionOperator().startMission(new CommonCallbacks.CompletionCallback() {
-                    @Override
-                    public void onResult(DJIError djiError) {
-                        if (djiError == null) {
-                            status = WaypointMissionStatus.ACTIVE;
-                            Log.i(TAG, "(3/3) Mission started successfully!");
-                        } else {
-                            Log.i(TAG, djiError.getDescription());
-                            status = WaypointMissionStatus.FAIL_TO_START;
+        if (error != null) {
+            attempts = 1;
+            status = WaypointMissionStatus.FAIL_TO_UPLOAD;
+            while (status.equals(WaypointMissionStatus.FAIL_TO_UPLOAD) && attempts <= MAX_ATTEMPTS) {
+                if (WaypointMissionState.READY_TO_RETRY_UPLOAD.equals(getWaypointMissionOperator().getCurrentState
+                        ()) || WaypointMissionState.READY_TO_UPLOAD.equals(getWaypointMissionOperator().
+                        getCurrentState())) {
+                    getWaypointMissionOperator().uploadMission(new CommonCallbacks.CompletionCallback() {
+                        @Override
+                        public void onResult(DJIError djiError) {
+                            if (djiError == null) {
+                                status = WaypointMissionStatus.UPLOADED;
+                                Log.i(TAG, "(2/3) Mission uploaded successfully!");
+                            } else {
+                                status = WaypointMissionStatus.FAIL_TO_UPLOAD;
+                                Log.i(TAG, djiError.toString());
+                            }
                         }
-                    }
-                });
+                    });
+                }
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                attempts++;
             }
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            attempts++;
-        }
-        Log.i(TAG, "No. attempts: " + (attempts - 1));
+            Log.i(TAG, "No. attempts: " + (attempts - 1));
 
+            if (status.equals(WaypointMissionStatus.UPLOADED)) {
+                attempts = 1;
+                status = WaypointMissionStatus.FAIL_TO_START;
+                while (status.equals(WaypointMissionStatus.FAIL_TO_START) && attempts <= MAX_ATTEMPTS) {
+                    if (WaypointMissionState.READY_TO_EXECUTE.equals(getWaypointMissionOperator().getCurrentState())) {
+                        getWaypointMissionOperator().startMission(new CommonCallbacks.CompletionCallback() {
+                            @Override
+                            public void onResult(DJIError djiError) {
+                                if (djiError == null) {
+                                    status = WaypointMissionStatus.ACTIVE;
+                                    Log.i(TAG, "(3/3) Mission started successfully!");
+                                } else {
+                                    Log.i(TAG, djiError.getDescription());
+                                    status = WaypointMissionStatus.FAIL_TO_START;
+                                }
+                            }
+                        });
+                    }
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    attempts++;
+                }
+                Log.i(TAG, "No. attempts: " + (attempts - 1));
+            }
+        }
         locked = false;
 
         /*

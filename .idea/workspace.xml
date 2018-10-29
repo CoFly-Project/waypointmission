@@ -119,8 +119,8 @@
           <file leaf-file-name="StartDJIGotoMission.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-404">
-                  <caret line="104" selection-start-line="104" selection-end-line="104" />
+                <state relative-caret-position="1774">
+                  <caret line="200" column="13" selection-start-line="200" selection-start-column="13" selection-end-line="200" selection-end-column="13" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -2468,8 +2468,8 @@
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DispatchMessage.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/dialog_info.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java" />
         <option value="$PROJECT_DIR$/app/src/main/assets/properties/Parameters.properties" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java" />
       </list>
     </option>
   </component>
@@ -2842,11 +2842,11 @@
       <window_info id="Image Layers" order="7" />
       <window_info id="Build Variants" order="2" side_tool="true" />
       <window_info anchor="right" id="Capture Analysis" order="4" />
-      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.08528785" side_tool="true" visible="true" weight="0.2716763" />
+      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.08528785" side_tool="true" visible="true" weight="0.26974952" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.81449896" weight="0.27360308" />
       <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49733475" weight="0.26493257" />
       <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.4968017" weight="0.22447014" />
-      <window_info active="true" anchor="bottom" id="Logcat" order="8" sideWeight="0.91471213" visible="true" weight="0.2716763" />
+      <window_info active="true" anchor="bottom" id="Logcat" order="8" sideWeight="0.91471213" visible="true" weight="0.26974952" />
       <window_info id="Captures" order="5" weight="0.25" />
       <window_info id="Capture Tool" order="3" />
       <window_info id="Designer" order="4" />
@@ -3255,8 +3255,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-404">
-          <caret line="104" selection-start-line="104" selection-end-line="104" />
+        <state relative-caret-position="1774">
+          <caret line="200" column="13" selection-start-line="200" selection-start-column="13" selection-end-line="200" selection-end-column="13" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
