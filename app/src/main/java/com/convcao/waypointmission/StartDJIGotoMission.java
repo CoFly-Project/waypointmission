@@ -34,7 +34,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
     private FlightAssistant FA;
     private float speed;
     protected boolean locked = false;
-    private final int attempts = 20;
+    private final int MAX_ATTEMPTS = 20;
     private WaypointMissionStatus status;
 
     protected static final String TAG = "StartDJIGotoMission";
@@ -106,9 +106,11 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
 
 
         getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
+        Log.i(TAG, "(1/3) Mission loaded successfully!");
 
+        int attempts = 1;
         status = WaypointMissionStatus.FAIL_TO_UPLOAD;
-        while (status.equals(WaypointMissionStatus.FAIL_TO_UPLOAD) ) {
+        while (status.equals(WaypointMissionStatus.FAIL_TO_UPLOAD) && attempts<=MAX_ATTEMPTS) {
             if (WaypointMissionState.READY_TO_RETRY_UPLOAD.equals(getWaypointMissionOperator().getCurrentState
                     ()) || WaypointMissionState.READY_TO_UPLOAD.equals(getWaypointMissionOperator().
                     getCurrentState())) {
@@ -117,6 +119,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
                     public void onResult(DJIError djiError) {
                         if (djiError==null){
                             status = WaypointMissionStatus.UPLOADED;
+                            Log.i(TAG, "(2/3) Mission uploaded successfully!");
                         }else {
                             status = WaypointMissionStatus.FAIL_TO_UPLOAD;
                             Log.i(TAG, djiError.toString());
@@ -129,10 +132,14 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            attempts++;
         }
+        Log.i(TAG, "No. attempts: "+(attempts-1));
 
+
+        attempts = 1;
         status = WaypointMissionStatus.FAIL_TO_START;
-        while (status.equals(WaypointMissionStatus.FAIL_TO_START) ) {
+        while (status.equals(WaypointMissionStatus.FAIL_TO_START) && attempts<=MAX_ATTEMPTS) {
             if (WaypointMissionState.READY_TO_EXECUTE.equals(getWaypointMissionOperator().getCurrentState())) {
                 getWaypointMissionOperator().startMission(new CommonCallbacks.CompletionCallback() {
                     @Override
@@ -152,8 +159,9 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            attempts++;
         }
-
+        Log.i(TAG, "No. attempts: "+(attempts-1));
 
         locked = false;
 
@@ -161,7 +169,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
         DJIError error = DJIError.COMMON_UNKNOWN;
         status = WaypointMissionStatus.FAIL_TO_LOAD;
         int current_attempt = 1;
-        while (error != null && current_attempt <= attempts) {
+        while (error != null && current_attempt <= MAX_ATTEMPTS) {
             error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
             try {
                 Thread.sleep(300);
@@ -218,7 +226,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
                     }
                     status = WaypointMissionStatus.FAIL_TO_START;
                     int current_attempt = 1;
-                    while (status == WaypointMissionStatus.FAIL_TO_START && current_attempt <= attempts) {
+                    while (status == WaypointMissionStatus.FAIL_TO_START && current_attempt <= MAX_ATTEMPTS) {
                         startWaypointMission();
                         try {
                             Thread.sleep(500);
@@ -269,7 +277,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
             locked = true;
             Log.i(TAG, "Stop previous mission");
             int current_attempt = 1;
-            while (status != WaypointMissionStatus.STOPPED && current_attempt <= attempts) {
+            while (status != WaypointMissionStatus.STOPPED && current_attempt <= MAX_ATTEMPTS) {
                 stopExecution();
                 try {
                     Thread.sleep(500);
