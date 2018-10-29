@@ -40,7 +40,7 @@
     </system>
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.21889672">
+    <splitter split-orientation="horizontal" split-proportion="0.23057644">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="activity_main.xml" pinned="false" current-in-tab="false">
@@ -55,11 +55,14 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="MainActivity.java" pinned="false" current-in-tab="false">
+          <file leaf-file-name="MainActivity.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="616">
-                  <caret line="28" selection-start-line="28" selection-end-line="28" />
+                <state relative-caret-position="227">
+                  <caret line="341" column="38" selection-start-line="341" selection-start-column="24" selection-end-line="341" selection-end-column="38" />
+                  <folding>
+                    <element signature="imports" expanded="true" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -88,11 +91,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="WaypointNavigation.java" pinned="false" current-in-tab="true">
+          <file leaf-file-name="WaypointNavigation.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/WaypointNavigation.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="208">
-                  <caret line="116" column="49" selection-start-line="116" selection-start-column="49" selection-end-line="116" selection-end-column="49" />
+                <state relative-caret-position="274">
+                  <caret line="119" column="11" selection-start-line="119" selection-start-column="11" selection-end-line="119" selection-end-column="11" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -107,8 +110,8 @@
           <file leaf-file-name="Parameters.properties" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/app/src/main/assets/properties/Parameters.properties">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="352">
-                  <caret line="16" column="14" selection-start-line="16" selection-start-column="14" selection-end-line="16" selection-end-column="14" />
+                <state relative-caret-position="88">
+                  <caret line="4" column="25" selection-start-line="4" selection-start-column="25" selection-end-line="4" selection-end-column="25" />
                 </state>
               </provider>
             </entry>
@@ -116,8 +119,8 @@
           <file leaf-file-name="StartDJIGotoMission.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1164">
-                  <caret line="184" column="36" selection-start-line="184" selection-start-column="36" selection-end-line="184" selection-end-column="36" />
+                <state relative-caret-position="-404">
+                  <caret line="104" selection-start-line="104" selection-end-line="104" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -138,7 +141,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>instance</find>
       <find>inOperation</find>
       <find>execute</find>
       <find>stop</find>
@@ -168,6 +170,7 @@
       <find>started</find>
       <find>WaypointMissionStatus.ACTIVE</find>
       <find>server_ip</find>
+      <find>camera</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -2462,11 +2465,11 @@
         <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_info_connection.xml" />
         <option value="$PROJECT_DIR$/app/src/main/res/drawable/info_button.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/WaypointNavigation.java" />
-        <option value="$PROJECT_DIR$/app/src/main/assets/properties/Parameters.properties" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DispatchMessage.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/dialog_info.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java" />
+        <option value="$PROJECT_DIR$/app/src/main/assets/properties/Parameters.properties" />
       </list>
     </option>
   </component>
@@ -2831,6 +2834,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="Android Profiler" order="7" sideWeight="0.5565032" weight="0.4479769" />
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.4989339" weight="0.1406551" />
@@ -2838,15 +2842,15 @@
       <window_info id="Image Layers" order="7" />
       <window_info id="Build Variants" order="2" side_tool="true" />
       <window_info anchor="right" id="Capture Analysis" order="4" />
-      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.084754795" side_tool="true" visible="true" weight="0.41811174" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.815032" weight="0.27360308" />
+      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.08528785" side_tool="true" visible="true" weight="0.2716763" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.81449896" weight="0.27360308" />
       <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49733475" weight="0.26493257" />
       <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.4968017" weight="0.22447014" />
-      <window_info active="true" anchor="bottom" id="Logcat" order="8" sideWeight="0.9152452" visible="true" weight="0.41811174" />
+      <window_info active="true" anchor="bottom" id="Logcat" order="8" sideWeight="0.91471213" visible="true" weight="0.2716763" />
       <window_info id="Captures" order="5" weight="0.25" />
       <window_info id="Capture Tool" order="3" />
       <window_info id="Designer" order="4" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.09168444" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.14925373" />
       <window_info anchor="bottom" id="Build" order="10" sideWeight="0.81663114" weight="0.39691713" />
       <window_info anchor="right" id="Gradle" order="5" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -3215,17 +3219,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java">
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.dji/dji-sdk-provided/4.5.1/62ce4f661efdc0d08d4926e0505bc9249eb7c193/dji-sdk-provided-4.5.1.jar!/dji/sdk/mission/waypoint/WaypointMissionOperator.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="616">
-          <caret line="28" selection-start-line="28" selection-end-line="28" />
+        <state relative-caret-position="132">
+          <caret line="17" column="13" selection-start-line="17" selection-start-column="13" selection-end-line="17" selection-end-column="13" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/WaypointNavigation.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="208">
-          <caret line="116" column="49" selection-start-line="116" selection-start-column="49" selection-end-line="116" selection-end-column="49" />
+        <state relative-caret-position="274">
+          <caret line="119" column="11" selection-start-line="119" selection-start-column="11" selection-end-line="119" selection-end-column="11" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="227">
+          <caret line="341" column="38" selection-start-line="341" selection-start-column="24" selection-end-line="341" selection-end-column="38" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -3234,22 +3248,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/assets/properties/Parameters.properties">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
-          <caret line="16" column="14" selection-start-line="16" selection-start-column="14" selection-end-line="16" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.dji/dji-sdk-provided/4.5.1/62ce4f661efdc0d08d4926e0505bc9249eb7c193/dji-sdk-provided-4.5.1.jar!/dji/sdk/mission/waypoint/WaypointMissionOperator.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="132">
-          <caret line="17" column="13" selection-start-line="17" selection-start-column="13" selection-end-line="17" selection-end-column="13" />
+        <state relative-caret-position="88">
+          <caret line="4" column="25" selection-start-line="4" selection-start-column="25" selection-end-line="4" selection-end-column="25" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1164">
-          <caret line="184" column="36" selection-start-line="184" selection-start-column="36" selection-end-line="184" selection-end-column="36" />
+        <state relative-caret-position="-404">
+          <caret line="104" selection-start-line="104" selection-end-line="104" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
