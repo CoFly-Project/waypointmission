@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import dji.common.camera.SettingsDefinitions;
 import dji.common.error.DJIError;
+import dji.common.flightcontroller.FlightControllerState;
 import dji.common.mission.waypoint.Waypoint;
 import dji.common.mission.waypoint.WaypointMission;
 import dji.common.mission.waypoint.WaypointMissionFinishedAction;
@@ -19,8 +20,10 @@ import dji.common.mission.waypoint.WaypointMissionState;
 import dji.common.util.CommonCallbacks;
 import dji.sdk.camera.Camera;
 import dji.sdk.flightcontroller.FlightAssistant;
+import dji.sdk.flightcontroller.FlightController;
 import dji.sdk.mission.MissionControl;
 import dji.sdk.mission.waypoint.WaypointMissionOperator;
+import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKManager;
 
 public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
@@ -109,11 +112,32 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
 
     public void Goto(Waypoint WPc, Waypoint WPe, float speed) {
         locked = true;
-        Log.i(TAG, "GOTO --> " + WPe.coordinate.toString());
-        double dist = CalculateDistanceLatLon(WPc.coordinate.getLatitude(),
-                WPe.coordinate.getLatitude(), WPc.coordinate.getLongitude(), WPe.coordinate.getLongitude(),
-                WPc.altitude, WPe.altitude);
+
+        FlightController mFlightController = ((Aircraft) DJIApplication.getProductInstance()).getFlightController();
+        FlightControllerState droneState = mFlightController.getState();
+
+        Log.i(TAG, "Current Position --> [" + droneState.getAircraftLocation().getLatitude()+","
+                +droneState.getAircraftLocation().getLongitude()+","+droneState.getAircraftLocation().getAltitude()+"]");
+        Log.i(TAG, "Fake Waypoint --> [" +WPc.coordinate.getLatitude()+","
+                +WPc.coordinate.getLongitude() +","+WPc.altitude+"]");
+        Log.i(TAG, "Actual Waypoint --> [" +WPe.coordinate.getLatitude()+","
+                +WPe.coordinate.getLongitude() +","+WPe.altitude+"]");
+
+        double dist = CalculateDistanceLatLon(droneState.getAircraftLocation().getLatitude(),
+                WPc.coordinate.getLatitude(), droneState.getAircraftLocation().getLongitude(),
+                WPc.coordinate.getLongitude(), droneState.getAircraftLocation().getAltitude(), WPc.altitude);
+        Log.i(TAG, "Distance between drone's current position and the first(fake) WP --> " + dist + " meters");
+
+        dist = CalculateDistanceLatLon(droneState.getAircraftLocation().getLatitude(),
+                WPe.coordinate.getLatitude(), droneState.getAircraftLocation().getLongitude(),
+                WPe.coordinate.getLongitude(), droneState.getAircraftLocation().getAltitude(), WPe.altitude);
+        Log.i(TAG, "Distance between drone's current position and the actual WP --> " + dist + " meters");
+
+        dist = CalculateDistanceLatLon(WPc.coordinate.getLatitude(), WPe.coordinate.getLatitude(),
+                WPc.coordinate.getLongitude(), WPe.coordinate.getLongitude(), WPc.altitude, WPe.altitude);
         Log.i(TAG, "Distance between WPs --> " + dist + " meters");
+
+
         FA.setCollisionAvoidanceEnabled(true, null);
         FA.setActiveObstacleAvoidanceEnabled(true, null);
 
