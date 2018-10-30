@@ -44,6 +44,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
     private final int MAX_ATTEMPTS = 20;
     private WaypointMissionStatus status;
     private Handler handler;
+    private Waypoint WP1, WP2;
 
     private boolean imageTaken = false;
 
@@ -60,7 +61,8 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
 
     public WaypointMissionOperator getWaypointMissionOperator() {
         if (instance == null) {
-            if (DJISDKManager.getInstance().getMissionControl() != null) {
+            if (MissionControl.getInstance().getWaypointMissionOperator() != null) {
+                Log.i(TAG, "The Mission Control Operator was null!");
                 instance = MissionControl.getInstance().getWaypointMissionOperator();
                 //DJISDKManager.getInstance().getMissionControl().getWaypointMissionOperator();
             }
@@ -70,8 +72,10 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
 
     @Override
     protected Void doInBackground(Waypoint... WPS) {
-
-        while (status != WaypointMissionStatus.ACTIVE) {
+        this.WP1 = WPS[0];
+        this.WP2 = WPS[1];
+        int attempt=1;
+        while (attempt<=2) {
             stopWaypointMission();
             while (locked) { //Wait to stop the mission
                 try {
@@ -82,7 +86,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
             }
 
             if (status == WaypointMissionStatus.STOPPED) { //If it stopped successfully
-                Goto(WPS[0], WPS[1], speed);
+                Goto(WP1, WP2, speed);
 
                 while (locked) { //Wait to start the mission
                     try {
@@ -92,6 +96,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
                     }
                 }
             }
+            attempt++;
         }
 
         /*
@@ -107,6 +112,15 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
         */
 
         return null;
+    }
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        if (status != WaypointMissionStatus.ACTIVE){
+            DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
+            StartDJIGotoMission adapterNew = new StartDJIGotoMission(speed);
+            adapterNew.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, WP1, WP2);
+        }
     }
 
 
@@ -220,6 +234,8 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
                 }
                 Log.i(TAG, "No. attempts: " + (attempts - 1));
             }
+        }else{
+            status = WaypointMissionStatus.INACTIVE;
         }
         locked = false;
 

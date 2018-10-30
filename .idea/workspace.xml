@@ -6,7 +6,7 @@
     </shared>
   </component>
   <component name="AndroidLogFilters">
-    <option name="TOOL_WINDOW_CUSTOM_FILTER" value="StartDJIGotoMission" />
+    <option name="TOOL_WINDOW_CUSTOM_FILTER" value="DispatchMessage" />
     <option name="TOOL_WINDOW_LOG_LEVEL" value="info" />
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="No Filters" />
   </component>
@@ -18,6 +18,7 @@
   <component name="ChangeListManager">
     <list default="true" id="589e5def-51b5-448b-88cf-451b8ab0d27c" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -40,14 +41,19 @@
     </system>
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.22313084">
+    <splitter split-orientation="horizontal" split-proportion="0.5525701">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="MainActivity.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="421">
-                  <caret line="410" column="105" selection-start-line="410" selection-start-column="93" selection-end-line="410" selection-end-column="105" />
+                <state relative-caret-position="374">
+                  <caret line="823" column="63" selection-start-line="823" selection-start-column="63" selection-end-line="823" selection-end-column="63" />
+                  <folding>
+                    <element signature="e#11342#11374#0" expanded="true" />
+                    <element signature="e#12878#13043#0" expanded="true" />
+                    <element signature="e#13042#13043#0" expanded="true" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -129,7 +135,7 @@
             <entry file="file://$PROJECT_DIR$/app/build.gradle">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="1031">
-                  <caret line="68" column="1" lean-forward="true" selection-start-line="68" selection-start-column="1" selection-end-line="68" selection-end-column="1" />
+                  <caret line="68" column="1" selection-start-line="68" selection-start-column="1" selection-end-line="68" selection-end-column="1" />
                 </state>
               </provider>
             </entry>
@@ -137,8 +143,8 @@
           <file leaf-file-name="StartDJIGotoMission.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="341">
-                  <caret line="124" lean-forward="true" selection-start-line="124" selection-end-line="124" />
+                <state relative-caret-position="501">
+                  <caret line="130" column="25" selection-start-line="130" selection-start-column="25" selection-end-line="130" selection-end-column="25" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -159,9 +165,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>inOperation</find>
-      <find>execute</find>
-      <find>stop</find>
       <find>Goto</find>
       <find>mSpeed</find>
       <find>not_started</find>
@@ -189,6 +192,9 @@
       <find>WaypointMissionStatus.ACTIVE</find>
       <find>server_ip</find>
       <find>camera</find>
+      <find>The execution cou</find>
+      <find>The exe</find>
+      <find>execute</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -2491,14 +2497,14 @@
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DispatchMessage.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/dialog_info.xml" />
         <option value="$PROJECT_DIR$/app/src/main/assets/properties/Parameters.properties" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="212" />
-    <option name="y" value="129" />
+    <option name="x" value="10" />
+    <option name="y" value="44" />
     <option name="width" value="1932" />
     <option name="height" value="1165" />
   </component>
@@ -2881,29 +2887,29 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="Android Profiler" order="7" sideWeight="0.5565032" weight="0.4479769" />
-      <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.4989339" weight="0.1406551" />
+      <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49840087" weight="0.1406551" />
       <window_info anchor="right" id="Palette&#9;" order="7" />
       <window_info id="Image Layers" order="7" />
       <window_info id="Build Variants" order="2" side_tool="true" />
       <window_info anchor="right" id="Capture Analysis" order="4" />
-      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.1977612" side_tool="true" visible="true" weight="0.18015414" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.83742005" weight="0.5192678" />
-      <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49733475" weight="0.26493257" />
+      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.09381663" side_tool="true" visible="true" weight="0.27938342" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.83635396" weight="0.5192678" />
+      <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49626866" weight="0.26493257" />
       <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.4968017" weight="0.22447014" />
-      <window_info anchor="bottom" id="Logcat" order="8" sideWeight="0.9141791" weight="0.2601156" />
+      <window_info active="true" anchor="bottom" id="Logcat" order="8" sideWeight="0.90618336" visible="true" weight="0.27938342" />
       <window_info id="Captures" order="5" weight="0.25" />
       <window_info id="Capture Tool" order="3" />
       <window_info id="Designer" order="4" />
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.08742005" />
-      <window_info active="true" anchor="bottom" id="Build" order="10" sideWeight="0.8022388" visible="true" weight="0.18015414" />
+      <window_info anchor="bottom" id="Build" order="10" sideWeight="0.8017058" weight="0.2726397" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.13487476" />
       <window_info anchor="right" id="Gradle" order="5" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Device File Explorer" order="3" side_tool="true" />
       <window_info anchor="right" id="Theme Preview" order="6" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.7782516" weight="0.42003852" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.77025586" weight="0.6136802" />
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info id="Designer" order="4" />
@@ -2928,7 +2934,6 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.13487476" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.81449896" weight="0.27360308" />
       <window_info anchor="bottom" id="Build" order="10" sideWeight="0.81663114" weight="0.39691713" />
       <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.4968017" weight="0.22447014" />
@@ -2969,11 +2974,78 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="365" />
+      <option name="time" value="398" />
     </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
+    <expressions id="evaluateCodeFragment">
+      <expression>
+        <expression-string>DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>status = WaypointMissionStatus.ACTIVE</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>status = WaypointMissionStatus.ACTIVE;</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>attempt=1;</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>getWaypointMissionOperator().getCurrentState()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>getWaypointMissionOperator()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>waypointMissionBuilder.build()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>waypointMissionBuilder.build().checkParameters()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>attempt=2;</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+    </expressions>
     <expressions id="evaluateExpression">
+      <expression>
+        <expression-string>Waypoint WP_temp0 = new Waypoint(41.13830192226055, 24.915062120831, 40.0f);</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>getWaypointMissionOperator().loadMission(waypointMissionBuilder.build())</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>waypointMissionBuilder.build()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>instance = MissionControl.getInstance().getWaypointMissionOperator()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>(EditText)connectionSettings.findViewById(R.id.canonical_name)</expression-string>
         <language-id>JAVA</language-id>
@@ -3004,25 +3076,9 @@
         <language-id>JAVA</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
-      <expression>
-        <expression-string>WPAdapter.getLocked().get()</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>error.getDescription()</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>WPAdapter.isCancelled()</expression-string>
-        <language-id>JAVA</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/schemas/goto.avsc" />
     <entry file="file://$PROJECT_DIR$/app/src/main/res/schemas/header.avsc" />
     <entry file="file://$PROJECT_DIR$/app/src/main/res/schemas/location.avsc" />
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MApplication.java">
@@ -3322,21 +3378,33 @@
     <entry file="file://$PROJECT_DIR$/app/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1031">
-          <caret line="68" column="1" lean-forward="true" selection-start-line="68" selection-start-column="1" selection-end-line="68" selection-end-column="1" />
+          <caret line="68" column="1" selection-start-line="68" selection-start-column="1" selection-end-line="68" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.dji/dji-sdk-provided/4.5.1/62ce4f661efdc0d08d4926e0505bc9249eb7c193/dji-sdk-provided-4.5.1.jar!/dji/common/error/DJIError.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="154">
+          <caret line="14" column="13" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="421">
-          <caret line="410" column="105" selection-start-line="410" selection-start-column="93" selection-end-line="410" selection-end-column="105" />
+        <state relative-caret-position="374">
+          <caret line="823" column="63" selection-start-line="823" selection-start-column="63" selection-end-line="823" selection-end-column="63" />
+          <folding>
+            <element signature="e#11342#11374#0" expanded="true" />
+            <element signature="e#12878#13043#0" expanded="true" />
+            <element signature="e#13042#13043#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="341">
-          <caret line="124" lean-forward="true" selection-start-line="124" selection-end-line="124" />
+        <state relative-caret-position="501">
+          <caret line="130" column="25" selection-start-line="130" selection-start-column="25" selection-end-line="130" selection-end-column="25" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
