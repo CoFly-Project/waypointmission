@@ -70,9 +70,12 @@ import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
 import dji.sdk.flightcontroller.FlightAssistant;
 import dji.sdk.flightcontroller.FlightController;
+import dji.sdk.mission.MissionControl;
 import dji.sdk.mission.waypoint.WaypointMissionOperator;
 import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKManager;
+
+import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
 
 
 public class MainActivity extends FragmentActivity implements TextureView.SurfaceTextureListener,
@@ -436,7 +439,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
         dispatchMessage = new DispatchMessage(schemaLoader.getSchema("location"), server_ip,
                 server_port, connection_time_out);
-        dispatchMessage.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,location);
+        dispatchMessage.execute(location);
     }
 
 
@@ -815,8 +818,10 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                 // this will run in the main thread
                                 PrepareMap(gotoLat, gotoLon);
 
+                                //MissionControl.getInstance().getWaypointMissionOperator().destroy();
+                                DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
                                 adapter = new StartDJIGotoMission(mSpeed);
-                                adapter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, new Waypoint(droneLocationLat, droneLocationLng,
+                                adapter.execute(new Waypoint(droneLocationLat, droneLocationLng,
                                         droneLocationAlt), new Waypoint(gotoLat, gotoLon, gotoAlt));
 
 

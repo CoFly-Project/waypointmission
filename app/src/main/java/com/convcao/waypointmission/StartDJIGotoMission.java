@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import dji.common.camera.SettingsDefinitions;
@@ -41,7 +42,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
     private FlightAssistant FA;
     private float speed;
     protected boolean locked = false;
-    private final int MAX_ATTEMPTS = 20;
+    private final int MAX_ATTEMPTS = 35;
     private WaypointMissionStatus status;
     private Handler handler;
     private Waypoint WP1, WP2;
@@ -61,6 +62,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
 
     public WaypointMissionOperator getWaypointMissionOperator() {
         if (instance == null) {
+            //MissionControl.getInstance().getWaypointMissionOperator().destroy();
             if (MissionControl.getInstance().getWaypointMissionOperator() != null) {
                 Log.i(TAG, "The Mission Control Operator was null!");
                 instance = MissionControl.getInstance().getWaypointMissionOperator();
@@ -117,9 +119,10 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         if (status != WaypointMissionStatus.ACTIVE){
+            Log.i(TAG, "The GOTO function failed. New AsyncTask will be started...");
             DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
             StartDJIGotoMission adapterNew = new StartDJIGotoMission(speed);
-            adapterNew.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, WP1, WP2);
+            adapterNew.execute(WP1, WP2);
         }
     }
 

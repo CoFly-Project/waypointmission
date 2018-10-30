@@ -6,7 +6,7 @@
     </shared>
   </component>
   <component name="AndroidLogFilters">
-    <option name="TOOL_WINDOW_CUSTOM_FILTER" value="DispatchMessage" />
+    <option name="TOOL_WINDOW_CUSTOM_FILTER" value="StartDJIGotoMission" />
     <option name="TOOL_WINDOW_LOG_LEVEL" value="info" />
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="No Filters" />
   </component>
@@ -41,14 +41,14 @@
     </system>
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5525701">
+    <splitter split-orientation="horizontal" split-proportion="0.45969626">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="MainActivity.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="374">
-                  <caret line="823" column="63" selection-start-line="823" selection-start-column="63" selection-end-line="823" selection-end-column="63" />
+                <state relative-caret-position="456">
+                  <caret line="819" lean-forward="true" selection-start-line="819" selection-end-line="819" />
                   <folding>
                     <element signature="e#11342#11374#0" expanded="true" />
                     <element signature="e#12878#13043#0" expanded="true" />
@@ -125,7 +125,7 @@
           <file leaf-file-name="Parameters.properties" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/app/src/main/assets/properties/Parameters.properties">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="418">
+                <state>
                   <caret line="19" selection-start-line="18" selection-end-line="19" />
                 </state>
               </provider>
@@ -143,8 +143,8 @@
           <file leaf-file-name="StartDJIGotoMission.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="501">
-                  <caret line="130" column="25" selection-start-line="130" selection-start-column="25" selection-end-line="130" selection-end-column="25" />
+                <state relative-caret-position="318">
+                  <caret line="86" column="17" lean-forward="true" selection-start-line="86" selection-start-column="17" selection-end-line="86" selection-end-column="17" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -165,7 +165,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>Goto</find>
       <find>mSpeed</find>
       <find>not_started</find>
       <find>GOTO</find>
@@ -194,6 +193,7 @@
       <find>camera</find>
       <find>The execution cou</find>
       <find>The exe</find>
+      <find>exec</find>
       <find>execute</find>
     </findStrings>
   </component>
@@ -2502,7 +2502,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="10" />
     <option name="y" value="44" />
     <option name="width" value="1932" />
@@ -2886,7 +2886,8 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1176" extended-state="7" />
+    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="Android Profiler" order="7" sideWeight="0.5565032" weight="0.4479769" />
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49840087" weight="0.1406551" />
@@ -2894,11 +2895,11 @@
       <window_info id="Image Layers" order="7" />
       <window_info id="Build Variants" order="2" side_tool="true" />
       <window_info anchor="right" id="Capture Analysis" order="4" />
-      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.09381663" side_tool="true" visible="true" weight="0.27938342" />
+      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.09381663" side_tool="true" visible="true" weight="0.19942197" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.83635396" weight="0.5192678" />
       <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49626866" weight="0.26493257" />
       <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.4968017" weight="0.22447014" />
-      <window_info active="true" anchor="bottom" id="Logcat" order="8" sideWeight="0.90618336" visible="true" weight="0.27938342" />
+      <window_info active="true" anchor="bottom" id="Logcat" order="8" sideWeight="0.90618336" visible="true" weight="0.19942197" />
       <window_info id="Captures" order="5" weight="0.25" />
       <window_info id="Capture Tool" order="3" />
       <window_info id="Designer" order="4" />
@@ -2974,7 +2975,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="398" />
+      <option name="time" value="400" />
     </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
@@ -3212,13 +3213,6 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-27/android/os/AsyncTask.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="22">
-          <caret line="593" column="53" selection-start-line="593" selection-start-column="53" selection-end-line="593" selection-end-column="53" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/round_btn_pressed.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state />
@@ -3360,7 +3354,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/assets/properties/Parameters.properties">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="418">
+        <state>
           <caret line="19" selection-start-line="18" selection-end-line="19" />
         </state>
       </provider>
@@ -3389,10 +3383,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-27/android/os/AsyncTask.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="22">
+          <caret line="204" column="33" selection-start-line="204" selection-start-column="33" selection-end-line="204" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="823" column="63" selection-start-line="823" selection-start-column="63" selection-end-line="823" selection-end-column="63" />
+        <state relative-caret-position="456">
+          <caret line="819" lean-forward="true" selection-start-line="819" selection-end-line="819" />
           <folding>
             <element signature="e#11342#11374#0" expanded="true" />
             <element signature="e#12878#13043#0" expanded="true" />
@@ -3403,8 +3404,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="501">
-          <caret line="130" column="25" selection-start-line="130" selection-start-column="25" selection-end-line="130" selection-end-column="25" />
+        <state relative-caret-position="318">
+          <caret line="86" column="17" lean-forward="true" selection-start-line="86" selection-start-column="17" selection-end-line="86" selection-end-column="17" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
