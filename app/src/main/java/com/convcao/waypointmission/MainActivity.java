@@ -819,7 +819,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                 PrepareMap(gotoLat, gotoLon);
 
                                 //MissionControl.getInstance().getWaypointMissionOperator().destroy();
-                                DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
+                                //DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
                                 adapter = new StartDJIGotoMission(mSpeed);
                                 adapter.execute(new Waypoint(droneLocationLat, droneLocationLng,
                                         droneLocationAlt), new Waypoint(gotoLat, gotoLon, gotoAlt));
