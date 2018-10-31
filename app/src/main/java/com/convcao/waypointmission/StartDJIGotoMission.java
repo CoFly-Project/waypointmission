@@ -122,19 +122,6 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
         return null;
     }
 
-    /*
-    @Override
-    protected void onPostExecute(Void aVoid) {
-        if (status != WaypointMissionStatus.ACTIVE){
-            Log.i(TAG, "The GOTO function failed. New AsyncTask will be started...");
-            DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
-            StartDJIGotoMission adapterNew = new StartDJIGotoMission(speed);
-            adapterNew.execute(WP1, WP2);
-        }
-    }
-    */
-
-
     public void Goto(Waypoint WPc, Waypoint WPe, float speed) {
         locked = true;
 
@@ -250,30 +237,6 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
         }
         locked = false;
 
-        /*
-        DJIError error = DJIError.COMMON_UNKNOWN;
-        status = WaypointMissionStatus.FAIL_TO_LOAD;
-        int current_attempt = 1;
-        while (error != null && current_attempt <= MAX_ATTEMPTS) {
-            error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            current_attempt++;
-        }
-        Log.i(TAG, (current_attempt - 1) + " attempts were needed for this operation");
-
-        if (error == null) {
-            Log.i(TAG, "(1/3) Mission loaded successfully!");
-            uploadWayPointMission();
-        }else{
-            Log.i(TAG, error.getDescription());
-            locked = false;
-        }
-        */
-
     }
 
     // Method for taking photo
@@ -363,68 +326,5 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
 
         return Math.sqrt(distance);
     }
-
-
-    /*
-    private void uploadWayPointMission() {
-        getWaypointMissionOperator().uploadMission(new CommonCallbacks.CompletionCallback() {
-            @Override
-            public void onResult(DJIError error) {
-                if (error == null) {
-                    //setResultToToast("Mission upload successfully!");
-                    status = WaypointMissionStatus.UPLOADED;
-                    Log.i(TAG, "(2/3) Mission uploaded successfully!");
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException ex) {
-                        android.util.Log.d("Waypoint Mission", ex.toString());
-                    }
-                    status = WaypointMissionStatus.FAIL_TO_START;
-                    int current_attempt = 1;
-                    while (status == WaypointMissionStatus.FAIL_TO_START && current_attempt <= MAX_ATTEMPTS) {
-                        startWaypointMission();
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException ex) {
-                            android.util.Log.d("Waypoint Mission", ex.toString());
-                        }
-                        current_attempt++;
-                    }
-                    Log.i(TAG, (current_attempt - 1) + " attempts were needed for this operation");
-                    locked = false;
-                } else {
-                    //setResultToToast("Mission upload failed, error: " + error.getDescription() + " retrying...");
-                    status = WaypointMissionStatus.FAIL_TO_UPLOAD;
-                    Log.i(TAG, "Mission upload failed, error: " + error.getDescription() + " retrying...");
-                    getWaypointMissionOperator().retryUploadMission(new CommonCallbacks.CompletionCallback() {
-                        @Override
-                        public void onResult(DJIError error) {
-                            if (error != null) {
-                                locked = false;
-                            }
-                        }
-                    });
-                }
-            }
-        });
-    }
-
-    private void startWaypointMission() {
-        //addListener();
-        getWaypointMissionOperator().startMission(new CommonCallbacks.CompletionCallback() {
-            @Override
-            public void onResult(DJIError error) {
-                //setResultToToast("Mission Start: " + (error == null ? "Successfully" : error.getDescription()));
-                if (error == null) {
-                    status = WaypointMissionStatus.ACTIVE;
-                    Log.i(TAG, "(3/3) Mission started successfully!");
-                } else {
-                    //Log.i(TAG, error.getDescription());
-                    status = WaypointMissionStatus.FAIL_TO_START;
-                }
-            }
-        });
-    }
-    */
 
 }
