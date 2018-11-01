@@ -52,11 +52,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import dji.common.camera.SettingsDefinitions;
+import dji.common.error.DJIError;
 import dji.common.flightcontroller.FlightControllerState;
 import dji.common.mission.waypoint.Waypoint;
 import dji.common.mission.waypoint.WaypointMission;
@@ -64,6 +68,7 @@ import dji.common.mission.waypoint.WaypointMissionFinishedAction;
 import dji.common.mission.waypoint.WaypointMissionHeadingMode;
 
 import dji.common.product.Model;
+import dji.common.util.CommonCallbacks;
 import dji.sdk.base.BaseProduct;
 import dji.sdk.camera.Camera;
 import dji.sdk.camera.VideoFeeder;
@@ -142,6 +147,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     private GoToListener gotoRun;
 
+    private byte[] cameraView;
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -188,6 +195,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         if (null != mVideoSurface) {
             mVideoSurface.setSurfaceTextureListener(this);
         }
+
 
         infoB = (ImageButton) findViewById(R.id.connection_info);
         locate = (ImageButton) findViewById(R.id.locate);
@@ -264,11 +272,13 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         mReceivedVideoDataCallBack = new VideoFeeder.VideoDataCallback() {
             @Override
             public void onReceive(byte[] videoBuffer, int size) {
+                cameraView = videoBuffer;
                 if (mCodecManager != null) {
                     mCodecManager.sendDataToDecoder(videoBuffer, size);
                 }
             }
         };
+
         //end of First Person View
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -420,7 +430,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     long currentTime = System.currentTimeMillis();
                     if (switchB.isChecked() && (currentTime - lastPublishLocationOn) >= publishPeriod) {
                         lastPublishLocationOn = currentTime;
-                        publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt, currentTime);
+                        publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt, cameraView,
+                                currentTime);
                     }
                 }
             });
@@ -429,27 +440,19 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
 
     //Send GenericRecord location to the server
-    private void publishLocation(double locationLat, double locationLon, float alt, long time) {
+    private void publishLocation(double locationLat, double locationLon, float alt, byte[] camera,
+                                 long time) {
         GenericRecord location = schemaLoader.createGenericRecord("location");
         location.put("sourceSystem", droneCanonicalName);
         location.put("time", time);
         location.put("latitude", locationLat);
         location.put("longitude", locationLon);
         location.put("altitude", alt);
+        location.put("image", ByteBuffer.wrap(camera));
 
         dispatchMessage = new DispatchMessage(schemaLoader.getSchema("location"), server_ip,
                 server_port, connection_time_out);
         dispatchMessage.execute(location);
-    }
-
-
-    public WaypointMissionOperator getWaypointMissionOperator() {
-        if (instance == null) {
-            if (DJISDKManager.getInstance().getMissionControl() != null) {
-                instance = DJISDKManager.getInstance().getMissionControl().getWaypointMissionOperator();
-            }
-        }
-        return instance;
     }
 
 

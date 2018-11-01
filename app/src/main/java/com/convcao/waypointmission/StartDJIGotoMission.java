@@ -4,6 +4,7 @@ package com.convcao.waypointmission;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.util.concurrent.Executor;
@@ -14,16 +15,20 @@ import dji.common.error.DJIError;
 import dji.common.flightcontroller.FlightControllerState;
 import dji.common.mission.waypoint.Waypoint;
 import dji.common.mission.waypoint.WaypointMission;
+import dji.common.mission.waypoint.WaypointMissionDownloadEvent;
+import dji.common.mission.waypoint.WaypointMissionExecutionEvent;
 import dji.common.mission.waypoint.WaypointMissionFinishedAction;
 import dji.common.mission.waypoint.WaypointMissionFlightPathMode;
 import dji.common.mission.waypoint.WaypointMissionHeadingMode;
 import dji.common.mission.waypoint.WaypointMissionState;
+import dji.common.mission.waypoint.WaypointMissionUploadEvent;
 import dji.common.util.CommonCallbacks;
 import dji.sdk.camera.Camera;
 import dji.sdk.flightcontroller.FlightAssistant;
 import dji.sdk.flightcontroller.FlightController;
 import dji.sdk.mission.MissionControl;
 import dji.sdk.mission.waypoint.WaypointMissionOperator;
+import dji.sdk.mission.waypoint.WaypointMissionOperatorListener;
 import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKManager;
 
@@ -34,7 +39,6 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
         ACTIVE, READY, FINISHED, INACTIVE, STOPPED, LOADED, UPLOADED,
         FAIL_TO_STOP, FAIL_TO_LOAD, FAIL_TO_UPLOAD, FAIL_TO_START
     }
-
 
     private WaypointMissionOperator instance;
     private WaypointMissionFinishedAction mFinishedAction;
@@ -106,18 +110,6 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
                 attempt=1;
             }
         }
-
-        /*
-        captureAction();
-        imageTaken = false;
-        while (!imageTaken) {
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException ex) {
-                Log.d(TAG, ex.toString());
-            }
-        }
-        */
 
         return null;
     }
@@ -214,6 +206,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
                             @Override
                             public void onResult(DJIError djiError) {
                                 if (djiError == null) {
+                                    //addListener();
                                     status = WaypointMissionStatus.ACTIVE;
                                     Log.i(TAG, "(3/3) Mission started successfully!");
                                 } else {
@@ -239,39 +232,6 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
 
     }
 
-    // Method for taking photo
-    private void captureAction() {
-
-        final Camera camera = DJIApplication.getCameraInstance();
-        if (camera != null) {
-            // Set the camera capture mode as Single mode
-            SettingsDefinitions.ShootPhotoMode photoMode = SettingsDefinitions.ShootPhotoMode.SINGLE;
-            camera.setShootPhotoMode(photoMode, new CommonCallbacks.CompletionCallback() {
-                @Override
-                public void onResult(DJIError djiError) {
-                    if (null == djiError) {
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                camera.startShootPhoto(new CommonCallbacks.CompletionCallback() {
-                                    @Override
-                                    public void onResult(DJIError djiError) {
-                                        if (djiError == null) {
-                                            Log.i(TAG, "take photo: success");
-                                        } else {
-                                            Log.i(TAG, djiError.getDescription());
-                                        }
-                                        imageTaken = true;
-                                    }
-                                });
-                            }
-                        }, 2000);
-                    }
-                }
-            });
-        }
-    }
-
     public void stopWaypointMission() {
         if (status != WaypointMissionStatus.STOPPED) {
             locked = true;
@@ -286,6 +246,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
                 }
                 current_attempt++;
             }
+            //removeListener();
             Log.i(TAG, (current_attempt - 1) + " attempts were needed for this operation");
             locked = false;
         }
@@ -306,6 +267,114 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
             }
         });
     }
+
+    /*
+    //Add Listener for WaypointMissionOperator
+    private void addListener() {
+        if (getWaypointMissionOperator() != null) {
+            getWaypointMissionOperator().addListener(eventNotificationListener);
+        }
+    }
+
+    private void removeListener() {
+        if (getWaypointMissionOperator() != null) {
+            getWaypointMissionOperator().removeListener(eventNotificationListener);
+        }
+    }
+
+    private WaypointMissionOperatorListener eventNotificationListener = new WaypointMissionOperatorListener() {
+        @Override
+        public void onDownloadUpdate(WaypointMissionDownloadEvent downloadEvent) {
+
+        }
+
+        @Override
+        public void onUploadUpdate(WaypointMissionUploadEvent uploadEvent) {
+
+        }
+
+        @Override
+        public void onExecutionUpdate(WaypointMissionExecutionEvent executionEvent) {
+
+        }
+
+        @Override
+        public void onExecutionStart() {
+
+        }
+
+
+        @Override
+        public void onExecutionFinish(@Nullable final DJIError error) {
+            //setResultToToast("Execution finished: " + (error == null ? "Success!" : error.getDescription()));
+            //if (markerWP != null) {
+            //    markerWP.remove();
+            //}
+            Log.i(TAG,"I am done! Le't shoot some photos");
+            captureAction();
+        }
+
+    };
+
+    // Method for taking photo
+    private void captureAction() {
+
+        final Camera camera = DJIApplication.getCameraInstance();
+        if (camera != null) {
+            // Set the camera capture mode as Single mode
+            SettingsDefinitions.ShootPhotoMode photoMode = SettingsDefinitions.ShootPhotoMode.SINGLE;
+            camera.stopRecordVideo(new CommonCallbacks.CompletionCallback() {
+                @Override
+                public void onResult(DJIError djiError) {
+                    Log.i(TAG, "stopRecordVideo failed with: "+djiError.getDescription());
+                }
+            });
+            camera.setShootPhotoMode(photoMode, new CommonCallbacks.CompletionCallback() {
+                @Override
+                public void onResult(DJIError djiError) {
+                    if (null == djiError) {
+                        //camera.setMode(SettingsDefinitions.CameraMode.SHOOT_PHOTO, new CommonCallbacks.CompletionCallback() {
+                        //    @Override
+                        //    public void onResult(DJIError djiError) {
+                        //        Log.i(TAG, djiError.getDescription());
+                        //    }
+                        //});
+                        camera.getMode(new CommonCallbacks.CompletionCallbackWith<SettingsDefinitions.CameraMode>() {
+                            @Override
+                            public void onSuccess(SettingsDefinitions.CameraMode cameraMode) {
+                                Log.i(TAG, cameraMode.toString());
+                            }
+
+                            @Override
+                            public void onFailure(DJIError djiError) {
+                                Log.i(TAG, "getMode of camera failed with: "+djiError.getDescription());
+                            }
+                        });
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                camera.startShootPhoto(new CommonCallbacks.CompletionCallback() {
+                                    @Override
+                                    public void onResult(DJIError djiError) {
+                                        if (djiError == null) {
+                                            Log.i(TAG, "take photo: success");
+                                        } else {
+                                            Log.i(TAG, "startShootPhoto failed with: "+djiError.getDescription());
+                                        }
+                                        imageTaken = true;
+                                        removeListener();
+                                    }
+                                });
+                            }
+                        }, 2000);
+                    }
+                }
+            });
+        }
+    }
+    */
+
+
 
     private double CalculateDistanceLatLon(double lat1, double lat2, double lon1,
                                            double lon2, double el1, double el2) {
