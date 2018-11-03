@@ -49,7 +49,7 @@ public class DispatchMessage extends AsyncTask<GenericRecord, Void, Void> {
             binaryEncoder.flush();
             outToServer.close();
             client.close();
-            Log.i(TAG, "Location information sent to " + server_ip + ":" + port);
+            Log.i(TAG, record[0].getSchema().getName() + " schema sent to " + server_ip + ":" + port);
         } catch (IOException e) {
             Log.i(TAG, e.toString());
         }

@@ -463,8 +463,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     long currentTime = System.currentTimeMillis();
                     if (switchB.isChecked() && (currentTime - lastPublishLocationOn) >= publishPeriod) {
                         lastPublishLocationOn = currentTime;
-                        publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt, cameraView,
-                                currentTime);
+                        publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt, currentTime);
                     }
                 }
             });
@@ -473,15 +472,14 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
 
     //Send GenericRecord location to the server
-    private void publishLocation(double locationLat, double locationLon, float alt, byte[] camera,
-                                 long time) {
+    private void publishLocation(double locationLat, double locationLon, float alt, long time) {
         GenericRecord location = schemaLoader.createGenericRecord("location");
         location.put("sourceSystem", droneCanonicalName);
         location.put("time", time);
         location.put("latitude", locationLat);
         location.put("longitude", locationLon);
         location.put("altitude", alt);
-        location.put("image", ByteBuffer.wrap(camera));
+        //location.put("image", ByteBuffer.wrap(camera));
 
         dispatchMessage = new DispatchMessage(schemaLoader.getSchema("location"), server_ip,
                 server_port, connection_time_out);
