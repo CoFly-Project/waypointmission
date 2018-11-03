@@ -7,9 +7,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.ImageFormat;
+import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
-import android.os.AsyncTask;
+import android.graphics.YuvImage;
+import android.media.MediaCodec;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.ActivityCompat;
@@ -48,13 +53,19 @@ import org.apache.avro.io.BinaryDecoder;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.DecoderFactory;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -71,6 +82,7 @@ import dji.common.product.Model;
 import dji.common.util.CommonCallbacks;
 import dji.sdk.base.BaseProduct;
 import dji.sdk.camera.Camera;
+import dji.sdk.camera.MediaManager;
 import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
 import dji.sdk.flightcontroller.FlightAssistant;
@@ -79,12 +91,11 @@ import dji.sdk.mission.MissionControl;
 import dji.sdk.mission.waypoint.WaypointMissionOperator;
 import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKManager;
-
-import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
+import dji.thirdparty.afinal.core.AsyncTask;
 
 
 public class MainActivity extends FragmentActivity implements TextureView.SurfaceTextureListener,
-        View.OnClickListener, OnMapReadyCallback {
+        View.OnClickListener, OnMapReadyCallback, ScreenShotCompleted, DJICodecManager.YuvDataCallback {
 
     Handler handler = new Handler();
     protected static final String TAG = "WaypointMissionActivity";
@@ -92,6 +103,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     // Codec for video live view
     protected DJICodecManager mCodecManager = null;
     protected TextureView mVideoSurface = null;
+    private MediaCodec codec;
 
     private GoogleMap gMap;
 
@@ -120,7 +132,6 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     private Waypoint WP;
     private LatLng point2D;
-    public static WaypointMission.Builder waypointMissionBuilder;
     private FlightController mFlightController;
     private WaypointMissionOperator instance;
     private WaypointMissionFinishedAction mFinishedAction = WaypointMissionFinishedAction.NO_ACTION;
@@ -148,6 +159,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private GoToListener gotoRun;
 
     private byte[] cameraView;
+    private ScreenShot savePhoto;
+    private int count;
 
     @Override
     protected void onResume() {
@@ -239,6 +252,10 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
+    public void onTaskComplete(byte[] result){
+        cameraView = result;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -266,13 +283,12 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         registerReceiver(mReceiver, filter);
 
         initUI();
-
+        cameraView = new byte[1];
         //First Person View
         // The callback for receiving the raw H264 video data for camera live view
         mReceivedVideoDataCallBack = new VideoFeeder.VideoDataCallback() {
             @Override
             public void onReceive(byte[] videoBuffer, int size) {
-                cameraView = videoBuffer;
                 if (mCodecManager != null) {
                     mCodecManager.sendDataToDecoder(videoBuffer, size);
                 }
@@ -280,7 +296,6 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         };
 
         //end of First Person View
-
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -337,6 +352,20 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     }
 
 
+    @Override
+    public void onYuvDataReceived(final ByteBuffer yuvFrame, int dataSize, final int width, final int height) {
+        //In this demo, we test the YUV data by saving it into JPG files.
+        //DJILog.d(TAG, "onYuvDataReceived " + dataSize);
+        if (count++ % 30 == 0 && yuvFrame != null) {
+            final byte[] bytes = new byte[dataSize];
+            yuvFrame.get(bytes);
+            //DJILog.d(TAG, "onYuvDataReceived2 " + dataSize);
+            savePhoto = new ScreenShot(width, height, MainActivity.this);
+            savePhoto.execute(bytes);
+        }
+    }
+
+
     //First Person View
     private void initPreviewer() {
         BaseProduct product = DJIApplication.getProductInstance();
@@ -348,6 +377,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             }
             if (!product.getModel().equals(Model.UNKNOWN_AIRCRAFT)) {
                 VideoFeeder.getInstance().getPrimaryVideoFeed().setCallback(mReceivedVideoDataCallBack);
+                VideoFeeder.getInstance().getPrimaryVideoFeed().getVideoSource();
             }
         }
     }
@@ -365,6 +395,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         Log.e(TAG, "onSurfaceTextureAvailable");
         if (mCodecManager == null) {
             mCodecManager = new DJICodecManager(this, surface, width, height);
+            mCodecManager.enabledYuvData(true);
+            mCodecManager.setYuvDataCallback(this);
+            //mCodecManager2 = new DJICodecManager(this, surface, 1280, 720);
         }
     }
 

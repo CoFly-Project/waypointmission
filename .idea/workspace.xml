@@ -6,7 +6,7 @@
     </shared>
   </component>
   <component name="AndroidLogFilters">
-    <option name="TOOL_WINDOW_CUSTOM_FILTER" value="StartDJIGotoMission" />
+    <option name="TOOL_WINDOW_CUSTOM_FILTER" value="DispatchMessage" />
     <option name="TOOL_WINDOW_LOG_LEVEL" value="info" />
     <option name="TOOL_WINDOW_CONFIGURED_FILTER" value="No Filters" />
   </component>
@@ -17,11 +17,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="589e5def-51b5-448b-88cf-451b8ab0d27c" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/caches/build_file_checksums.ser" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/build_file_checksums.ser" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Gradle__com_android_support_multidex_instrumentation_1_0_2.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/assets/schemas/location.avsc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/assets/schemas/location.avsc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/app.iml" beforeDir="false" afterPath="$PROJECT_DIR$/app/app.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -43,15 +44,70 @@
     </system>
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.720076">
+    <splitter split-orientation="horizontal" split-proportion="0.863924">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="MainActivity.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="542">
-                  <caret line="451" lean-forward="true" selection-start-line="451" selection-end-line="451" />
+                <state relative-caret-position="409">
+                  <caret line="293" column="17" lean-forward="true" selection-start-line="293" selection-start-column="17" selection-end-line="293" selection-end-column="17" />
+                  <folding>
+                    <element signature="imports" expanded="true" />
+                    <element signature="e#16437#16469#0" expanded="true" />
+                    <element signature="e#18133#18298#0" expanded="true" />
+                    <element signature="e#18297#18298#0" expanded="true" />
+                    <element signature="e#28090#28091#0" expanded="true" />
+                    <element signature="e#28153#28154#0" expanded="true" />
+                    <element signature="e#33014#33015#0" expanded="true" />
+                    <element signature="e#33077#33078#0" expanded="true" />
+                  </folding>
                 </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="ScreenShot.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/ScreenShot.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="1229">
+                  <caret line="83" column="9" lean-forward="true" selection-start-line="83" selection-start-column="9" selection-end-line="83" selection-end-column="9" />
+                  <folding>
+                    <element signature="imports" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="ScreenShotCompleted.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/ScreenShotCompleted.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="110">
+                  <caret line="5" column="1" selection-start-line="5" selection-start-column="1" selection-end-line="5" selection-end-column="1" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="DispatchMessage.java" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DispatchMessage.java">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="387">
+                  <caret line="38" selection-start-line="38" selection-end-line="38" />
+                  <folding>
+                    <element signature="imports" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="activity_main.xml" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="3784">
+                  <caret line="172" column="53" selection-start-line="172" selection-start-column="53" selection-end-line="172" selection-end-column="53" />
+                </state>
+              </provider>
+              <provider editor-type-id="android-designer2">
+                <state />
               </provider>
             </entry>
           </file>
@@ -60,30 +116,6 @@
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="946">
                   <caret line="43" column="25" selection-start-line="43" selection-start-column="25" selection-end-line="43" selection-end-column="25" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="DJIApplication.java" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DJIApplication.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="3124">
-                  <caret line="165" column="29" selection-start-line="165" selection-start-column="29" selection-end-line="165" selection-end-column="29" />
-                  <folding>
-                    <element signature="imports" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="DispatchMessage.java" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DispatchMessage.java">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="88">
-                  <caret line="17" selection-start-line="17" selection-end-line="17" />
-                  <folding>
-                    <element signature="imports" expanded="true" />
-                  </folding>
                 </state>
               </provider>
             </entry>
@@ -102,13 +134,13 @@
           </file>
           <file leaf-file-name="dialog_info.xml" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/dialog_info.xml">
-              <provider editor-type-id="android-designer2">
-                <state />
-              </provider>
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="1716">
                   <caret line="78" column="44" selection-start-line="78" selection-start-column="44" selection-end-line="78" selection-end-column="44" />
                 </state>
+              </provider>
+              <provider editor-type-id="android-designer2">
+                <state />
               </provider>
             </entry>
           </file>
@@ -116,11 +148,11 @@
       </split-first>
       <split-second>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="Parameters.properties" pinned="false" current-in-tab="false">
+          <file leaf-file-name="Parameters.properties" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/src/main/assets/properties/Parameters.properties">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="418">
-                  <caret line="19" selection-start-line="18" selection-end-line="19" />
+                <state relative-caret-position="440">
+                  <caret line="20" column="1" selection-start-line="20" selection-start-column="1" selection-end-line="20" selection-end-column="1" />
                 </state>
               </provider>
             </entry>
@@ -128,16 +160,16 @@
           <file leaf-file-name="build.gradle" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/app/build.gradle">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1496">
-                  <caret line="68" column="1" selection-start-line="68" selection-start-column="1" selection-end-line="68" selection-end-column="1" />
+                <state relative-caret-position="1012">
+                  <caret line="46" selection-start-line="46" selection-end-line="46" />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="StartDJIGotoMission.java" pinned="false" current-in-tab="true">
+          <file leaf-file-name="StartDJIGotoMission.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="218">
+                <state relative-caret-position="264">
                   <caret line="41" selection-start-line="41" selection-end-line="41" />
                   <folding>
                     <element signature="imports" expanded="true" />
@@ -154,26 +186,13 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Class" />
+        <option value="Interface" />
       </list>
     </option>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>locate</find>
-      <find>canonical_name</find>
-      <find>droneCanonicalName</find>
-      <find>connectionSettings</find>
-      <find>viewPointUpdate</find>
-      <find>switchB</find>
-      <find>location</find>
-      <find>gotoRun</find>
-      <find>current_attempt&lt;=attempts</find>
-      <find>status</find>
-      <find>started</find>
-      <find>WaypointMissionStatus.ACTIVE</find>
-      <find>server_ip</find>
       <find>The execution cou</find>
-      <find>exec</find>
       <find>execute</find>
       <find>The exe</find>
       <find>Dest</find>
@@ -183,12 +202,26 @@
       <find>removeListener();</find>
       <find>RemainingFlightTime</find>
       <find>mReceivedVideoDataCallBack</find>
-      <find>mCodecManager</find>
-      <find>mVideoSurface</find>
       <find>initPreviewer</find>
       <find>camera</find>
       <find>DispatchMessage</find>
       <find>dispatchMessage</find>
+      <find>mVideoSurface</find>
+      <find>DJIFrame</find>
+      <find>decode</find>
+      <find>decoder</find>
+      <find>receive</find>
+      <find>releaseCodec</find>
+      <find>surface</find>
+      <find>init</find>
+      <find>codec.getInputBuffer</find>
+      <find>MediaCodec</find>
+      <find>codec</find>
+      <find>scre</find>
+      <find>savePhot</find>
+      <find>mCodecManager</find>
+      <find>exec</find>
+      <find>count</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -664,6 +697,10 @@
                 <option name="name" value="generateDebugBuildConfig" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="transformDexArchiveWithExternalLibsDexMergerForDebug" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
                 <option name="description" value="Assembles all Release builds." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
                 <option name="name" value="assembleRelease" />
@@ -757,10 +794,6 @@
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
-                <option name="name" value="transformClassesWithMultidexlistForDebug" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
                 <option name="name" value="generateDebugResources" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
@@ -809,6 +842,10 @@
               <ExternalTaskPojo>
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
                 <option name="name" value="checkDebugClasspath" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="transformDexArchiveWithExternalLibsDexMergerForRelease" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
@@ -862,10 +899,6 @@
               <ExternalTaskPojo>
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
                 <option name="name" value="preReleaseBuild" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
-                <option name="name" value="transformClassesWithMultidexlistForRelease" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="description" value="Displays a help message." />
@@ -954,6 +987,10 @@
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
+                <option name="name" value="transformDexArchiveWithExternalLibsDexMergerForDebugAndroidTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
                 <option name="name" value="generateDebugSources" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
@@ -979,10 +1016,6 @@
               <ExternalTaskPojo>
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
                 <option name="name" value="generateReleaseUnitTestResources" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
-                <option name="name" value="transformClassesWithMultidexlistForDebugAndroidTest" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$" />
@@ -1527,6 +1560,10 @@
                 <option name="name" value="generateDebugBuildConfig" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/app" />
+                <option name="name" value="transformDexArchiveWithExternalLibsDexMergerForDebug" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
                 <option name="description" value="Assembles all Release builds." />
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/app" />
                 <option name="name" value="assembleRelease" />
@@ -1615,10 +1652,6 @@
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/app" />
-                <option name="name" value="transformClassesWithMultidexlistForDebug" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/app" />
                 <option name="name" value="generateDebugResources" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
@@ -1667,6 +1700,10 @@
               <ExternalTaskPojo>
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/app" />
                 <option name="name" value="checkDebugClasspath" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/app" />
+                <option name="name" value="transformDexArchiveWithExternalLibsDexMergerForRelease" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/app" />
@@ -1720,10 +1757,6 @@
               <ExternalTaskPojo>
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/app" />
                 <option name="name" value="preReleaseBuild" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/app" />
-                <option name="name" value="transformClassesWithMultidexlistForRelease" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="description" value="Displays a help message." />
@@ -1807,6 +1840,10 @@
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/app" />
+                <option name="name" value="transformDexArchiveWithExternalLibsDexMergerForDebugAndroidTest" />
+              </ExternalTaskPojo>
+              <ExternalTaskPojo>
+                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/app" />
                 <option name="name" value="generateDebugSources" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
@@ -1832,10 +1869,6 @@
               <ExternalTaskPojo>
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/app" />
                 <option name="name" value="generateReleaseUnitTestResources" />
-              </ExternalTaskPojo>
-              <ExternalTaskPojo>
-                <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/app" />
-                <option name="name" value="transformClassesWithMultidexlistForDebugAndroidTest" />
               </ExternalTaskPojo>
               <ExternalTaskPojo>
                 <option name="linkedExternalProjectPath" value="$PROJECT_DIR$/app" />
@@ -2471,7 +2504,6 @@
         <option value="$PROJECT_DIR$/app/src/main/res/schemas/location.avsc" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/exceptions/InvalidResourcePath.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/loaders/SchemaLoader.java" />
-        <option value="$PROJECT_DIR$/app/build.gradle" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/SchemaLoader.java" />
         <option value="$PROJECT_DIR$/app/src/main/assets/schemas/header.avsc" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DispatchMessage2.java" />
@@ -2488,19 +2520,25 @@
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/WaypointNavigation.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DispatchMessage.java" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/dialog_info.xml" />
-        <option value="$PROJECT_DIR$/app/src/main/assets/properties/Parameters.properties" />
         <option value="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java" />
         <option value="$PROJECT_DIR$/app/src/main/assets/schemas/location.avsc" />
+        <option value="$PROJECT_DIR$/app/src/main/assets/properties/Parameters.properties" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DJIVideoStreamDecoder.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/media/NativeHelper.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/media/DJIVideoStreamDecoder.java" />
+        <option value="$PROJECT_DIR$/app/build.gradle" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/ScreenShotCompleted.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/ScreenShot.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="218" />
-    <option name="y" value="467" />
-    <option name="width" value="1932" />
-    <option name="height" value="1165" />
+  <component name="ProjectFrameBounds" extendedState="7">
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="1936" />
+    <option name="height" value="1176" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -2508,6 +2546,49 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="AndroidView">
+        <subPane>
+          <expand>
+            <path>
+              <item name="WaypointMission" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+            </path>
+            <path>
+              <item name="WaypointMission" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+            </path>
+            <path>
+              <item name="WaypointMission" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
+              <item name="waypointmission" type="cbb59c9e:AndroidPsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="WaypointMission" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="res" type="d4f16f75:AndroidResFolderNode" />
+            </path>
+            <path>
+              <item name="WaypointMission" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="res" type="d4f16f75:AndroidResFolderNode" />
+              <item name="layout" type="ddeffd01:AndroidResFolderTypeNode" />
+            </path>
+            <path>
+              <item name="WaypointMission" type="1abcf292:AndroidViewProjectNode" />
+              <item name="app" type="feadf853:AndroidModuleNode" />
+              <item name="res" type="d4f16f75:AndroidResFolderNode" />
+              <item name="values" type="ddeffd01:AndroidResFolderTypeNode" />
+            </path>
+            <path>
+              <item name="WaypointMission" type="1abcf292:AndroidViewProjectNode" />
+              <item name="Gradle Scripts" type="ae0cef3a:AndroidBuildScriptsGroupNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
       <pane id="PackagesPane">
         <subPane>
           <expand>
@@ -2664,71 +2745,29 @@
           <select />
         </subPane>
       </pane>
-      <pane id="AndroidView">
-        <subPane>
-          <expand>
-            <path>
-              <item name="WaypointMission" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-            </path>
-            <path>
-              <item name="WaypointMission" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-            </path>
-            <path>
-              <item name="WaypointMission" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="java" type="edd41e36:AndroidSourceTypeNode" />
-              <item name="waypointmission" type="cbb59c9e:AndroidPsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="WaypointMission" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="res" type="d4f16f75:AndroidResFolderNode" />
-            </path>
-            <path>
-              <item name="WaypointMission" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="res" type="d4f16f75:AndroidResFolderNode" />
-              <item name="layout" type="ddeffd01:AndroidResFolderTypeNode" />
-            </path>
-            <path>
-              <item name="WaypointMission" type="1abcf292:AndroidViewProjectNode" />
-              <item name="app" type="feadf853:AndroidModuleNode" />
-              <item name="res" type="d4f16f75:AndroidResFolderNode" />
-              <item name="values" type="ddeffd01:AndroidResFolderTypeNode" />
-            </path>
-            <path>
-              <item name="WaypointMission" type="1abcf292:AndroidViewProjectNode" />
-              <item name="Gradle Scripts" type="ae0cef3a:AndroidBuildScriptsGroupNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="SearchEverywhereHistoryKey" value="drawble&#9;PSI&#9;JAVA://dji.midware.R.styleable#DrawerArrowToggle_barLength&#10;ConnectionActivity&#9;FILE&#9;file://D:/git_Repositories/AndroidStudioProjects/WaypointMission/app/src/main/java/com/convcao/waypointmission/ConnectionActivity.java" />
-    <property name="android.project.structure.last.selected" value="app" />
+    <property name="android.project.structure.last.selected" value="SDK Location" />
     <property name="android.project.structure.proportion" value="0.15" />
     <property name="android.sdk.path" value="$USER_HOME$/AppData/Local/Android/Sdk" />
     <property name="device.picker.selection" value="192.168.1.84:5555" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="D:/Downloads/Android-VideoStreamDecodingSample-master (1)/Android-VideoStreamDecodingSample-master/android-videostreamdecodingsample" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\git_Repositories\AndroidStudioProjects\WaypointMission\app\src\main\res\drawable" />
-      <recent name="D:\git_Repositories\AndroidStudioProjects\WaypointMission\app\libs" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\git_Repositories\AndroidStudioProjects\WaypointMission\app\src\main\res\drawable" />
       <recent name="D:\git_Repositories\AndroidStudioProjects\WaypointMission\app\src\main\assets" />
       <recent name="D:\git_Repositories\AndroidStudioProjects\WaypointMission\app\src\main\res\schemas" />
       <recent name="D:\git_Repositories\AndroidStudioProjects\WaypointMission\app\src\main\java\com\convcao\waypointmission" />
       <recent name="D:\git_Repositories\AndroidStudioProjects\WaypointMission\app\src\main\java\com\convcao\waypointmission\loaders" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\git_Repositories\AndroidStudioProjects\WaypointMission\app\src\main\java\com\convcao\waypointmission\media" />
+      <recent name="D:\git_Repositories\AndroidStudioProjects\WaypointMission\app\src\main\res\drawable" />
+      <recent name="D:\git_Repositories\AndroidStudioProjects\WaypointMission\app\libs" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -2880,30 +2919,30 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1176" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="Android Profiler" order="7" sideWeight="0.5565032" weight="0.4479769" />
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.4989339" weight="0.1406551" />
       <window_info anchor="right" id="Palette&#9;" order="7" />
       <window_info id="Image Layers" order="7" />
-      <window_info id="Build Variants" order="2" sideWeight="0.13025211" side_tool="true" visible="true" weight="0.15831557" />
+      <window_info id="Build Variants" order="2" sideWeight="0.1316129" side_tool="true" visible="true" weight="0.15778251" />
       <window_info anchor="right" id="Capture Analysis" order="4" />
-      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.22654584" side_tool="true" visible="true" weight="0.31213874" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.8123667" weight="0.30154142" />
+      <window_info active="true" anchor="bottom" id="Event Log" order="12" sideWeight="0.1924307" side_tool="true" visible="true" weight="0.25337186" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.8075693" weight="0.43930635" />
       <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49733475" weight="0.26493257" />
       <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.4968017" weight="0.22447014" />
-      <window_info anchor="bottom" id="Logcat" order="8" sideWeight="0.9104478" weight="0.526975" />
+      <window_info anchor="bottom" id="Logcat" order="8" sideWeight="0.9093817" weight="0.34874758" />
       <window_info id="Captures" order="5" weight="0.25" />
       <window_info id="Capture Tool" order="3" />
       <window_info id="Designer" order="4" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.8697479" visible="true" weight="0.15831557" />
-      <window_info anchor="bottom" id="Build" order="10" sideWeight="0.7851812" weight="0.35549134" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.8683871" visible="true" weight="0.15778251" />
+      <window_info anchor="bottom" id="Build" order="10" sideWeight="0.78206897" weight="0.21732955" />
       <window_info anchor="right" id="Gradle" order="5" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Device File Explorer" order="3" side_tool="true" />
       <window_info anchor="right" id="Theme Preview" order="6" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.7734541" visible="true" weight="0.31213874" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.9211087" weight="0.18015414" />
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="right" id="Assistant" order="8" weight="0.32995737" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
@@ -2949,29 +2988,34 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java</url>
-          <line>452</line>
+          <url>file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DispatchMessage.java</url>
+          <line>48</line>
           <properties />
-          <option name="timeStamp" value="435" />
+          <option name="timeStamp" value="478" />
         </line-breakpoint>
       </breakpoints>
-      <option name="time" value="436" />
+      <option name="time" value="489" />
     </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateCodeFragment">
       <expression>
-        <expression-string>ByteBuffer.wrap(camera)</expression-string>
+        <expression-string>record[0].length</expression-string>
         <language-id>JAVA</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>Arrays.asList(camera)</expression-string>
+        <expression-string>record[0]</expression-string>
         <language-id>JAVA</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>videoBuffer.length</expression-string>
+        <expression-string>mCodecManager.getYuvDataCallback()</expression-string>
+        <language-id>JAVA</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>mCodecManager.getVideoHeight()</expression-string>
         <language-id>JAVA</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
@@ -2981,27 +3025,28 @@
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>videoBuffer</expression-string>
+        <expression-string>videoBuffer.length</expression-string>
         <language-id>JAVA</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();</expression-string>
+        <expression-string>width * height</expression-string>
         <language-id>JAVA</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>status = WaypointMissionStatus.ACTIVE</expression-string>
+        <expression-string>yuvFrame.length</expression-string>
         <language-id>JAVA</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>status = WaypointMissionStatus.ACTIVE;</expression-string>
+        <expression-string>skata.compress(Bitmap.CompressFormat.PNG, 100, )</expression-string>
         <language-id>JAVA</language-id>
+        <custom-info>android.graphics.Bitmap</custom-info>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>attempt=1;</expression-string>
+        <expression-string>skata.toString()</expression-string>
         <language-id>JAVA</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
@@ -3060,44 +3105,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/aircraft.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/build/generated/not_namespaced_r_class_sources/debug/processDebugResources/r/dji/midware/R.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="214">
-          <caret line="2175" column="32" selection-start-line="2175" selection-start-column="32" selection-end-line="2175" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/app.iml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="440">
-          <caret line="20" column="62" selection-start-line="20" selection-start-column="62" selection-end-line="20" selection-end-column="62" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/assets/schemas/header.avsc" />
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.avro/avro/1.8.2/9a134e0bead395687dab63f5aa2c301b52b2dfa3/avro-1.8.2-sources.jar!/org/apache/avro/io/DatumWriter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="26" column="28" selection-start-line="26" selection-start-column="17" selection-end-line="26" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DispatchMessage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="264">
-          <caret line="12" column="33" lean-forward="true" selection-start-line="12" selection-start-column="33" selection-end-line="12" selection-end-column="33" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/SchemaLoader.java" />
     <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-27/java/lang/System.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="263">
@@ -3170,21 +3177,21 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/round_btn.xml">
-      <provider selected="true" editor-type-id="android-designer2">
+      <provider editor-type-id="text-editor">
         <state />
       </provider>
-      <provider editor-type-id="text-editor">
+      <provider selected="true" editor-type-id="android-designer2">
         <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_connection.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="22">
           <caret line="21" column="43" selection-start-line="21" selection-start-column="43" selection-end-line="21" selection-end-column="43" />
         </state>
+      </provider>
+      <provider editor-type-id="android-designer2">
+        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/gps_position_target_normal.png">
@@ -3198,30 +3205,23 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/dialog_waypointsetting.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1445">
           <caret line="165" column="29" lean-forward="true" selection-start-line="165" selection-start-column="29" selection-end-line="165" selection-end-column="29" />
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/values/styles.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="154">
-          <caret line="7" column="58" selection-start-line="7" selection-start-column="58" selection-end-line="7" selection-end-column="58" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/locate_button.xml">
       <provider editor-type-id="android-designer2">
         <state />
       </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/locate_button.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="66">
           <caret line="3" column="63" selection-start-line="3" selection-start-column="63" selection-end-line="3" selection-end-column="63" />
         </state>
+      </provider>
+      <provider editor-type-id="android-designer2">
+        <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/info_button_disabled.png">
@@ -3237,23 +3237,23 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/drawable/info_button.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="154">
           <caret line="7" column="11" selection-start-line="7" selection-start-column="11" selection-end-line="7" selection-end-column="11" />
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/dialog_info.xml">
       <provider editor-type-id="android-designer2">
         <state />
       </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/dialog_info.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1716">
           <caret line="78" column="44" selection-start-line="78" selection-start-column="44" selection-end-line="78" selection-end-column="44" />
         </state>
+      </provider>
+      <provider editor-type-id="android-designer2">
+        <state />
       </provider>
     </entry>
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.dji/dji-sdk-provided/4.5.1/62ce4f661efdc0d08d4926e0505bc9249eb7c193/dji-sdk-provided-4.5.1.jar!/dji/sdk/mission/waypoint/WaypointMissionOperator.class">
@@ -3273,32 +3273,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/assets/properties/Parameters.properties">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="418">
-          <caret line="19" selection-start-line="18" selection-end-line="19" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/utils/ToastUtils.java" />
-    <entry file="file://$PROJECT_DIR$/app/build.gradle">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1496">
-          <caret line="68" column="1" selection-start-line="68" selection-start-column="1" selection-end-line="68" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.dji/dji-sdk-provided/4.5.1/62ce4f661efdc0d08d4926e0505bc9249eb7c193/dji-sdk-provided-4.5.1.jar!/dji/common/error/DJIError.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="154">
           <caret line="14" column="13" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-27/android/os/AsyncTask.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="22">
-          <caret line="204" column="33" selection-start-line="204" selection-start-column="33" selection-end-line="204" selection-end-column="33" />
         </state>
       </provider>
     </entry>
@@ -3326,6 +3305,40 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="264">
+          <caret line="41" selection-start-line="41" selection-end-line="41" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-27/android/graphics/Bitmap.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="132">
+          <caret line="38" column="19" selection-start-line="38" selection-start-column="19" selection-end-line="38" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/values/styles.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="154">
+          <caret line="7" column="58" selection-start-line="7" selection-start-column="58" selection-end-line="7" selection-end-column="58" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3784">
+          <caret line="172" column="53" selection-start-line="172" selection-start-column="53" selection-end-line="172" selection-end-column="53" />
+        </state>
+      </provider>
+      <provider editor-type-id="android-designer2">
+        <state />
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MApplication.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="154">
@@ -3336,43 +3349,29 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml">
-      <provider editor-type-id="android-designer2">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="244">
-          <caret line="167" column="31" selection-start-line="167" selection-start-column="31" selection-end-line="167" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DJIApplication.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3124">
-          <caret line="165" column="29" selection-start-line="165" selection-start-column="29" selection-end-line="165" selection-end-column="29" />
+        <state relative-caret-position="1870">
+          <caret line="149" lean-forward="true" selection-start-line="149" selection-end-line="149" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java">
+    <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-27/android/media/MediaCodec.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="218">
-          <caret line="41" selection-start-line="41" selection-end-line="41" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="281">
+          <caret line="1481" column="19" selection-start-line="1481" selection-start-column="19" selection-end-line="1481" selection-end-column="19" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DispatchMessage.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/media/DJIVideoStreamDecoder.java" />
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/media/NativeHelper.java" />
+    <entry file="file://$PROJECT_DIR$/app/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="88">
-          <caret line="17" selection-start-line="17" selection-end-line="17" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="1012">
+          <caret line="46" selection-start-line="46" selection-end-line="46" />
         </state>
       </provider>
     </entry>
@@ -3383,10 +3382,68 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-27/android/os/AsyncTask.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="22">
+          <caret line="593" column="53" selection-start-line="593" selection-start-column="53" selection-end-line="593" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/assets/properties/Parameters.properties">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="440">
+          <caret line="20" column="1" selection-start-line="20" selection-start-column="1" selection-end-line="20" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Android/Sdk/sources/android-27/android/graphics/YuvImage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-3005">
+          <caret line="29" column="13" selection-start-line="29" selection-start-column="13" selection-end-line="29" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/ScreenShotCompleted.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="110">
+          <caret line="5" column="1" selection-start-line="5" selection-start-column="1" selection-end-line="5" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DispatchMessage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="387">
+          <caret line="38" selection-start-line="38" selection-end-line="38" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/ScreenShot.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1229">
+          <caret line="83" column="9" lean-forward="true" selection-start-line="83" selection-start-column="9" selection-end-line="83" selection-end-column="9" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="542">
-          <caret line="451" lean-forward="true" selection-start-line="451" selection-end-line="451" />
+        <state relative-caret-position="409">
+          <caret line="293" column="17" lean-forward="true" selection-start-line="293" selection-start-column="17" selection-end-line="293" selection-end-column="17" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#16437#16469#0" expanded="true" />
+            <element signature="e#18133#18298#0" expanded="true" />
+            <element signature="e#18297#18298#0" expanded="true" />
+            <element signature="e#28090#28091#0" expanded="true" />
+            <element signature="e#28153#28154#0" expanded="true" />
+            <element signature="e#33014#33015#0" expanded="true" />
+            <element signature="e#33077#33078#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
