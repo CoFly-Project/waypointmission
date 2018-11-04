@@ -7,6 +7,8 @@ import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import org.apache.avro.generic.GenericRecord;
+
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -120,6 +122,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
         FlightController mFlightController = ((Aircraft) DJIApplication.getProductInstance()).getFlightController();
         FlightControllerState droneState = mFlightController.getState();
 
+        /*
         Log.i(TAG, "Current Position --> [" + droneState.getAircraftLocation().getLatitude()+","
                 +droneState.getAircraftLocation().getLongitude()+","+droneState.getAircraftLocation().getAltitude()+"]");
         Log.i(TAG, "Fake Waypoint --> [" +WPc.coordinate.getLatitude()+","
@@ -140,7 +143,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
         dist = CalculateDistanceLatLon(WPc.coordinate.getLatitude(), WPe.coordinate.getLatitude(),
                 WPc.coordinate.getLongitude(), WPe.coordinate.getLongitude(), WPc.altitude, WPe.altitude);
         Log.i(TAG, "Distance between WPs --> " + dist + " meters");
-
+        */
 
         FA.setCollisionAvoidanceEnabled(true, null);
         FA.setActiveObstacleAvoidanceEnabled(true, null);
@@ -311,69 +314,10 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
             //    markerWP.remove();
             //}
             Log.i(TAG,"I am done! Le't shoot some photos");
-            captureAction();
         }
 
     };
-
-    // Method for taking photo
-    private void captureAction() {
-
-        final Camera camera = DJIApplication.getCameraInstance();
-        if (camera != null) {
-            // Set the camera capture mode as Single mode
-            SettingsDefinitions.ShootPhotoMode photoMode = SettingsDefinitions.ShootPhotoMode.SINGLE;
-            camera.stopRecordVideo(new CommonCallbacks.CompletionCallback() {
-                @Override
-                public void onResult(DJIError djiError) {
-                    Log.i(TAG, "stopRecordVideo failed with: "+djiError.getDescription());
-                }
-            });
-            camera.setShootPhotoMode(photoMode, new CommonCallbacks.CompletionCallback() {
-                @Override
-                public void onResult(DJIError djiError) {
-                    if (null == djiError) {
-                        //camera.setMode(SettingsDefinitions.CameraMode.SHOOT_PHOTO, new CommonCallbacks.CompletionCallback() {
-                        //    @Override
-                        //    public void onResult(DJIError djiError) {
-                        //        Log.i(TAG, djiError.getDescription());
-                        //    }
-                        //});
-                        camera.getMode(new CommonCallbacks.CompletionCallbackWith<SettingsDefinitions.CameraMode>() {
-                            @Override
-                            public void onSuccess(SettingsDefinitions.CameraMode cameraMode) {
-                                Log.i(TAG, cameraMode.toString());
-                            }
-
-                            @Override
-                            public void onFailure(DJIError djiError) {
-                                Log.i(TAG, "getMode of camera failed with: "+djiError.getDescription());
-                            }
-                        });
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                camera.startShootPhoto(new CommonCallbacks.CompletionCallback() {
-                                    @Override
-                                    public void onResult(DJIError djiError) {
-                                        if (djiError == null) {
-                                            Log.i(TAG, "take photo: success");
-                                        } else {
-                                            Log.i(TAG, "startShootPhoto failed with: "+djiError.getDescription());
-                                        }
-                                        imageTaken = true;
-                                        removeListener();
-                                    }
-                                });
-                            }
-                        }, 2000);
-                    }
-                }
-            });
-        }
-    }
     */
-
 
 
     private double CalculateDistanceLatLon(double lat1, double lat2, double lon1,

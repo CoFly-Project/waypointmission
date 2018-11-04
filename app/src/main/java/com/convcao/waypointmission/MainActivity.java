@@ -463,7 +463,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     long currentTime = System.currentTimeMillis();
                     if (switchB.isChecked() && (currentTime - lastPublishLocationOn) >= publishPeriod) {
                         lastPublishLocationOn = currentTime;
-                        publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt, currentTime);
+                        //publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt, currentTime);
+                        publishCameraInfo(droneLocationLat, droneLocationLng, droneLocationAlt, currentTime, cameraView);
                     }
                 }
             });
@@ -479,11 +480,25 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         location.put("latitude", locationLat);
         location.put("longitude", locationLon);
         location.put("altitude", alt);
-        //location.put("image", ByteBuffer.wrap(camera));
 
         dispatchMessage = new DispatchMessage(schemaLoader.getSchema("location"), server_ip,
                 server_port, connection_time_out);
         dispatchMessage.execute(location);
+    }
+
+    //Send Camera view to the server
+    private void publishCameraInfo(double locationLat, double locationLon, float alt, long time, byte[] camera) {
+        GenericRecord cameraSchema = schemaLoader.createGenericRecord("camera");
+        cameraSchema.put("sourceSystem", droneCanonicalName);
+        cameraSchema.put("time", time);
+        cameraSchema.put("latitude", locationLat);
+        cameraSchema.put("longitude", locationLon);
+        cameraSchema.put("altitude", alt);
+        cameraSchema.put("image", ByteBuffer.wrap(camera));
+
+        dispatchMessage = new DispatchMessage(schemaLoader.getSchema("camera"), server_ip,
+                server_port, connection_time_out);
+        dispatchMessage.execute(cameraSchema);
     }
 
 
