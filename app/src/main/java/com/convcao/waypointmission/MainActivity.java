@@ -117,7 +117,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     private double droneLocationLat = 181, droneLocationLng = 181, minimumArmHeight;
     private float droneLocationAlt;
-    private float droneRotation = 0f;
+    private int droneRotation = 0;
 
     //private final Map<Integer, Marker> mMarkers = new ConcurrentHashMap<Integer, Marker>();
     private Marker markerWP = null;
@@ -252,7 +252,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
-    public void onTaskComplete(byte[] result){
+    public void onTaskComplete(byte[] result) {
         cameraView = result;
     }
 
@@ -463,8 +463,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     long currentTime = System.currentTimeMillis();
                     if (switchB.isChecked() && (currentTime - lastPublishLocationOn) >= publishPeriod) {
                         lastPublishLocationOn = currentTime;
-                        //publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt, currentTime);
-                        publishCameraInfo(droneLocationLat, droneLocationLng, droneLocationAlt, currentTime, cameraView);
+                        //publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt,droneRotation, currentTime);
+                        publishCameraInfo(droneLocationLat, droneLocationLng, droneLocationAlt, droneRotation, currentTime, cameraView);
                     }
                 }
             });
@@ -473,13 +473,14 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
 
     //Send GenericRecord location to the server
-    private void publishLocation(double locationLat, double locationLon, float alt, long time) {
+    private void publishLocation(double locationLat, double locationLon, float alt, int heading, long time) {
         GenericRecord location = schemaLoader.createGenericRecord("location");
         location.put("sourceSystem", droneCanonicalName);
         location.put("time", time);
         location.put("latitude", locationLat);
         location.put("longitude", locationLon);
         location.put("altitude", alt);
+        location.put("heading", heading);
 
         dispatchMessage = new DispatchMessage(schemaLoader.getSchema("location"), server_ip,
                 server_port, connection_time_out);
@@ -487,13 +488,15 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     }
 
     //Send Camera view to the server
-    private void publishCameraInfo(double locationLat, double locationLon, float alt, long time, byte[] camera) {
+    private void publishCameraInfo(double locationLat, double locationLon, float alt, int heading,
+                                   long time, byte[] camera) {
         GenericRecord cameraSchema = schemaLoader.createGenericRecord("camera");
         cameraSchema.put("sourceSystem", droneCanonicalName);
         cameraSchema.put("time", time);
         cameraSchema.put("latitude", locationLat);
         cameraSchema.put("longitude", locationLon);
         cameraSchema.put("altitude", alt);
+        cameraSchema.put("heading", heading);
         cameraSchema.put("image", ByteBuffer.wrap(camera));
 
         dispatchMessage = new DispatchMessage(schemaLoader.getSchema("camera"), server_ip,
@@ -859,6 +862,18 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                         double gotoLon = (double) gotoRecord.get("longitude");
                         float gotoAlt = (float) gotoRecord.get("altitude");
 
+                        Waypoint fakeWP = new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt);
+                        Waypoint realWP = new Waypoint(gotoLat, gotoLon, gotoAlt);
+
+                        WaypointMissionHeadingMode mHeadingMode;
+
+                        if (gotoRecord.get("heading") != null) {
+                            fakeWP.heading = (int) gotoRecord.get("heading");
+                            realWP.heading = fakeWP.heading;
+                            mHeadingMode = WaypointMissionHeadingMode.USING_WAYPOINT_HEADING;
+                        } else {
+                            mHeadingMode = WaypointMissionHeadingMode.AUTO;
+                        }
 
                         new Handler(Looper.getMainLooper()).post(new Runnable() {
 
@@ -868,9 +883,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                 PrepareMap(gotoLat, gotoLon);
 
                                 //DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
-                                adapter = new StartDJIGotoMission(mSpeed);
-                                adapter.execute(new Waypoint(droneLocationLat, droneLocationLng,
-                                        droneLocationAlt), new Waypoint(gotoLat, gotoLon, gotoAlt));
+                                adapter = new StartDJIGotoMission(mSpeed, mHeadingMode);
+                                adapter.execute(fakeWP, realWP);
 
                             }
                         });

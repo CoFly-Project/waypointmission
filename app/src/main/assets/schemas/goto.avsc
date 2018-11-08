@@ -5,9 +5,9 @@
   "doc": "Command a system to move to a given location at a given speed",
   "fields": [
       {
-              "name": "destinationSystem",
-              "type": "string",
-              "doc": "Canonical name of the destination system"
+            "name": "destinationSystem",
+            "type": "string",
+            "doc": "Canonical name of the destination system"
       },
       {
           "name": "sourceSystem",
@@ -38,9 +38,18 @@
       },
       {
         "name": "altitude",
-        "type": ["float", "null"],
+        "type": "float",
         "unit": "m",
         "doc": "Altitude"
+      },
+      {
+        "name": "heading",
+        "type": ["int", "null"],
+        "default": "null",
+        "unit": "degrees",
+        "min": -180,
+        "max": 180,
+        "doc": "Heading"
       },
       {
         "name": "speed",

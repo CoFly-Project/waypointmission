@@ -57,11 +57,11 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
 
     protected static final String TAG = "StartDJIGotoMission";
 
-    public StartDJIGotoMission(float speed) {
-        mFinishedAction = WaypointMissionFinishedAction.NO_ACTION;
-        mHeadingMode = WaypointMissionHeadingMode.AUTO; //TODO fix me in the future
-        FA = new FlightAssistant();
-        status = WaypointMissionStatus.INACTIVE;
+    public StartDJIGotoMission(float speed, WaypointMissionHeadingMode mHeadingMode) {
+        this.mHeadingMode = mHeadingMode;
+        this.mFinishedAction = WaypointMissionFinishedAction.NO_ACTION; //TODO fix me in the future
+        this.FA = new FlightAssistant();
+        this.status = WaypointMissionStatus.INACTIVE;
         this.speed = speed;
         this.handler = new Handler();
     }
@@ -82,7 +82,8 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
     protected Void doInBackground(Waypoint... WPS) {
         this.WP1 = WPS[0];
         this.WP2 = WPS[1];
-        int attempt=1;
+        Log.i(TAG, "Fake Waypoint Heading " + WP1.heading + ", Real Waypoint Heading: " + WP2.heading);
+        int attempt = 1;
         while (status != WaypointMissionStatus.ACTIVE) {
             stopWaypointMission();
             while (locked) { //Wait to stop the mission
@@ -105,11 +106,11 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
                 }
             }
             attempt++;
-            if (attempt>=3) {
+            if (attempt >= 3) {
                 Log.i(TAG, "Destroy Mission Operator and start over");
                 DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
                 instance = MissionControl.getInstance().getWaypointMissionOperator();
-                attempt=1;
+                attempt = 1;
             }
         }
 
@@ -171,7 +172,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
         }
 
         if (error == null) {
-            Log.i(TAG, "(1/3) Mission loaded successfully! No. attempts: " + attempts );
+            Log.i(TAG, "(1/3) Mission loaded successfully! No. attempts: " + attempts);
             attempts = 1;
             status = WaypointMissionStatus.FAIL_TO_UPLOAD;
             while (status.equals(WaypointMissionStatus.FAIL_TO_UPLOAD) && attempts <= MAX_ATTEMPTS) {
@@ -228,7 +229,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
                 }
                 Log.i(TAG, "No. attempts: " + (attempts - 1));
             }
-        }else{
+        } else {
             status = WaypointMissionStatus.INACTIVE;
         }
         locked = false;

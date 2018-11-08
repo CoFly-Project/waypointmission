@@ -33,14 +33,21 @@
     },
     {
       "name": "altitude",
-      "type": ["float", "null"],
+      "type": "float",
       "unit": "m",
       "doc": "Altitude"
     },
     {
+      "name": "heading",
+      "type": "int",
+      "unit": "degrees",
+      "min": -180,
+      "max": 180,
+      "doc": "Heading"
+    },
+    {
     "name" : "image",
-    "type":["null", "bytes"],
-    "default":null,
+    "type": "bytes",
     "doc": "Camera view from the current location"
     }
   ]
