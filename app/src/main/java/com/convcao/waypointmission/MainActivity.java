@@ -866,7 +866,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                         Waypoint realWP = new Waypoint(gotoLat, gotoLon, gotoAlt);
 
                         WaypointMissionHeadingMode mHeadingMode;
-
+                        realWP.gimbalPitch = -45;
+                        fakeWP.gimbalPitch = -45;
                         if (gotoRecord.get("heading") != null) {
                             fakeWP.heading = (int) gotoRecord.get("heading");
                             realWP.heading = fakeWP.heading;

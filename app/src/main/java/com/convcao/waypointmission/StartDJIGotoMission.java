@@ -157,6 +157,13 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
         //.addWaypoint(fakeWP)
         //.waypointCount(2);
 
+        try {
+            if (!waypointMissionBuilder.isGimbalPitchRotationEnabled()) {
+                waypointMissionBuilder.setGimbalPitchRotationEnabled(true);
+            }
+        }catch (Exception e){
+            Log.i(TAG, "ERROR in enabling gimbal pitch rotation:"+e.toString());
+        }
 
         DJIError error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
         int attempts = 1;
