@@ -46,6 +46,15 @@
       "doc": "Heading"
     },
     {
+      "name": "gimbalPitch",
+      "type": ["float", "null"],
+      "default": "null",
+      "unit": "degrees",
+      "min": -90,
+      "max": 0,
+      "doc": "Gimbal pitch angle when reached this waypoint"
+    },
+    {
     "name" : "image",
     "type": "bytes",
     "doc": "Camera view from the current location"

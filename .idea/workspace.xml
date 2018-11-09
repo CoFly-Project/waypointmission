@@ -18,8 +18,10 @@
   <component name="ChangeListManager">
     <list default="true" id="589e5def-51b5-448b-88cf-451b8ab0d27c" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/assets/schemas/camera.avsc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/assets/schemas/camera.avsc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/assets/schemas/goto.avsc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/assets/schemas/goto.avsc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/assets/schemas/location.avsc" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/assets/schemas/location.avsc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -41,18 +43,25 @@
     </system>
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.360799">
+    <splitter split-orientation="horizontal" split-proportion="0.7435575">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="MainActivity.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="279">
-                  <caret line="869" column="49" selection-start-line="869" selection-start-column="49" selection-end-line="869" selection-end-column="49" />
+                <state relative-caret-position="129">
+                  <caret line="465" column="19" selection-start-line="465" selection-start-column="12" selection-end-line="465" selection-end-column="19" />
                   <folding>
                     <element signature="imports" expanded="true" />
                     <element signature="e#8309#8310#0" expanded="true" />
                     <element signature="e#8344#8345#0" expanded="true" />
+                    <element signature="e#13288#13320#0" expanded="true" />
+                    <element signature="e#15084#15249#0" expanded="true" />
+                    <element signature="e#15248#15249#0" expanded="true" />
+                    <element signature="e#26050#26051#0" expanded="true" />
+                    <element signature="e#26113#26114#0" expanded="true" />
+                    <element signature="e#30974#30975#0" expanded="true" />
+                    <element signature="e#31037#31038#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -82,8 +91,8 @@
           <file leaf-file-name="DispatchMessage.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DispatchMessage.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="902">
-                  <caret line="54" column="9" selection-start-line="54" selection-start-column="9" selection-end-line="54" selection-end-column="9" />
+                <state relative-caret-position="282">
+                  <caret line="52" column="12" selection-start-line="52" selection-start-column="12" selection-end-line="52" selection-end-column="12" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -106,8 +115,8 @@
           <file leaf-file-name="camera.avsc" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/app/src/main/assets/schemas/camera.avsc">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="616">
-                  <caret line="28" column="28" selection-start-line="28" selection-start-column="28" selection-end-line="28" selection-end-column="28" />
+                <state relative-caret-position="288">
+                  <caret line="49" column="21" selection-start-line="49" selection-start-column="21" selection-end-line="49" selection-end-column="21" />
                 </state>
               </provider>
             </entry>
@@ -115,8 +124,8 @@
           <file leaf-file-name="goto.avsc" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/app/src/main/assets/schemas/goto.avsc">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1430">
-                  <caret line="65" selection-start-line="65" selection-end-line="65" />
+                <state relative-caret-position="292">
+                  <caret line="55" column="23" selection-start-line="55" selection-start-column="23" selection-end-line="55" selection-end-column="23" />
                 </state>
               </provider>
             </entry>
@@ -124,8 +133,8 @@
           <file leaf-file-name="location.avsc" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/app/src/main/assets/schemas/location.avsc">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="858">
-                  <caret line="39" column="5" selection-start-line="39" selection-start-column="5" selection-end-line="39" selection-end-column="5" />
+                <state relative-caret-position="465">
+                  <caret line="49" column="21" selection-start-line="49" selection-start-column="21" selection-end-line="49" selection-end-column="21" />
                 </state>
               </provider>
             </entry>
@@ -179,8 +188,8 @@
           <file leaf-file-name="StartDJIGotoMission.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="587">
-                  <caret line="164" column="80" selection-start-line="164" selection-start-column="80" selection-end-line="164" selection-end-column="80" />
+                <state relative-caret-position="142">
+                  <caret line="165" column="8" selection-start-line="165" selection-start-column="8" selection-end-line="165" selection-end-column="8" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -202,14 +211,10 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>Dest</find>
-      <find>Destroy</find>
-      <find>captureAction</find>
       <find>removeListener();</find>
       <find>RemainingFlightTime</find>
       <find>mReceivedVideoDataCallBack</find>
       <find>initPreviewer</find>
-      <find>camera</find>
       <find>dispatchMessage</find>
       <find>mVideoSurface</find>
       <find>DJIFrame</find>
@@ -232,6 +237,10 @@
       <find>removeListener</find>
       <find>location</find>
       <find>goto</find>
+      <find>mGi</find>
+      <find>camera</find>
+      <find>gimbal</find>
+      <find>mGimbal</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -2537,11 +2546,11 @@
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/ScreenShotCompleted.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/ScreenShot.java" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DispatchMessage.java" />
+        <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java" />
+        <option value="$PROJECT_DIR$/app/src/main/assets/schemas/location.avsc" />
         <option value="$PROJECT_DIR$/app/src/main/assets/schemas/goto.avsc" />
         <option value="$PROJECT_DIR$/app/src/main/assets/schemas/camera.avsc" />
-        <option value="$PROJECT_DIR$/app/src/main/assets/schemas/location.avsc" />
         <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java" />
-        <option value="$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java" />
       </list>
     </option>
   </component>
@@ -2581,23 +2590,6 @@
               <item name="app" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="androidTest" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="WaypointMission" type="b2602c69:ProjectViewProjectNode" />
-              <item name="WaypointMission" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="app" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="androidTest" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="WaypointMission" type="b2602c69:ProjectViewProjectNode" />
-              <item name="WaypointMission" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="app" type="8a07ba80:GradleTreeStructureProvider$GradleModuleDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="androidTest" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="waypointmission" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="WaypointMission" type="b2602c69:ProjectViewProjectNode" />
@@ -2887,27 +2879,26 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="Android Profiler" order="7" sideWeight="0.5565032" weight="0.4479769" />
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.4989339" weight="0.1406551" />
       <window_info anchor="right" id="Palette&#9;" order="7" />
       <window_info id="Image Layers" order="7" />
-      <window_info id="Build Variants" order="2" sideWeight="0.13780488" side_tool="true" visible="true" weight="0.14605543" />
+      <window_info id="Build Variants" order="2" sideWeight="0.14617941" side_tool="true" visible="true" weight="0.15191898" />
       <window_info anchor="right" id="Capture Analysis" order="4" />
-      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.15405117" side_tool="true" visible="true" weight="0.21001926" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.8075693" weight="0.43930635" />
+      <window_info anchor="bottom" id="Event Log" order="12" sideWeight="0.10394456" side_tool="true" visible="true" weight="0.7100193" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.8065032" weight="0.7485549" />
       <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49733475" weight="0.26493257" />
       <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.4968017" weight="0.22447014" />
-      <window_info anchor="bottom" id="Logcat" order="8" sideWeight="0.8560768" weight="0.16859345" />
+      <window_info active="true" anchor="bottom" id="Logcat" order="8" sideWeight="0.89605546" visible="true" weight="0.7100193" />
       <window_info id="Captures" order="5" weight="0.25" />
       <window_info id="Capture Tool" order="3" />
       <window_info id="Designer" order="4" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.86219513" visible="true" weight="0.14605543" />
-      <window_info active="true" anchor="bottom" id="Build" order="10" sideWeight="0.8459488" visible="true" weight="0.21001926" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.8538206" visible="true" weight="0.15191898" />
+      <window_info anchor="bottom" id="Build" order="10" sideWeight="0.8459488" weight="0.45857418" />
       <window_info anchor="right" id="Gradle" order="5" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.91897655" weight="0.53757226" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.91684437" weight="0.44412333" />
       <window_info anchor="right" id="Device File Explorer" order="3" side_tool="true" />
       <window_info anchor="right" id="Theme Preview" order="6" />
       <window_info id="Favorites" order="6" side_tool="true" />
@@ -2953,7 +2944,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="506" />
+      <option name="time" value="515" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="app">
@@ -3343,37 +3334,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DispatchMessage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="902">
-          <caret line="54" column="9" selection-start-line="54" selection-start-column="9" selection-end-line="54" selection-end-column="9" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/assets/schemas/goto.avsc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1430">
-          <caret line="65" selection-start-line="65" selection-end-line="65" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/assets/schemas/camera.avsc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="616">
-          <caret line="28" column="28" selection-start-line="28" selection-start-column="28" selection-end-line="28" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/assets/schemas/location.avsc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="858">
-          <caret line="39" column="5" selection-start-line="39" selection-start-column="5" selection-end-line="39" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MApplication.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="154">
@@ -3384,24 +3344,62 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java">
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/DispatchMessage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="279">
-          <caret line="869" column="49" selection-start-line="869" selection-start-column="49" selection-end-line="869" selection-end-column="49" />
+        <state relative-caret-position="282">
+          <caret line="52" column="12" selection-start-line="52" selection-start-column="12" selection-end-line="52" selection-end-column="12" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#8309#8310#0" expanded="true" />
-            <element signature="e#8344#8345#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/StartDJIGotoMission.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="587">
-          <caret line="164" column="80" selection-start-line="164" selection-start-column="80" selection-end-line="164" selection-end-column="80" />
+        <state relative-caret-position="142">
+          <caret line="165" column="8" selection-start-line="165" selection-start-column="8" selection-end-line="165" selection-end-column="8" />
           <folding>
             <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/assets/schemas/location.avsc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="465">
+          <caret line="49" column="21" selection-start-line="49" selection-start-column="21" selection-end-line="49" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/assets/schemas/goto.avsc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="292">
+          <caret line="55" column="23" selection-start-line="55" selection-start-column="23" selection-end-line="55" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/assets/schemas/camera.avsc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="288">
+          <caret line="49" column="21" selection-start-line="49" selection-start-column="21" selection-end-line="49" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/src/main/java/com/convcao/waypointmission/MainActivity.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="129">
+          <caret line="465" column="19" selection-start-line="465" selection-start-column="12" selection-end-line="465" selection-end-column="19" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#8309#8310#0" expanded="true" />
+            <element signature="e#8344#8345#0" expanded="true" />
+            <element signature="e#13288#13320#0" expanded="true" />
+            <element signature="e#15084#15249#0" expanded="true" />
+            <element signature="e#15248#15249#0" expanded="true" />
+            <element signature="e#26050#26051#0" expanded="true" />
+            <element signature="e#26113#26114#0" expanded="true" />
+            <element signature="e#30974#30975#0" expanded="true" />
+            <element signature="e#31037#31038#0" expanded="true" />
           </folding>
         </state>
       </provider>

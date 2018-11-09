@@ -17,6 +17,8 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -73,6 +75,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import dji.common.camera.SettingsDefinitions;
 import dji.common.error.DJIError;
 import dji.common.flightcontroller.FlightControllerState;
+import dji.common.gimbal.Axis;
+import dji.common.gimbal.DJIGimbalAttitude;
+import dji.common.gimbal.GimbalMode;
+import dji.common.gimbal.GimbalState;
+import dji.common.gimbal.MovementSettings;
+import dji.common.gimbal.MovementSettingsProfile;
+import dji.common.gimbal.Rotation;
 import dji.common.mission.waypoint.Waypoint;
 import dji.common.mission.waypoint.WaypointMission;
 import dji.common.mission.waypoint.WaypointMissionFinishedAction;
@@ -87,6 +96,7 @@ import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
 import dji.sdk.flightcontroller.FlightAssistant;
 import dji.sdk.flightcontroller.FlightController;
+import dji.sdk.gimbal.Gimbal;
 import dji.sdk.mission.MissionControl;
 import dji.sdk.mission.waypoint.WaypointMissionOperator;
 import dji.sdk.products.Aircraft;
@@ -117,6 +127,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     private double droneLocationLat = 181, droneLocationLng = 181, minimumArmHeight;
     private float droneLocationAlt;
+    private float droneGimbal;
     private int droneRotation = 0;
 
     //private final Map<Integer, Marker> mMarkers = new ConcurrentHashMap<Integer, Marker>();
@@ -133,6 +144,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private Waypoint WP;
     private LatLng point2D;
     private FlightController mFlightController;
+    private Gimbal mGimbal;
     private WaypointMissionOperator instance;
     private WaypointMissionFinishedAction mFinishedAction = WaypointMissionFinishedAction.NO_ACTION;
     private WaypointMissionHeadingMode mHeadingMode = WaypointMissionHeadingMode.AUTO;
@@ -444,10 +456,21 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         if (product != null && product.isConnected()) {
             if (product instanceof Aircraft) {
                 mFlightController = ((Aircraft) product).getFlightController();
+                mGimbal = product.getGimbal();
                 FA.setCollisionAvoidanceEnabled(true, null);
                 FA.setActiveObstacleAvoidanceEnabled(true, null);
             }
         }
+
+        if (mGimbal != null) {
+            mGimbal.setStateCallback(new GimbalState.Callback() {
+                @Override
+                public void onUpdate(@NonNull GimbalState gimbalState) {
+                    droneGimbal = gimbalState.getAttitudeInDegrees().getPitch();
+                }
+            });
+        }
+
 
         if (mFlightController != null) {
             mFlightController.setStateCallback(new FlightControllerState.Callback() {
@@ -458,13 +481,15 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     droneLocationLng = djiFlightControllerCurrentState.getAircraftLocation().getLongitude();
                     droneLocationAlt = djiFlightControllerCurrentState.getAircraftLocation().getAltitude();
                     droneRotation = djiFlightControllerCurrentState.getAircraftHeadDirection();
+
                     updateDroneLocation();
 
                     long currentTime = System.currentTimeMillis();
                     if (switchB.isChecked() && (currentTime - lastPublishLocationOn) >= publishPeriod) {
                         lastPublishLocationOn = currentTime;
                         //publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt,droneRotation, currentTime);
-                        publishCameraInfo(droneLocationLat, droneLocationLng, droneLocationAlt, droneRotation, currentTime, cameraView);
+                        publishCameraInfo(droneLocationLat, droneLocationLng, droneLocationAlt, droneRotation,
+                                droneGimbal, currentTime, cameraView);
                     }
                 }
             });
@@ -489,7 +514,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     //Send Camera view to the server
     private void publishCameraInfo(double locationLat, double locationLon, float alt, int heading,
-                                   long time, byte[] camera) {
+                                   float gimbal, long time, byte[] camera) {
         GenericRecord cameraSchema = schemaLoader.createGenericRecord("camera");
         cameraSchema.put("sourceSystem", droneCanonicalName);
         cameraSchema.put("time", time);
@@ -497,6 +522,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         cameraSchema.put("longitude", locationLon);
         cameraSchema.put("altitude", alt);
         cameraSchema.put("heading", heading);
+        cameraSchema.put("gimbalPitch", gimbal);
         cameraSchema.put("image", ByteBuffer.wrap(camera));
 
         dispatchMessage = new DispatchMessage(schemaLoader.getSchema("camera"), server_ip,
@@ -866,14 +892,19 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                         Waypoint realWP = new Waypoint(gotoLat, gotoLon, gotoAlt);
 
                         WaypointMissionHeadingMode mHeadingMode;
-                        realWP.gimbalPitch = -45;
-                        fakeWP.gimbalPitch = -45;
                         if (gotoRecord.get("heading") != null) {
                             fakeWP.heading = (int) gotoRecord.get("heading");
                             realWP.heading = fakeWP.heading;
                             mHeadingMode = WaypointMissionHeadingMode.USING_WAYPOINT_HEADING;
                         } else {
                             mHeadingMode = WaypointMissionHeadingMode.AUTO;
+                        }
+
+
+                        if (gotoRecord.get("gimbalPitch") != null) {
+                            //fakeWP.gimbalPitch = -45.0f;//(int) gotoRecord.get("gimbalPitch");
+                            realWP.gimbalPitch = (float) gotoRecord.get("gimbalPitch");
+                            fakeWP.gimbalPitch = (float) gotoRecord.get("gimbalPitch");
                         }
 
                         new Handler(Looper.getMainLooper()).post(new Runnable() {
