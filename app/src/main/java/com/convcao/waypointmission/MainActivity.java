@@ -268,6 +268,11 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         cameraView = result;
     }
 
+    public void onWaypointReached() {
+        publishCameraInfo(droneLocationLat, droneLocationLng, droneLocationAlt, droneRotation,
+                droneGimbal, System.currentTimeMillis(), cameraView);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -359,7 +364,6 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         lastPublishLocationOn = System.currentTimeMillis();
 
         WPAdapter = new WaypointNavigation();
-
 
     }
 
@@ -487,9 +491,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     long currentTime = System.currentTimeMillis();
                     if (switchB.isChecked() && (currentTime - lastPublishLocationOn) >= publishPeriod) {
                         lastPublishLocationOn = currentTime;
-                        //publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt,droneRotation, currentTime);
-                        publishCameraInfo(droneLocationLat, droneLocationLng, droneLocationAlt, droneRotation,
-                                droneGimbal, currentTime, cameraView);
+                        publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt,droneRotation, currentTime);
+                        //publishCameraInfo(droneLocationLat, droneLocationLng, droneLocationAlt, droneRotation, droneGimbal, currentTime, cameraView);
                     }
                 }
             });
@@ -532,7 +535,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
 
     public static boolean checkGpsCoordination(double latitude, double longitude) {
-        return (latitude > -90 && latitude < 90 && longitude > -180 && longitude < 180) && (latitude != 0f && longitude != 0f);
+        return (latitude > -90 && latitude < 90 && longitude > -180 && longitude < 180) &&
+                (latitude != 0f && longitude != 0f);
     }
 
     // Update the drone location based on states from MCU.

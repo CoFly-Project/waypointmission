@@ -53,6 +53,8 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
     private Handler handler;
     private Waypoint WP1, WP2;
 
+    //private AtomicBoolean waypointNotReached=new AtomicBoolean(true);
+    //private AtomicBoolean stopped = new AtomicBoolean(false);
     private boolean imageTaken = false;
 
     protected static final String TAG = "StartDJIGotoMission";
@@ -113,6 +115,15 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
                 attempt = 1;
             }
         }
+
+        /*
+        while(waypointNotReached.get() && !stopped.get()){
+            try{
+                Thread.sleep(200);
+            }catch (InterruptedException e){
+                Log.e(TAG, "Error in sleeping...");
+            }
+        }*/
 
         return null;
     }
@@ -279,6 +290,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
         });
     }
 
+
     /*
     //Add Listener for WaypointMissionOperator
     private void addListener() {
@@ -321,11 +333,13 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
             //if (markerWP != null) {
             //    markerWP.remove();
             //}
-            Log.i(TAG,"I am done! Le't shoot some photos");
+            Log.i(TAG,"I am done! Send photo");
+            waypointNotReached.set(false);
         }
 
     };
     */
+
 
 
     private double CalculateDistanceLatLon(double lat1, double lat2, double lon1,
