@@ -504,6 +504,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private void publishLocation(double locationLat, double locationLon, float alt, int heading, long time) {
         GenericRecord location = schemaLoader.createGenericRecord("location");
         location.put("sourceSystem", droneCanonicalName);
+        location.put("listeningPort", android_port);
         location.put("time", time);
         location.put("latitude", locationLat);
         location.put("longitude", locationLon);
