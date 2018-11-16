@@ -491,8 +491,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     long currentTime = System.currentTimeMillis();
                     if (switchB.isChecked() && (currentTime - lastPublishLocationOn) >= publishPeriod) {
                         lastPublishLocationOn = currentTime;
-                        publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt,droneRotation, currentTime);
-                        //publishCameraInfo(droneLocationLat, droneLocationLng, droneLocationAlt, droneRotation, droneGimbal, currentTime, cameraView);
+                        //publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt,droneRotation, currentTime);
+                        publishCameraInfo(droneLocationLat, droneLocationLng, droneLocationAlt, droneRotation, droneGimbal, currentTime, cameraView);
                     }
                 }
             });
@@ -521,6 +521,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                    float gimbal, long time, byte[] camera) {
         GenericRecord cameraSchema = schemaLoader.createGenericRecord("camera");
         cameraSchema.put("sourceSystem", droneCanonicalName);
+        cameraSchema.put("listeningPort", android_port);
         cameraSchema.put("time", time);
         cameraSchema.put("latitude", locationLat);
         cameraSchema.put("longitude", locationLon);
