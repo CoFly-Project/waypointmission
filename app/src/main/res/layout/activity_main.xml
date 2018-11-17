@@ -68,19 +68,19 @@
         <dji.ux.widget.TakeOffWidget
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp" />
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp" />
 
         <dji.ux.widget.ReturnHomeWidget
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginEnd="12dp" />
+            android:layout_marginEnd="10dp" />
 
         <ImageButton
             android:id="@+id/connection_info"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginEnd="12dp"
+            android:layout_marginEnd="10dp"
             android:background="@android:color/transparent"
             android:adjustViewBounds="true"
             android:cropToPadding="false"
@@ -88,12 +88,29 @@
             android:contentDescription="info"
             android:src="@drawable/info_button"/>
 
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Publish">
+            </TextView>
+            <Spinner
+                android:id="@+id/publisher"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/publish_arrays" />
+        </LinearLayout>
+
         <Switch
             android:id="@+id/arm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
+            android:layout_marginEnd="10dp"
             android:text="ARM" />
 
         <Button
@@ -117,8 +134,8 @@
             android:id="@+id/locate"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
             android:background="@android:color/transparent"
             android:adjustViewBounds="true"
             android:cropToPadding="false"

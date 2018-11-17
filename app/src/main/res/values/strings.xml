@@ -5,4 +5,11 @@
     <string name="disconnected">Disconnected</string>
     <string name="product_information">Product Information</string>
     <string name="connection_loose">Status: No Product Connected</string>
+
+    <string-array name="publish_arrays">
+        <item>Only location</item>
+        <item>Location &amp; camera</item>
+    </string-array>
+
+
 </resources>

@@ -32,6 +32,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -122,6 +123,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private Switch switchB;
     private ImageButton locate, infoB;
     private Button gotoc, stop;
+    private Spinner publisher;
 
     public boolean inOperation = false;
 
@@ -227,6 +229,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         gotoc = (Button) findViewById(R.id.gotoc);
         switchB = (Switch) findViewById(R.id.arm);
         stop = (Button) findViewById(R.id.stop);
+        publisher = (Spinner) findViewById(R.id.publisher);
 
         infoB.setOnClickListener(this);
         locate.setOnClickListener(this);
@@ -491,8 +494,18 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     long currentTime = System.currentTimeMillis();
                     if (switchB.isChecked() && (currentTime - lastPublishLocationOn) >= publishPeriod) {
                         lastPublishLocationOn = currentTime;
-                        //publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt,droneRotation, currentTime);
-                        publishCameraInfo(droneLocationLat, droneLocationLng, droneLocationAlt, droneRotation, droneGimbal, currentTime, cameraView);
+
+                        switch (publisher.getSelectedItem().toString()){
+                            case "Only location":
+                                publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt,droneRotation, currentTime);
+                                break;
+                            case "Location & camera":
+                                publishCameraInfo(droneLocationLat, droneLocationLng, droneLocationAlt, droneRotation, droneGimbal, currentTime, cameraView);
+                                break;
+                            default:
+                                publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt,droneRotation, currentTime);
+                                break;
+                        }
                     }
                 }
             });
