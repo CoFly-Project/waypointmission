@@ -131,6 +131,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private float droneLocationAlt;
     private float droneGimbal;
     private int droneRotation = 0;
+    private float droneVelocityX;
+    private float droneVelocityY;
+    private float droneVelocityZ;
 
     //private final Map<Integer, Marker> mMarkers = new ConcurrentHashMap<Integer, Marker>();
     private Marker markerWP = null;
@@ -273,7 +276,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     public void onWaypointReached() {
         publishCameraInfo(droneLocationLat, droneLocationLng, droneLocationAlt, droneRotation,
-                droneGimbal, System.currentTimeMillis(), cameraView);
+                droneGimbal, System.currentTimeMillis(), cameraView, droneVelocityX, droneVelocityY,
+                droneVelocityZ);
     }
 
     @Override
@@ -488,6 +492,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     droneLocationLng = djiFlightControllerCurrentState.getAircraftLocation().getLongitude();
                     droneLocationAlt = djiFlightControllerCurrentState.getAircraftLocation().getAltitude();
                     droneRotation = djiFlightControllerCurrentState.getAircraftHeadDirection();
+                    droneVelocityX = djiFlightControllerCurrentState.getVelocityX();
+                    droneVelocityY = djiFlightControllerCurrentState.getVelocityY();
+                    droneVelocityZ = djiFlightControllerCurrentState.getVelocityZ();
 
                     updateDroneLocation();
 
@@ -495,15 +502,19 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     if (switchB.isChecked() && (currentTime - lastPublishLocationOn) >= publishPeriod) {
                         lastPublishLocationOn = currentTime;
 
-                        switch (publisher.getSelectedItem().toString()){
+                        switch (publisher.getSelectedItem().toString()) {
                             case "Only location":
-                                publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt,droneRotation, currentTime);
+                                publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt,
+                                        droneRotation, currentTime);
                                 break;
                             case "Location & camera":
-                                publishCameraInfo(droneLocationLat, droneLocationLng, droneLocationAlt, droneRotation, droneGimbal, currentTime, cameraView);
+                                publishCameraInfo(droneLocationLat, droneLocationLng, droneLocationAlt,
+                                        droneRotation, droneGimbal, currentTime, cameraView, droneVelocityX,
+                                        droneVelocityY, droneVelocityZ);
                                 break;
                             default:
-                                publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt,droneRotation, currentTime);
+                                publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt,
+                                        droneRotation, currentTime);
                                 break;
                         }
                     }
@@ -530,8 +541,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     }
 
     //Send Camera view to the server
-    private void publishCameraInfo(double locationLat, double locationLon, float alt, int heading,
-                                   float gimbal, long time, byte[] camera) {
+    private void publishCameraInfo(double locationLat, double locationLon, float alt, int heading, float gimbal,
+                                   long time, byte[] camera, float velocityX, float velocityY, float velocityZ) {
         GenericRecord cameraSchema = schemaLoader.createGenericRecord("camera");
         cameraSchema.put("sourceSystem", droneCanonicalName);
         cameraSchema.put("listeningPort", android_port);
@@ -539,6 +550,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         cameraSchema.put("latitude", locationLat);
         cameraSchema.put("longitude", locationLon);
         cameraSchema.put("altitude", alt);
+        cameraSchema.put("velocityX", velocityX);
+        cameraSchema.put("velocityY", velocityY);
+        cameraSchema.put("velocityZ", velocityZ);
         cameraSchema.put("heading", heading);
         cameraSchema.put("gimbalPitch", gimbal);
         cameraSchema.put("image", ByteBuffer.wrap(camera));

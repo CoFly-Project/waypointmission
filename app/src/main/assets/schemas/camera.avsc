@@ -43,6 +43,24 @@
       "doc": "Altitude"
     },
     {
+      "name": "velocityX",
+      "type": ["float", "null"],
+      "default": "null",
+      "doc": "Current speed of the aircraft in the x direction in meters per second using North-East-Down coordinate system."
+    },
+    {
+      "name": "velocityY",
+      "type": ["float", "null"],
+      "default": "null",
+      "doc": "Current speed of the aircraft in the y direction in meters per second using North-East-Down coordinate system."
+    },
+    {
+      "name": "velocityZ",
+      "type": ["float", "null"],
+      "default": "null",
+      "doc": "Current speed of the aircraft in the z direction in meters per second using North-East-Down coordinate system."
+    },
+    {
       "name": "heading",
       "type": "int",
       "unit": "degrees",
