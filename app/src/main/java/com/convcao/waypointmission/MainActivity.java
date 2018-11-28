@@ -913,68 +913,84 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             isAlive.set(true);
             try {
                 ss = new ServerSocket(consumerPort);
-                while (isAlive.get()) {
+            } catch (IOException e) {
+                setResultToToast("Error in reading GOTO commands");
+                Log.e(TAGsocket, "Cannot open server socket");
+                Log.e(TAGsocket, e.toString());
+                Log.e(TAGsocket, "Any incoming message cannot be executed");
+                this.stop();
+            }
+            while (isAlive.get()) {
+
+                GenericRecord gotoRecord;
+                boolean parseOK = true;
+                try {
                     s = ss.accept();
                     DatumReader datumReader = new GenericDatumReader(schemaGoto);
-                    GenericRecord gotoRecord = new GenericData.Record(schemaGoto);
+                    gotoRecord = new GenericData.Record(schemaGoto);
                     InputStream inputStream = s.getInputStream();
                     DecoderFactory decoderFactory = new DecoderFactory();
                     BinaryDecoder binaryDecoder = decoderFactory.binaryDecoder(inputStream, null);
                     datumReader.read(gotoRecord, binaryDecoder);
-
-                    //setResultToToast(gotoRecord.toString());
-
                     Log.i(TAGsocket, gotoRecord.toString());
-
-                    if (switchB.isChecked()) { //Check if the drone is armed
-
-                        double gotoLat = (double) gotoRecord.get("latitude");
-                        double gotoLon = (double) gotoRecord.get("longitude");
-                        float gotoAlt = (float) gotoRecord.get("altitude");
-
-                        Waypoint fakeWP = new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt);
-                        Waypoint realWP = new Waypoint(gotoLat, gotoLon, gotoAlt);
-
-                        WaypointMissionHeadingMode mHeadingMode;
-                        if (gotoRecord.get("heading") != null) {
-                            fakeWP.heading = (int) gotoRecord.get("heading");
-                            realWP.heading = fakeWP.heading;
-                            mHeadingMode = WaypointMissionHeadingMode.USING_WAYPOINT_HEADING;
-                        } else {
-                            mHeadingMode = WaypointMissionHeadingMode.AUTO;
-                        }
-
-
-                        if (gotoRecord.get("gimbalPitch") != null) {
-                            //fakeWP.gimbalPitch = -45.0f;//(int) gotoRecord.get("gimbalPitch");
-                            realWP.gimbalPitch = (float) gotoRecord.get("gimbalPitch");
-                            fakeWP.gimbalPitch = (float) gotoRecord.get("gimbalPitch");
-                        }
-                        
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                // this will run in the main thread
-                                PrepareMap(gotoLat, gotoLon);
-
-                                Log.i(TAGsocket, "Inside run() realWP value -> Coordinate: " + realWP.coordinate.toString() + ", Altitude: "+
-                                        realWP.altitude +", Heading: " + realWP.heading +", Gimbal Pitch: "+ realWP.gimbalPitch);
-
-                                //DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
-                                adapter = new StartDJIGotoMission(mSpeed, mHeadingMode);
-                                adapter.execute(fakeWP, realWP);
-
-                            }
-                        });
-
-                    }
+                } catch (IOException e) {
+                    setResultToToast("Error in reading GOTO commands");
+                    Log.d(TAGsocket, e.toString());
+                    gotoRecord = new GenericData.Record(null);
+                    parseOK = false;
                 }
+
+                if (switchB.isChecked() && parseOK) { //Check if the drone is armed
+
+                    double gotoLat = (double) gotoRecord.get("latitude");
+                    double gotoLon = (double) gotoRecord.get("longitude");
+                    float gotoAlt = (float) gotoRecord.get("altitude");
+
+                    Waypoint fakeWP = new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt);
+                    Waypoint realWP = new Waypoint(gotoLat, gotoLon, gotoAlt);
+
+                    WaypointMissionHeadingMode mHeadingMode;
+                    if (gotoRecord.get("heading") != null) {
+                        fakeWP.heading = (int) gotoRecord.get("heading");
+                        realWP.heading = fakeWP.heading;
+                        mHeadingMode = WaypointMissionHeadingMode.USING_WAYPOINT_HEADING;
+                    } else {
+                        mHeadingMode = WaypointMissionHeadingMode.AUTO;
+                    }
+
+
+                    if (gotoRecord.get("gimbalPitch") != null) {
+                        //fakeWP.gimbalPitch = -45.0f;//(int) gotoRecord.get("gimbalPitch");
+                        realWP.gimbalPitch = (float) gotoRecord.get("gimbalPitch");
+                        fakeWP.gimbalPitch = (float) gotoRecord.get("gimbalPitch");
+                    }
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            // this will run in the main thread
+                            PrepareMap(gotoLat, gotoLon);
+
+                            Log.i(TAGsocket, "Inside run() realWP value -> Coordinate: " + realWP.coordinate.toString() + ", Altitude: " +
+                                    realWP.altitude + ", Heading: " + realWP.heading + ", Gimbal Pitch: " + realWP.gimbalPitch);
+
+                            //DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
+                            adapter = new StartDJIGotoMission(mSpeed, mHeadingMode);
+                            adapter.execute(fakeWP, realWP);
+
+                        }
+                    });
+
+                }
+
+            }
+            try {
                 s.close();
                 ss.close();
             } catch (IOException e) {
                 setResultToToast("Error in reading GOTO commands");
-                Log.d(TAG, e.toString());
+                Log.e(TAGsocket, "Cannot close server socket");
+                Log.e(TAGsocket, e.toString());
             }
 
 
