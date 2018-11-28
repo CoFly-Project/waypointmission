@@ -935,7 +935,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     Log.i(TAGsocket, gotoRecord.toString());
                 } catch (IOException e) {
                     setResultToToast("Error in reading GOTO commands");
-                    Log.d(TAGsocket, e.toString());
+                    Log.e(TAGsocket, e.toString());
                     gotoRecord = new GenericData.Record(null);
                     parseOK = false;
                 }
@@ -955,7 +955,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                         realWP.heading = fakeWP.heading;
                         mHeadingMode = WaypointMissionHeadingMode.USING_WAYPOINT_HEADING;
                     } else {
-                        mHeadingMode = WaypointMissionHeadingMode.AUTO;
+                        mHeadingMode = WaypointMissionHeadingMode.CONTROL_BY_REMOTE_CONTROLLER;
                     }
 
 
