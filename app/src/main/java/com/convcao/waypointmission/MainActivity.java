@@ -110,6 +110,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     Handler handler = new Handler();
     protected static final String TAG = "WaypointMissionActivity";
+    protected static final String TAGsocket = "ReceiveWayPoint";
     protected VideoFeeder.VideoDataCallback mReceivedVideoDataCallBack = null;
     // Codec for video live view
     protected DJICodecManager mCodecManager = null;
@@ -181,6 +182,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     @Override
     protected void onResume() {
+        Log.d(TAG, "onResume");
         super.onResume();
         initFlightController();
         initPreviewer();
@@ -188,12 +190,14 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     @Override
     protected void onPause() {
+        Log.d(TAG, "onPause");
         uninitPreviewer();
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
+        Log.d(TAG, "onDestroy");
         unregisterReceiver(mReceiver);
         //removeListener();
         uninitPreviewer();
@@ -218,6 +222,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     }
 
     private void initUI() {
+        Log.d(TAG, "initUI");
         ScreenAlwaysOn_MaxBrightness();
 
         // init mVideoSurface
@@ -391,6 +396,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     //First Person View
     private void initPreviewer() {
+        Log.d(TAG, "initPreviewer");
         BaseProduct product = DJIApplication.getProductInstance();
         if (product == null || !product.isConnected()) {
             setResultToToast(getString(R.string.disconnected));
@@ -406,6 +412,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     }
 
     private void uninitPreviewer() {
+        Log.d(TAG, "unInitPreviewer");
         Camera camera = DJIApplication.getCameraInstance();
         if (camera != null) {
             // Reset the callback
@@ -415,7 +422,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-        Log.e(TAG, "onSurfaceTextureAvailable");
+        Log.d(TAG, "onSurfaceTextureAvailable");
         if (mCodecManager == null) {
             mCodecManager = new DJICodecManager(this, surface, width, height);
             mCodecManager.enabledYuvData(true);
@@ -426,12 +433,12 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     @Override
     public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-        Log.e(TAG, "onSurfaceTextureSizeChanged");
+        Log.d(TAG, "onSurfaceTextureSizeChanged");
     }
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        Log.e(TAG, "onSurfaceTextureDestroyed");
+        Log.d(TAG, "onSurfaceTextureDestroyed");
         if (mCodecManager != null) {
             mCodecManager.cleanSurface();
             mCodecManager = null;
@@ -442,6 +449,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+        Log.d(TAG, "onSurfaceTextureUpdated");
     }
 
     //end of First Person View
@@ -456,13 +464,14 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     };
 
     private void onProductConnectionChange() {
+        Log.d(TAG, "onProductConnectionChange");
         initFlightController();
         initPreviewer();
         //loginAccount();
     }
 
     private void initFlightController() {
-
+        Log.d(TAG, "initFlightController");
         BaseProduct product = DJIApplication.getProductInstance();
         if (product != null && product.isConnected()) {
             if (product instanceof Aircraft) {
@@ -564,7 +573,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
 
     public static boolean checkGpsCoordination(double latitude, double longitude) {
-        return (latitude > -90 && latitude < 90 && longitude > -180 && longitude < 180) &&
+        return (latitude > -90.0 && latitude < 90.0 && longitude > -180.0 && longitude < 180.0) &&
                 (latitude != 0f && longitude != 0f);
     }
 
@@ -915,6 +924,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
                     //setResultToToast(gotoRecord.toString());
 
+                    Log.i(TAGsocket, gotoRecord.toString());
+
                     if (switchB.isChecked()) { //Check if the drone is armed
 
                         double gotoLat = (double) gotoRecord.get("latitude");
@@ -939,13 +950,16 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                             realWP.gimbalPitch = (float) gotoRecord.get("gimbalPitch");
                             fakeWP.gimbalPitch = (float) gotoRecord.get("gimbalPitch");
                         }
-
+                        
                         new Handler(Looper.getMainLooper()).post(new Runnable() {
 
                             @Override
                             public void run() {
                                 // this will run in the main thread
                                 PrepareMap(gotoLat, gotoLon);
+
+                                Log.i(TAGsocket, "Inside run() realWP value -> Coordinate: " + realWP.coordinate.toString() + ", Altitude: "+
+                                        realWP.altitude +", Heading: " + realWP.heading +", Gimbal Pitch: "+ realWP.gimbalPitch);
 
                                 //DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
                                 adapter = new StartDJIGotoMission(mSpeed, mHeadingMode);

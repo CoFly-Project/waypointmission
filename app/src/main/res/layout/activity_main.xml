@@ -189,11 +189,12 @@
         <TextureView
             android:id="@+id/video_previewer_surface"
             android:layout_width="181dp"
-            android:layout_height="94dp" />
-    </LinearLayout>
+            android:layout_height="94dp"/>
+            <!--android:visibility="invisible" -->
+</LinearLayout>
 
 
-    <!-- Pre-flight checklist panel -->
+<!-- Pre-flight checklist panel -->
     <dji.ux.panel.PreFlightCheckListPanel
         android:layout_width="400dp"
         android:layout_height="wrap_content"
