@@ -945,9 +945,16 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     double gotoLat = (double) gotoRecord.get("latitude");
                     double gotoLon = (double) gotoRecord.get("longitude");
                     float gotoAlt = (float) gotoRecord.get("altitude");
+                    float gotoSpeed;
 
                     Waypoint fakeWP = new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt);
                     Waypoint realWP = new Waypoint(gotoLat, gotoLon, gotoAlt);
+
+                    if (gotoRecord.get("speed") != null) {
+                        gotoSpeed = (float) gotoRecord.get("speed");
+                    }else{
+                        gotoSpeed = mSpeed;
+                    }
 
                     WaypointMissionHeadingMode mHeadingMode;
                     if (gotoRecord.get("heading") != null) {
@@ -975,7 +982,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                     realWP.altitude + ", Heading: " + realWP.heading + ", Gimbal Pitch: " + realWP.gimbalPitch);
 
                             //DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
-                            adapter = new StartDJIGotoMission(mSpeed, mHeadingMode);
+                            adapter = new StartDJIGotoMission(gotoSpeed, mHeadingMode);
                             adapter.execute(fakeWP, realWP);
 
                         }
