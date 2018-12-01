@@ -9,6 +9,7 @@ import android.util.Log;
 
 import org.apache.avro.generic.GenericRecord;
 
+import java.util.Date;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -58,6 +59,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
     private boolean imageTaken = false;
 
     protected static final String TAG = "StartDJIGotoMission";
+    protected static final String TAGtime = "StartDJIWPTrackTime";
 
     public StartDJIGotoMission(float timeout, float speed, WaypointMissionHeadingMode mHeadingMode) {
         this.mHeadingMode = mHeadingMode;
@@ -88,6 +90,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
         Log.i(TAG, "Fake Waypoint Heading " + WP1.heading + ", Real Waypoint Heading: " + WP2.heading);
         int attempt = 1;
         long startedTime = System.currentTimeMillis();
+        Log.i(TAGtime, "Goto received at " + new Date(startedTime));
         while ((System.currentTimeMillis() - startedTime) < timeout * 1000L &&
                 status != WaypointMissionStatus.ACTIVE) {
             stopWaypointMission();
@@ -119,14 +122,10 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
             }
         }
 
-        /*
-        while(waypointNotReached.get() && !stopped.get()){
-            try{
-                Thread.sleep(200);
-            }catch (InterruptedException e){
-                Log.e(TAG, "Error in sleeping...");
-            }
-        }*/
+        if (status != WaypointMissionStatus.ACTIVE) {
+            StopWaypointNavigation stopWP = new StopWaypointNavigation();
+            stopWP.execute();
+        }
 
         return null;
     }
