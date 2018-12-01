@@ -7,18 +7,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.ImageFormat;
-import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
-import android.graphics.YuvImage;
 import android.media.MediaCodec;
 import android.os.Build;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -31,7 +25,6 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -56,53 +49,32 @@ import org.apache.avro.io.BinaryDecoder;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.DecoderFactory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import dji.common.camera.SettingsDefinitions;
-import dji.common.error.DJIError;
 import dji.common.flightcontroller.FlightControllerState;
-import dji.common.gimbal.Axis;
-import dji.common.gimbal.DJIGimbalAttitude;
-import dji.common.gimbal.GimbalMode;
 import dji.common.gimbal.GimbalState;
-import dji.common.gimbal.MovementSettings;
-import dji.common.gimbal.MovementSettingsProfile;
-import dji.common.gimbal.Rotation;
 import dji.common.mission.waypoint.Waypoint;
-import dji.common.mission.waypoint.WaypointMission;
 import dji.common.mission.waypoint.WaypointMissionFinishedAction;
 import dji.common.mission.waypoint.WaypointMissionHeadingMode;
 
 import dji.common.product.Model;
-import dji.common.util.CommonCallbacks;
 import dji.sdk.base.BaseProduct;
 import dji.sdk.camera.Camera;
-import dji.sdk.camera.MediaManager;
 import dji.sdk.camera.VideoFeeder;
 import dji.sdk.codec.DJICodecManager;
 import dji.sdk.flightcontroller.FlightAssistant;
 import dji.sdk.flightcontroller.FlightController;
 import dji.sdk.gimbal.Gimbal;
-import dji.sdk.mission.MissionControl;
 import dji.sdk.mission.waypoint.WaypointMissionOperator;
 import dji.sdk.products.Aircraft;
-import dji.sdk.sdkmanager.DJISDKManager;
-import dji.thirdparty.afinal.core.AsyncTask;
 
 
 public class MainActivity extends FragmentActivity implements TextureView.SurfaceTextureListener,
@@ -167,7 +139,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private int connection_time_out;
     private String droneCanonicalName;
 
-    private WaypointNavigation WPAdapter;
+    private StopWaypointNavigation WPAdapter;
 
     private StartDJIGotoMission adapter;
 
@@ -368,8 +340,6 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         schemaLoader.load();
         schemaGoto = schemaLoader.getSchema("goto");
         lastPublishLocationOn = System.currentTimeMillis();
-
-        WPAdapter = new WaypointNavigation();
 
     }
 
@@ -628,7 +598,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                 break;
             }
             case R.id.stop: {
-                WPAdapter.stopWaypointMission();
+                WPAdapter = new StopWaypointNavigation();
+                WPAdapter.execute();
                 break;
             }
             default:
