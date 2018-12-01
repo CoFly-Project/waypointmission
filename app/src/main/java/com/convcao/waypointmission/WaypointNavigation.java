@@ -139,7 +139,6 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
 
     public void stopWaypointMission() {
         locked.set(true);
-        if (status != WaypointMissionStatus.STOPPED) {
             Log.i(TAG, "Stop previous mission");
             int current_attempt = 1;
             while (status != WaypointMissionStatus.STOPPED && current_attempt<=attempts) {
@@ -153,7 +152,6 @@ public class WaypointNavigation { //extends AsyncTask<Waypoint,Void, Void>
             }
             Log.i(TAG, (current_attempt-1)+" attempts were needed for this operation");
             locked.set(false);
-        }
     }
 
     private void stopExecution() {

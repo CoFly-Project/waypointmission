@@ -46,7 +46,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
     private WaypointMissionFinishedAction mFinishedAction;
     private WaypointMissionHeadingMode mHeadingMode;
     private FlightAssistant FA;
-    private float speed;
+    private float speed, timeout;
     protected boolean locked = false;
     private final int MAX_ATTEMPTS = 35;
     private WaypointMissionStatus status;
@@ -59,12 +59,13 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
 
     protected static final String TAG = "StartDJIGotoMission";
 
-    public StartDJIGotoMission(float speed, WaypointMissionHeadingMode mHeadingMode) {
+    public StartDJIGotoMission(float timeout, float speed, WaypointMissionHeadingMode mHeadingMode) {
         this.mHeadingMode = mHeadingMode;
         this.mFinishedAction = WaypointMissionFinishedAction.NO_ACTION; //TODO fix me in the future
         this.FA = new FlightAssistant();
         this.status = WaypointMissionStatus.INACTIVE;
         this.speed = speed;
+        this.timeout = timeout;
         this.handler = new Handler();
     }
 
@@ -86,7 +87,9 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
         this.WP2 = WPS[1];
         Log.i(TAG, "Fake Waypoint Heading " + WP1.heading + ", Real Waypoint Heading: " + WP2.heading);
         int attempt = 1;
-        while (status != WaypointMissionStatus.ACTIVE) {
+        long startedTime = System.currentTimeMillis();
+        while ((System.currentTimeMillis() - startedTime) < timeout * 1000L ||
+                status != WaypointMissionStatus.ACTIVE) {
             stopWaypointMission();
             while (locked) { //Wait to stop the mission
                 try {
@@ -172,8 +175,8 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
             if (!waypointMissionBuilder.isGimbalPitchRotationEnabled()) {
                 waypointMissionBuilder.setGimbalPitchRotationEnabled(true);
             }
-        }catch (Exception e){
-            Log.i(TAG, "ERROR in enabling gimbal pitch rotation:"+e.toString());
+        } catch (Exception e) {
+            Log.i(TAG, "ERROR in enabling gimbal pitch rotation:" + e.toString());
         }
 
         DJIError error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
@@ -339,7 +342,6 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
 
     };
     */
-
 
 
     private double CalculateDistanceLatLon(double lat1, double lat2, double lon1,

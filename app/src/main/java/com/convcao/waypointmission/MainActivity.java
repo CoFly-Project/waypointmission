@@ -142,10 +142,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private LatLngBounds bounds = null;
     LatLngBounds.Builder builder;
 
-    private float zoomLevel;
-
-    //private float altitude = 100.0f;
-    private float mSpeed = 10.0f;
+    private float zoomLevel, dSpeed, dTimeout;
 
     private Waypoint WP;
     private LatLng point2D;
@@ -364,6 +361,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         mapPadding = Integer.parseInt(props.getProperty("map_padding"));
         publishPeriod = Long.parseLong(props.getProperty("publish_location_period"));
         zoomLevel = Float.parseFloat(props.getProperty("zoomlevel"));
+        dSpeed = Float.parseFloat(props.getProperty("speed"));
+        dTimeout = Float.parseFloat(props.getProperty("timeout"));
 
 
         gotoRun = new GoToListener(android_port);
@@ -746,10 +745,13 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         RadioGroup actionAfterFinished_RG = (RadioGroup) wayPointSettings.findViewById(R.id.actionAfterFinished);
         RadioGroup heading_RG = (RadioGroup) wayPointSettings.findViewById(R.id.heading);
 
+        float mSpeed = dSpeed;
+
         speed_RG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
 
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
+                float mSpeed;
                 if (checkedId == R.id.lowSpeed) {
                     mSpeed = 3.0f;
                 } else if (checkedId == R.id.MidSpeed) {
@@ -946,14 +948,22 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     double gotoLon = (double) gotoRecord.get("longitude");
                     float gotoAlt = (float) gotoRecord.get("altitude");
                     float gotoSpeed;
+                    float timeout;
 
                     Waypoint fakeWP = new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt);
                     Waypoint realWP = new Waypoint(gotoLat, gotoLon, gotoAlt);
 
+                    if (gotoRecord.get("timeout") != null) {
+                        timeout = (float) gotoRecord.get("timeout");
+                    }else{
+                        timeout = dTimeout;
+                    }
+
+
                     if (gotoRecord.get("speed") != null) {
                         gotoSpeed = (float) gotoRecord.get("speed");
                     }else{
-                        gotoSpeed = mSpeed;
+                        gotoSpeed = dSpeed;
                     }
 
                     WaypointMissionHeadingMode mHeadingMode;
@@ -982,7 +992,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                     realWP.altitude + ", Heading: " + realWP.heading + ", Gimbal Pitch: " + realWP.gimbalPitch);
 
                             //DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
-                            adapter = new StartDJIGotoMission(gotoSpeed, mHeadingMode);
+                            adapter = new StartDJIGotoMission(timeout, gotoSpeed, mHeadingMode);
                             adapter.execute(fakeWP, realWP);
 
                         }
