@@ -123,7 +123,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     private Switch switchB;
     private ImageButton locate, infoB;
-    private Button gotoc, stop;
+    private Button stop;
     private Spinner publisher;
 
     public boolean inOperation = false;
@@ -231,17 +231,14 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
         infoB = (ImageButton) findViewById(R.id.connection_info);
         locate = (ImageButton) findViewById(R.id.locate);
-        gotoc = (Button) findViewById(R.id.gotoc);
         switchB = (Switch) findViewById(R.id.arm);
         stop = (Button) findViewById(R.id.stop);
         publisher = (Spinner) findViewById(R.id.publisher);
 
         infoB.setOnClickListener(this);
         locate.setOnClickListener(this);
-        gotoc.setOnClickListener(this);
         stop.setOnClickListener(this);
 
-        gotoc.setEnabled(false);
         switchB.setEnabled(false);
         infoB.setEnabled(true);
         stop.setEnabled(false);
@@ -250,11 +247,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     infoB.setEnabled(false);
-                    gotoc.setEnabled(true);
                     stop.setEnabled(true);
                 } else {
                     infoB.setEnabled(true);
-                    gotoc.setEnabled(false);
                     stop.setEnabled(false);
                 }
             }
@@ -632,10 +627,6 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                 viewPointUpdate(zoomLevel); // Locate the drone's place
                 break;
             }
-            case R.id.gotoc: {
-                showSettingDialog();
-                break;
-            }
             case R.id.stop: {
                 WPAdapter.stopWaypointMission();
                 break;
@@ -734,108 +725,6 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                 .show();
     }
 
-
-    private void showSettingDialog() {
-        LinearLayout wayPointSettings = (LinearLayout) getLayoutInflater().inflate(R.layout.dialog_waypointsetting, null);
-
-        final TextView wpAltitude_TV = (TextView) wayPointSettings.findViewById(R.id.altitude);
-        final TextView wpLatitude_TV = (TextView) wayPointSettings.findViewById(R.id.latitude);
-        final TextView wpLongitude_TV = (TextView) wayPointSettings.findViewById(R.id.longitude);
-        RadioGroup speed_RG = (RadioGroup) wayPointSettings.findViewById(R.id.speed);
-        RadioGroup actionAfterFinished_RG = (RadioGroup) wayPointSettings.findViewById(R.id.actionAfterFinished);
-        RadioGroup heading_RG = (RadioGroup) wayPointSettings.findViewById(R.id.heading);
-
-        float mSpeed = dSpeed;
-
-        speed_RG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                float mSpeed;
-                if (checkedId == R.id.lowSpeed) {
-                    mSpeed = 3.0f;
-                } else if (checkedId == R.id.MidSpeed) {
-                    mSpeed = 5.0f;
-                } else if (checkedId == R.id.HighSpeed) {
-                    mSpeed = 10.0f;
-                }
-            }
-
-        });
-
-        actionAfterFinished_RG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                Log.d(TAG, "Select finish action");
-                if (checkedId == R.id.finishNone) {
-                    mFinishedAction = WaypointMissionFinishedAction.NO_ACTION;
-                } else if (checkedId == R.id.finishGoHome) {
-                    mFinishedAction = WaypointMissionFinishedAction.GO_HOME;
-                } else if (checkedId == R.id.finishAutoLanding) {
-                    mFinishedAction = WaypointMissionFinishedAction.AUTO_LAND;
-                } else if (checkedId == R.id.finishToFirst) {
-                    mFinishedAction = WaypointMissionFinishedAction.GO_FIRST_WAYPOINT;
-                }
-            }
-        });
-
-        heading_RG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                Log.d(TAG, "Select heading");
-                if (checkedId == R.id.headingNext) {
-                    mHeadingMode = WaypointMissionHeadingMode.AUTO;
-                } else if (checkedId == R.id.headingInitDirec) {
-                    mHeadingMode = WaypointMissionHeadingMode.USING_INITIAL_DIRECTION;
-                } else if (checkedId == R.id.headingRC) {
-                    mHeadingMode = WaypointMissionHeadingMode.CONTROL_BY_REMOTE_CONTROLLER;
-                } else if (checkedId == R.id.headingWP) {
-                    mHeadingMode = WaypointMissionHeadingMode.USING_WAYPOINT_HEADING;
-                }
-            }
-        });
-
-        new AlertDialog.Builder(this)
-                .setTitle("")
-                .setView(wayPointSettings)
-                .setPositiveButton("Start", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-
-                        String altitudeString = wpAltitude_TV.getText().toString();
-
-                        double latitude = Double.parseDouble(wpLatitude_TV.getText().toString());
-                        double longitude = Double.parseDouble(wpLongitude_TV.getText().toString());
-                        int altitude = Integer.parseInt(nulltoIntegerDefalt(altitudeString));
-
-                        //stopWaypointMission();
-
-                        //adapter.cancel(true);
-                        WPAdapter.stopWaypointMission();
-                        PrepareMap(latitude, longitude);
-                        //adapter.stopWaypointMission();
-                        //adapter.Goto(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
-                        //        new Waypoint(latitude, longitude, altitude), mSpeed);
-
-                        //adapter = new StartDJIGotoMission(mSpeed);
-                        //adapter.execute(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
-                        //        new Waypoint(latitude, longitude, altitude));
-                        WPAdapter.Goto(new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt),
-                                new Waypoint(latitude, longitude, altitude), mSpeed);
-                        //Goto(latitude, longitude, altitude);
-                    }
-
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-
-                })
-                .create()
-                .show();
-    }
 
     String nulltoIntegerDefalt(String value) {
         if (!isIntValue(value)) value = "0";

@@ -114,14 +114,6 @@
             android:text="ARM" />
 
         <Button
-            android:id="@+id/gotoc"
-            android:clickable="false"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Go to" />
-
-        <Button
             android:id="@+id/stop"
             android:clickable="false"
             android:layout_width="match_parent"
