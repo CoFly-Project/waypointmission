@@ -90,7 +90,8 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
         Log.i(TAG, "Fake Waypoint Heading " + WP1.heading + ", Real Waypoint Heading: " + WP2.heading);
         int attempt = 1;
         long startedTime = System.currentTimeMillis();
-        Log.i(TAGtime, "Goto received at " + new Date(startedTime));
+        Log.i(TAGtime, "Goto: " + WP2.coordinate.getLatitude() + ", " + WP2.coordinate.getLongitude()+", "
+                +WP2.altitude + " received at " + new Date(startedTime));
         while ((System.currentTimeMillis() - startedTime) < timeout * 1000L &&
                 status != WaypointMissionStatus.ACTIVE) {
             stopWaypointMission();
