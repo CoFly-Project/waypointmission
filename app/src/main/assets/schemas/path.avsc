@@ -1,0 +1,40 @@
+{
+    "namespace": "com.convcao.dji.commands",
+    "name": "Path",
+    "type":"record",
+    "fields":[
+       {
+       "name": "destinationSystem",
+       "type": "string",
+       "doc": "Canonical name of the destination system"
+       },
+       {
+       "name": "sourceSystem",
+       "type": "string",
+       "doc": "Canonical name of the originating system"
+       },
+       {
+       "name": "time",
+       "type": "long",
+       "unit": "ms",
+       "doc": "Time elapsed since the Unix epoch"
+       },
+       {
+       "name": "speed",
+       "type": ["float", "null"],
+       "unit": "m/s"
+       },
+       {
+       "name": "timeout",
+       "type": "float",
+       "unit": "s"
+       },
+       {
+       "name" : "waypoints",
+       "type" : {
+           "type" : "array",
+           "items" : "string"
+           }
+       }
+    ]
+}

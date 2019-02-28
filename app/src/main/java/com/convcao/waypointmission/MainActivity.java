@@ -49,8 +49,11 @@ import org.apache.avro.io.BinaryDecoder;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.DecoderFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -75,6 +78,9 @@ import dji.sdk.flightcontroller.FlightController;
 import dji.sdk.gimbal.Gimbal;
 import dji.sdk.mission.waypoint.WaypointMissionOperator;
 import dji.sdk.products.Aircraft;
+
+import static org.apache.avro.file.BZip2Codec.DEFAULT_BUFFER_SIZE;
+import static org.apache.commons.io.IOUtils.copy;
 
 
 public class MainActivity extends FragmentActivity implements TextureView.SurfaceTextureListener,
@@ -127,7 +133,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     private SchemaLoader schemaLoader;
     private DispatchMessage dispatchMessage;
-    private Schema schemaGoto;
+    private Schema schemaGoto, schemaPath;
 
     private long publishPeriod;
     private long lastPublishLocationOn;
@@ -144,6 +150,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private StartDJIGotoMission adapter;
 
     private GoToListener gotoRun;
+    private enum Command {
+        GOTO, PATH_FOLLOWING, UNKNOWN
+    }
 
     private byte[] cameraView;
     private ScreenShot savePhoto;
@@ -331,14 +340,15 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         dSpeed = Float.parseFloat(props.getProperty("speed"));
         dTimeout = Float.parseFloat(props.getProperty("timeout"));
 
+        schemaLoader = new SchemaLoader();
+        schemaLoader.load();
+        schemaGoto = schemaLoader.getSchema("goto");
+        schemaPath = schemaLoader.getSchema("path");
 
         gotoRun = new GoToListener(android_port);
         gotoRun.stop();
         gotoRun.start();
 
-        schemaLoader = new SchemaLoader();
-        schemaLoader.load();
-        schemaGoto = schemaLoader.getSchema("goto");
         lastPublishLocationOn = System.currentTimeMillis();
 
     }
@@ -750,6 +760,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
 
     class GoToListener implements Runnable {
+
+
         private Socket s;
         private ServerSocket ss;
         private AtomicBoolean isAlive = new AtomicBoolean(true);
@@ -770,6 +782,20 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             isAlive.set(false);
         }
 
+
+        private boolean parseItAs(InputStream inputStream, Schema schema, GenericRecord record){
+            try {
+                DecoderFactory decoderFactory = new DecoderFactory();
+                BinaryDecoder binaryDecoder = decoderFactory.binaryDecoder(inputStream, null);
+                DatumReader datumReader = new GenericDatumReader(schema);
+                record = new GenericData.Record(schema);
+                datumReader.read(record, binaryDecoder);
+                return true;
+            }catch (Exception e){
+                return false;
+            }
+        }
+
         @Override
         public void run() {
             isAlive.set(true);
@@ -784,80 +810,95 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             }
             while (isAlive.get()) {
 
-                GenericRecord gotoRecord;
-                boolean parseOK = true;
+                GenericRecord sentRecord = null;
+                Command type;
                 try {
+
                     s = ss.accept();
-                    DatumReader datumReader = new GenericDatumReader(schemaGoto);
-                    gotoRecord = new GenericData.Record(schemaGoto);
                     InputStream inputStream = s.getInputStream();
-                    DecoderFactory decoderFactory = new DecoderFactory();
-                    BinaryDecoder binaryDecoder = decoderFactory.binaryDecoder(inputStream, null);
-                    datumReader.read(gotoRecord, binaryDecoder);
-                    Log.i(TAGsocket, gotoRecord.toString());
+
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    copy(inputStream, baos);
+                    byte[] inputStreamAsBytes = baos.toByteArray();
+
+                    if (parseItAs(new ByteArrayInputStream(inputStreamAsBytes), schemaGoto, sentRecord)){
+                        type = Command.GOTO;
+                    }else if(parseItAs(new ByteArrayInputStream(inputStreamAsBytes), schemaPath, sentRecord)){
+                        type = Command.PATH_FOLLOWING;
+                    }else{
+                        type = Command.UNKNOWN;
+                    }
+                    Log.i(TAGsocket, sentRecord.toString());
                 } catch (IOException e) {
-                    setResultToToast("Error in reading GOTO commands");
+                    setResultToToast("Error in reading sent command");
+                    type = Command.UNKNOWN;
                     Log.e(TAGsocket, e.toString());
-                    gotoRecord = new GenericData.Record(null);
-                    parseOK = false;
                 }
 
-                if (switchB.isChecked() && parseOK) { //Check if the drone is armed
+                if (switchB.isChecked()) {//Check if the drone is armed
+                    switch (type){
+                        case GOTO:
+                            GenericRecord gotoRecord = sentRecord;
+                            double gotoLat = (double) gotoRecord.get("latitude");
+                            double gotoLon = (double) gotoRecord.get("longitude");
+                            float gotoAlt = (float) gotoRecord.get("altitude");
+                            float gotoSpeed;
+                            float timeout;
 
-                    double gotoLat = (double) gotoRecord.get("latitude");
-                    double gotoLon = (double) gotoRecord.get("longitude");
-                    float gotoAlt = (float) gotoRecord.get("altitude");
-                    float gotoSpeed;
-                    float timeout;
+                            Waypoint fakeWP = new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt);
+                            Waypoint realWP = new Waypoint(gotoLat, gotoLon, gotoAlt);
 
-                    Waypoint fakeWP = new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt);
-                    Waypoint realWP = new Waypoint(gotoLat, gotoLon, gotoAlt);
+                            if (gotoRecord.get("timeout") != null) {
+                                timeout = (float) gotoRecord.get("timeout");
+                            }else{
+                                timeout = dTimeout;
+                            }
 
-                    if (gotoRecord.get("timeout") != null) {
-                        timeout = (float) gotoRecord.get("timeout");
-                    }else{
-                        timeout = dTimeout;
+
+                            if (gotoRecord.get("speed") != null) {
+                                gotoSpeed = (float) gotoRecord.get("speed");
+                            }else{
+                                gotoSpeed = dSpeed;
+                            }
+
+                            WaypointMissionHeadingMode mHeadingMode;
+                            if (gotoRecord.get("heading") != null) {
+                                fakeWP.heading = (int) gotoRecord.get("heading");
+                                realWP.heading = fakeWP.heading;
+                                mHeadingMode = WaypointMissionHeadingMode.USING_WAYPOINT_HEADING;
+                            } else {
+                                mHeadingMode = WaypointMissionHeadingMode.CONTROL_BY_REMOTE_CONTROLLER;
+                            }
+
+
+                            if (gotoRecord.get("gimbalPitch") != null) {
+                                //fakeWP.gimbalPitch = -45.0f;//(int) gotoRecord.get("gimbalPitch");
+                                realWP.gimbalPitch = (float) gotoRecord.get("gimbalPitch");
+                                fakeWP.gimbalPitch = (float) gotoRecord.get("gimbalPitch");
+                            }
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    // this will run in the main thread
+                                    PrepareMap(gotoLat, gotoLon);
+
+                                    Log.i(TAGsocket, "Inside run() realWP value -> Coordinate: " + realWP.coordinate.toString() + ", Altitude: " +
+                                            realWP.altitude + ", Heading: " + realWP.heading + ", Gimbal Pitch: " + realWP.gimbalPitch);
+
+                                    //DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
+                                    adapter = new StartDJIGotoMission(timeout, gotoSpeed, mHeadingMode);
+                                    adapter.execute(fakeWP, realWP);
+
+                                }
+                            });
+
+                            break;
+                        case PATH_FOLLOWING:
+                            break;
+                        case UNKNOWN:
+
                     }
-
-
-                    if (gotoRecord.get("speed") != null) {
-                        gotoSpeed = (float) gotoRecord.get("speed");
-                    }else{
-                        gotoSpeed = dSpeed;
-                    }
-
-                    WaypointMissionHeadingMode mHeadingMode;
-                    if (gotoRecord.get("heading") != null) {
-                        fakeWP.heading = (int) gotoRecord.get("heading");
-                        realWP.heading = fakeWP.heading;
-                        mHeadingMode = WaypointMissionHeadingMode.USING_WAYPOINT_HEADING;
-                    } else {
-                        mHeadingMode = WaypointMissionHeadingMode.CONTROL_BY_REMOTE_CONTROLLER;
-                    }
-
-
-                    if (gotoRecord.get("gimbalPitch") != null) {
-                        //fakeWP.gimbalPitch = -45.0f;//(int) gotoRecord.get("gimbalPitch");
-                        realWP.gimbalPitch = (float) gotoRecord.get("gimbalPitch");
-                        fakeWP.gimbalPitch = (float) gotoRecord.get("gimbalPitch");
-                    }
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            // this will run in the main thread
-                            PrepareMap(gotoLat, gotoLon);
-
-                            Log.i(TAGsocket, "Inside run() realWP value -> Coordinate: " + realWP.coordinate.toString() + ", Altitude: " +
-                                    realWP.altitude + ", Heading: " + realWP.heading + ", Gimbal Pitch: " + realWP.gimbalPitch);
-
-                            //DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
-                            adapter = new StartDJIGotoMission(timeout, gotoSpeed, mHeadingMode);
-                            adapter.execute(fakeWP, realWP);
-
-                        }
-                    });
-
                 }
 
             }
