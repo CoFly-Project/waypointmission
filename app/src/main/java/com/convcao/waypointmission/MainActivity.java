@@ -53,10 +53,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -79,7 +79,6 @@ import dji.sdk.gimbal.Gimbal;
 import dji.sdk.mission.waypoint.WaypointMissionOperator;
 import dji.sdk.products.Aircraft;
 
-import static org.apache.avro.file.BZip2Codec.DEFAULT_BUFFER_SIZE;
 import static org.apache.commons.io.IOUtils.copy;
 
 
@@ -151,7 +150,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     private StopWaypointNavigation WPAdapter;
 
-    private StartDJIGotoMission adapter;
+    private StartDJIMission adapter;
 
     private MessageListener gotoRun;
 
@@ -929,14 +928,22 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                             realWP.altitude + ", Heading: " + realWP.heading + ", Gimbal Pitch: " + realWP.gimbalPitch);
 
                                     //DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
-                                    adapter = new StartDJIGotoMission(timeout, gotoSpeed, mHeadingMode);
-                                    adapter.execute(fakeWP, realWP);
+                                    adapter = new StartDJIMission(timeout, gotoSpeed, mHeadingMode);
+                                    ArrayList<Waypoint> wpList = new ArrayList<>();
+                                    wpList.add(fakeWP);
+                                    wpList.add(realWP);
+                                    adapter.execute(wpList);
 
                                 }
                             });
 
                             break;
                         case PATH_FOLLOWING:
+
+                            GenericRecord pathRecord = sentRecord;
+
+
+
                             break;
                         case UNKNOWN:
 

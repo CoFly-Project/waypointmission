@@ -9,6 +9,7 @@ import android.util.Log;
 
 import org.apache.avro.generic.GenericRecord;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -35,7 +36,7 @@ import dji.sdk.mission.waypoint.WaypointMissionOperatorListener;
 import dji.sdk.products.Aircraft;
 import dji.sdk.sdkmanager.DJISDKManager;
 
-public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
+public class StartDJIMission extends AsyncTask<ArrayList<Waypoint>, Void, Void> {
 
 
     protected enum WaypointMissionStatus {
@@ -52,16 +53,16 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
     private final int MAX_ATTEMPTS = 35;
     private WaypointMissionStatus status;
     private Handler handler;
-    private Waypoint WP1, WP2;
+    //private Waypoint WP1, WP2;
 
     //private AtomicBoolean waypointNotReached=new AtomicBoolean(true);
     //private AtomicBoolean stopped = new AtomicBoolean(false);
     private boolean imageTaken = false;
 
-    protected static final String TAG = "StartDJIGotoMission";
+    protected static final String TAG = "StartDJIMission";
     protected static final String TAGtime = "StartDJIWPTrackTime";
 
-    public StartDJIGotoMission(float timeout, float speed, WaypointMissionHeadingMode mHeadingMode) {
+    public StartDJIMission(float timeout, float speed, WaypointMissionHeadingMode mHeadingMode) {
         this.mHeadingMode = mHeadingMode;
         this.mFinishedAction = WaypointMissionFinishedAction.NO_ACTION; //TODO fix me in the future
         this.FA = new FlightAssistant();
@@ -84,14 +85,15 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(Waypoint... WPS) {
-        this.WP1 = WPS[0];
-        this.WP2 = WPS[1];
-        Log.i(TAG, "Fake Waypoint Heading " + WP1.heading + ", Real Waypoint Heading: " + WP2.heading);
+    protected Void doInBackground(ArrayList<Waypoint>... WPSarray) {
+        ArrayList<Waypoint> WPS = WPSarray[0];
+        //this.WP1 = WPS[0];
+        //this.WP2 = WPS[1];
+        //Log.i(TAG, "Fake Waypoint Heading " + WP1.heading + ", Real Waypoint Heading: " + WP2.heading);
         int attempt = 1;
         long startedTime = System.currentTimeMillis();
-        Log.i(TAGtime, "Goto: " + WP2.coordinate.getLatitude() + ", " + WP2.coordinate.getLongitude()+", "
-                +WP2.altitude + " received at " + new Date(startedTime));
+        //Log.i(TAGtime, "Goto: " + WP2.coordinate.getLatitude() + ", " + WP2.coordinate.getLongitude()+", "
+        //        +WP2.altitude + " received at " + new Date(startedTime));
         while ((System.currentTimeMillis() - startedTime) < timeout * 1000L &&
                 status != WaypointMissionStatus.ACTIVE) {
             stopWaypointMission();
@@ -104,7 +106,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
             }
 
             if (status == WaypointMissionStatus.STOPPED) { //If it stopped successfully
-                Goto(WP1, WP2, speed);
+                mainOperation(WPS, speed); //Goto(WP1, WP2, speed);
 
                 while (locked) { //Wait to start the mission
                     try {
@@ -131,7 +133,7 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
         return null;
     }
 
-    public void Goto(Waypoint WPc, Waypoint WPe, float speed) {
+    public void mainOperation(ArrayList<Waypoint> WPs, float speed) { //public void Goto(Waypoint WPc, Waypoint WPe, float speed) {
         locked = true;
 
         FlightController mFlightController = ((Aircraft) DJIApplication.getProductInstance()).getFlightController();
@@ -167,9 +169,14 @@ public class StartDJIGotoMission extends AsyncTask<Waypoint, Void, Void> {
                 .headingMode(mHeadingMode)
                 .autoFlightSpeed(speed)
                 .maxFlightSpeed(speed)
-                .flightPathMode(WaypointMissionFlightPathMode.NORMAL).addWaypoint(WPc).addWaypoint(WPe);
+                .flightPathMode(WaypointMissionFlightPathMode.NORMAL); //.addWaypoint(WPc).addWaypoint(WPe);
         //.addWaypoint(fakeWP)
         //.waypointCount(2);
+
+        for (Waypoint wp: WPs) {
+            waypointMissionBuilder.addWaypoint(wp);
+        }
+
 
         try {
             if (!waypointMissionBuilder.isGimbalPitchRotationEnabled()) {
