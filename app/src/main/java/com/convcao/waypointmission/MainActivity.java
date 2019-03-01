@@ -114,6 +114,10 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private float droneVelocityY;
     private float droneVelocityZ;
 
+    private double cameraLat, cameraLon;
+    private float cameraAlt, cameraGimbal, cameraVelocityX, cameraVelocityY, cameraVelocityZ;
+    private int cameraRotation;
+
     //private final Map<Integer, Marker> mMarkers = new ConcurrentHashMap<Integer, Marker>();
     private Marker markerWP = null;
     private Marker droneMarker = null;
@@ -149,12 +153,14 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     private StartDJIGotoMission adapter;
 
-    private GoToListener gotoRun;
+    private MessageListener gotoRun;
+
     private enum Command {
         GOTO, PATH_FOLLOWING, UNKNOWN
     }
 
     private byte[] cameraView;
+    private boolean cameraBytesUpdated = false;
     private ScreenShot savePhoto;
     private int count;
 
@@ -250,6 +256,15 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     public void onTaskComplete(byte[] result) {
         cameraView = result;
+        cameraLat = droneLocationLat;
+        cameraLon = droneLocationLng;
+        cameraAlt = droneLocationAlt;
+        cameraRotation = droneRotation;
+        cameraGimbal = droneGimbal;
+        cameraVelocityX = droneVelocityX;
+        cameraVelocityY = droneVelocityY;
+        cameraVelocityZ = droneVelocityZ;
+        cameraBytesUpdated = true;
     }
 
     public void onWaypointReached() {
@@ -345,7 +360,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         schemaGoto = schemaLoader.getSchema("goto");
         schemaPath = schemaLoader.getSchema("path");
 
-        gotoRun = new GoToListener(android_port);
+        gotoRun = new MessageListener(android_port);
         gotoRun.stop();
         gotoRun.start();
 
@@ -482,24 +497,44 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     updateDroneLocation();
 
                     long currentTime = System.currentTimeMillis();
-                    if (switchB.isChecked() && (currentTime - lastPublishLocationOn) >= publishPeriod) {
-                        lastPublishLocationOn = currentTime;
 
-                        switch (publisher.getSelectedItem().toString()) {
-                            case "Only location":
-                                publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt,
-                                        droneRotation, currentTime);
-                                break;
-                            case "Location & camera":
-                                publishCameraInfo(droneLocationLat, droneLocationLng, droneLocationAlt,
-                                        droneRotation, droneGimbal, currentTime, cameraView, droneVelocityX,
-                                        droneVelocityY, droneVelocityZ);
-                                break;
-                            default:
-                                publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt,
-                                        droneRotation, currentTime);
-                                break;
-                        }
+                    if (switchB.isChecked() && publisher.getSelectedItem().toString().equals("Location & camera")
+                            && cameraBytesUpdated) {
+                        publishCameraInfo(cameraLat, cameraLon, cameraAlt,
+                                cameraRotation, cameraGimbal, currentTime, cameraView, cameraVelocityX,
+                                cameraVelocityY, cameraVelocityZ);
+                        cameraBytesUpdated = false;
+                    }
+
+
+                    if (switchB.isChecked() && (currentTime - lastPublishLocationOn) >= publishPeriod) {
+
+                        lastPublishLocationOn = currentTime;
+                        publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt,
+                                droneRotation, currentTime);
+
+//                        if (publisher.getSelectedItem().toString().equals("Location & camera") && cameraBytesUpdated) {
+//                            publishCameraInfo(cameraLat, cameraLon, cameraAlt,
+//                                    cameraRotation, cameraGimbal, currentTime, cameraView, cameraVelocityX,
+//                                    cameraVelocityY, cameraVelocityZ);
+//                            cameraBytesUpdated = false;
+//                        }
+//
+//                        switch (publisher.getSelectedItem().toString()) {
+//                            case "Only location":
+//                                publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt,
+//                                        droneRotation, currentTime);
+//                                break;
+//                            case "Location & camera":
+//                                publishCameraInfo(droneLocationLat, droneLocationLng, droneLocationAlt,
+//                                        droneRotation, droneGimbal, currentTime, cameraView, droneVelocityX,
+//                                        droneVelocityY, droneVelocityZ);
+//                                break;
+//                            default:
+//                                publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt,
+//                                        droneRotation, currentTime);
+//                                break;
+//                        }
                     }
                 }
             });
@@ -690,7 +725,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                         if (android_port_temp != android_port) {
                             android_port = android_port_temp;
                             gotoRun.stop();
-                            gotoRun = new GoToListener(android_port);
+                            gotoRun = new MessageListener(android_port);
                             gotoRun.start();
                         }
                     }
@@ -759,7 +794,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     }
 
 
-    class GoToListener implements Runnable {
+    class MessageListener implements Runnable {
 
 
         private Socket s;
@@ -768,7 +803,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         private Thread worker;
         private int consumerPort;
 
-        GoToListener(int port) {
+        MessageListener(int port) {
             isAlive.set(true);
             consumerPort = port;
         }
@@ -783,17 +818,22 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         }
 
 
-        private boolean parseItAs(InputStream inputStream, Schema schema, GenericRecord record){
+        private boolean parseItAs(InputStream inputStream, Schema schema) {
             try {
-                DecoderFactory decoderFactory = new DecoderFactory();
-                BinaryDecoder binaryDecoder = decoderFactory.binaryDecoder(inputStream, null);
-                DatumReader datumReader = new GenericDatumReader(schema);
-                record = new GenericData.Record(schema);
-                datumReader.read(record, binaryDecoder);
+                constructRecord(inputStream, schema);
                 return true;
-            }catch (Exception e){
+            } catch (Exception e) {
                 return false;
             }
+        }
+
+        private GenericRecord constructRecord(InputStream inputStream, Schema schema) throws Exception {
+            DecoderFactory decoderFactory = new DecoderFactory();
+            BinaryDecoder binaryDecoder = decoderFactory.binaryDecoder(inputStream, null);
+            DatumReader datumReader = new GenericDatumReader(schema);
+            GenericRecord record = new GenericData.Record(schema);
+            datumReader.read(record, binaryDecoder);
+            return record;
         }
 
         @Override
@@ -821,22 +861,24 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     copy(inputStream, baos);
                     byte[] inputStreamAsBytes = baos.toByteArray();
 
-                    if (parseItAs(new ByteArrayInputStream(inputStreamAsBytes), schemaGoto, sentRecord)){
+                    if (parseItAs(new ByteArrayInputStream(inputStreamAsBytes), schemaGoto)) {
                         type = Command.GOTO;
-                    }else if(parseItAs(new ByteArrayInputStream(inputStreamAsBytes), schemaPath, sentRecord)){
+                        sentRecord = constructRecord(new ByteArrayInputStream(inputStreamAsBytes), schemaGoto);
+                    } else if (parseItAs(new ByteArrayInputStream(inputStreamAsBytes), schemaPath)) {
                         type = Command.PATH_FOLLOWING;
-                    }else{
+                        sentRecord = constructRecord(new ByteArrayInputStream(inputStreamAsBytes), schemaPath);
+                    } else {
                         type = Command.UNKNOWN;
                     }
-                    Log.i(TAGsocket, sentRecord.toString());
-                } catch (IOException e) {
+                    Log.i(TAGsocket, "Command of type " + type.toString() + " received");
+                } catch (Exception e) {
                     setResultToToast("Error in reading sent command");
                     type = Command.UNKNOWN;
                     Log.e(TAGsocket, e.toString());
                 }
 
                 if (switchB.isChecked()) {//Check if the drone is armed
-                    switch (type){
+                    switch (type) {
                         case GOTO:
                             GenericRecord gotoRecord = sentRecord;
                             double gotoLat = (double) gotoRecord.get("latitude");
@@ -850,14 +892,14 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
                             if (gotoRecord.get("timeout") != null) {
                                 timeout = (float) gotoRecord.get("timeout");
-                            }else{
+                            } else {
                                 timeout = dTimeout;
                             }
 
 
                             if (gotoRecord.get("speed") != null) {
                                 gotoSpeed = (float) gotoRecord.get("speed");
-                            }else{
+                            } else {
                                 gotoSpeed = dSpeed;
                             }
 
