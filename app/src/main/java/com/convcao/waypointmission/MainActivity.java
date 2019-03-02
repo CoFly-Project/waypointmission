@@ -40,6 +40,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
@@ -47,7 +49,10 @@ import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.BinaryDecoder;
 import org.apache.avro.io.DatumReader;
+import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
+import org.apache.avro.io.JsonDecoder;
+import org.apache.avro.util.Utf8;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -56,8 +61,10 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -118,7 +125,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private int cameraRotation;
 
     //private final Map<Integer, Marker> mMarkers = new ConcurrentHashMap<Integer, Marker>();
-    private Marker markerWP = null;
+    //private Marker markerWP = null;
+    private ArrayList<Marker> allMarkers = new ArrayList<>();
+
     private Marker droneMarker = null;
     private LatLngBounds bounds = null;
     LatLngBounds.Builder builder;
@@ -625,7 +634,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(point);
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-        markerWP = gMap.addMarker(markerOptions);
+        allMarkers.add(gMap.addMarker(markerOptions));
+        //markerWP = gMap.addMarker(markerOptions);
         //mMarkers.put(mMarkers.size(), marker);
     }
 
@@ -756,21 +766,40 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         return true;
     }
 
-    private void PrepareMap(double lat, double lon) {
-        if (markerWP != null) {
-            markerWP.remove();
+    private void PrepareMap(ArrayList<Waypoint> list) {
+
+        LatLng currentPose = new LatLng(droneLocationLat, droneLocationLng);
+        gMap.clear();
+
+        for (Marker marker: allMarkers) {
+            marker.remove();
         }
 
-        point2D = new LatLng(lat, lon);
-        markWaypoint(point2D);
-
         bounds = null;
-        //LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        //builder = new LatLngBounds.Builder();
         //Include current possition
-        builder.include(new LatLng(droneLocationLat, droneLocationLng));
-        //Include the desired waypoint location
-        builder.include(point2D);
+        builder.include(currentPose);
+
+        PolylineOptions polylineOptions = new PolylineOptions();
+        polylineOptions.clickable(false);
+        polylineOptions.add(currentPose);
+
+        for (Waypoint wp: list) {
+
+            double lat = wp.coordinate.getLatitude();
+            double lon = wp.coordinate.getLongitude();
+
+            point2D = new LatLng(lat, lon);
+            markWaypoint(point2D);
+
+            //Include the desired waypoint location
+            builder.include(point2D);
+            polylineOptions.add(point2D);
+        }
+
         bounds = builder.build();
+
+        Polyline polyline = gMap.addPolyline(polylineOptions);
     }
 
 
@@ -877,14 +906,23 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                 }
 
                 if (switchB.isChecked()) {//Check if the drone is armed
+
+                    ArrayList<Waypoint> wpList = new ArrayList<>();
+                    ArrayList<Waypoint> wpDisplayList = new ArrayList<>();
+
+                    float missionSpeed = 1.0f;
+                    float timeout = 10.0f ;
+                    WaypointMissionHeadingMode mHeadingMode = WaypointMissionHeadingMode.CONTROL_BY_REMOTE_CONTROLLER;
+
+                    boolean startTheDJI = false;
+
                     switch (type) {
                         case GOTO:
                             GenericRecord gotoRecord = sentRecord;
                             double gotoLat = (double) gotoRecord.get("latitude");
                             double gotoLon = (double) gotoRecord.get("longitude");
                             float gotoAlt = (float) gotoRecord.get("altitude");
-                            float gotoSpeed;
-                            float timeout;
+
 
                             Waypoint fakeWP = new Waypoint(droneLocationLat, droneLocationLng, droneLocationAlt);
                             Waypoint realWP = new Waypoint(gotoLat, gotoLon, gotoAlt);
@@ -897,12 +935,12 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
 
                             if (gotoRecord.get("speed") != null) {
-                                gotoSpeed = (float) gotoRecord.get("speed");
+                                missionSpeed = (float) gotoRecord.get("speed");
                             } else {
-                                gotoSpeed = dSpeed;
+                                missionSpeed = dSpeed;
                             }
 
-                            WaypointMissionHeadingMode mHeadingMode;
+
                             if (gotoRecord.get("heading") != null) {
                                 fakeWP.heading = (int) gotoRecord.get("heading");
                                 realWP.heading = fakeWP.heading;
@@ -917,25 +955,17 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                 realWP.gimbalPitch = (float) gotoRecord.get("gimbalPitch");
                                 fakeWP.gimbalPitch = (float) gotoRecord.get("gimbalPitch");
                             }
-                            new Handler(Looper.getMainLooper()).post(new Runnable() {
 
-                                @Override
-                                public void run() {
-                                    // this will run in the main thread
-                                    PrepareMap(gotoLat, gotoLon);
+                            Log.i(TAGsocket, "Inside run() realWP value -> Coordinate: " + realWP.coordinate.toString() + ", Altitude: " +
+                                    realWP.altitude + ", Heading: " + realWP.heading + ", Gimbal Pitch: " + realWP.gimbalPitch);
 
-                                    Log.i(TAGsocket, "Inside run() realWP value -> Coordinate: " + realWP.coordinate.toString() + ", Altitude: " +
-                                            realWP.altitude + ", Heading: " + realWP.heading + ", Gimbal Pitch: " + realWP.gimbalPitch);
 
-                                    //DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
-                                    adapter = new StartDJIMission(timeout, gotoSpeed, mHeadingMode);
-                                    ArrayList<Waypoint> wpList = new ArrayList<>();
-                                    wpList.add(fakeWP);
-                                    wpList.add(realWP);
-                                    adapter.execute(wpList);
+                            wpList.add(fakeWP);
+                            wpList.add(realWP);
 
-                                }
-                            });
+                            wpDisplayList.add(realWP);
+
+                            startTheDJI=true;
 
                             break;
                         case PATH_FOLLOWING:
@@ -943,10 +973,77 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                             GenericRecord pathRecord = sentRecord;
 
 
+                            //Retrieve all waypoints from inside schema
+                            List allWPList = (List) pathRecord.get("waypoints");
+                            try {
 
+                                for (Object wpObject : allWPList) {
+                                    ByteBuffer byteBuffer = (ByteBuffer) wpObject;
+                                    byte[] byteArray = byteBuffer.array();
+                                    GenericRecord wpRecord = constructRecord(new ByteArrayInputStream(byteArray), schemaGoto);
+
+                                    Waypoint waypoint = new Waypoint((double) wpRecord.get("latitude"),
+                                            (double) wpRecord.get("longitude"), (float) wpRecord.get("altitude"));
+
+                                    if (wpRecord.get("heading") != null) {
+                                        waypoint.heading = (int) wpRecord.get("heading");
+                                    }
+
+                                    if (wpRecord.get("gimbalPitch") != null) {
+                                        waypoint.gimbalPitch = (float) wpRecord.get("gimbalPitch");
+                                    }
+
+                                    wpList.add(waypoint);
+                                    wpDisplayList.add(waypoint);
+                                }
+
+                            } catch (Exception e) {
+                                Log.e(TAGsocket, "Error in reading waypoints inside the received path schema");
+                            }
+
+
+                            //Define heading-speed-timeout
+                            mHeadingMode = WaypointMissionHeadingMode.AUTO;
+                            if (pathRecord.get("speed") != null) {
+                                missionSpeed = (float) pathRecord.get("speed");
+                            } else {
+                                missionSpeed = dSpeed;
+                            }
+                            if (pathRecord.get("timeout") != null) {
+                                timeout = (float) pathRecord.get("timeout");
+                            } else {
+                                timeout = dTimeout * wpList.size();
+                            }
+
+                            startTheDJI=true;
                             break;
                         case UNKNOWN:
+                            startTheDJI=false;
+                            break;
+                    }
 
+
+                    if (startTheDJI) {
+
+
+                        float final_timeout = timeout;
+                        float final_missionSpeed = missionSpeed;
+                        WaypointMissionHeadingMode final_HeadingMode = mHeadingMode;
+
+
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                // this will run in the main thread
+                                PrepareMap(wpDisplayList);
+
+                                //DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
+                                adapter = new StartDJIMission(final_timeout, final_missionSpeed, final_HeadingMode);
+                                adapter.execute(wpList);
+
+                            }
+                        });
                     }
                 }
 
@@ -979,6 +1076,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     Schema schema = parser.parse(getAssets().open("schemas/" + name));
                     schemaMap.put(schemaIdWithOutExt, schema);
                 }
+                //parser.addTypes(schemaMap);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -986,6 +1084,10 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
         public GenericRecord createGenericRecord(final String schemaId) {
             return new GenericData.Record(getSchema(schemaId));
+        }
+
+        public GenericRecord parseString(String s) {
+            return new GenericData.Record(parser.parse(s));
         }
 
         private Schema getSchema(final String schemaId) {

@@ -33,7 +33,7 @@
        "name" : "waypoints",
        "type" : {
            "type" : "array",
-           "items" : "string"
+           "items" : "bytes"
            }
        }
     ]
