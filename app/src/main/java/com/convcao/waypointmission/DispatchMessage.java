@@ -52,6 +52,7 @@ public class DispatchMessage extends AsyncTask<GenericRecord, Void, Void> {
             Log.i(TAG, record[0].getSchema().getName() + " schema sent to " + server_ip + ":" + port);
         } catch (IOException e) {
             Log.i(TAG, e.toString());
+            e.printStackTrace();
         }
         return null;
     }
