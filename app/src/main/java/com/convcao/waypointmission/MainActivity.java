@@ -170,7 +170,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private byte[] cameraView;
     private boolean cameraBytesUpdated = false;
     private ScreenShot savePhoto;
-    private int count;
+    private int countIncomingFrames;
 
     @Override
     protected void onResume() {
@@ -379,12 +379,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     @Override
     public void onYuvDataReceived(final ByteBuffer yuvFrame, int dataSize, final int width, final int height) {
-        //In this demo, we test the YUV data by saving it into JPG files.
-        //DJILog.d(TAG, "onYuvDataReceived " + dataSize);
-        if (count++ % 30 == 0 && yuvFrame != null) {
+        if (countIncomingFrames++ % 30 == 0 && yuvFrame != null) {
             final byte[] bytes = new byte[dataSize];
             yuvFrame.get(bytes);
-            //DJILog.d(TAG, "onYuvDataReceived2 " + dataSize);
             savePhoto = new ScreenShot(width, height, MainActivity.this);
             savePhoto.execute(bytes);
         }

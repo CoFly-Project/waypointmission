@@ -126,8 +126,9 @@ public class StartDJIMission extends AsyncTask<ArrayList<Waypoint>, Void, Void> 
         }
 
         if (status != WaypointMissionStatus.ACTIVE) {
-            StopWaypointNavigation stopWP = new StopWaypointNavigation();
-            stopWP.execute();
+            //StopWaypointNavigation stopWP = new StopWaypointNavigation();
+            //stopWP.execute();
+            stopWaypointMission();
         }
 
         return null;
