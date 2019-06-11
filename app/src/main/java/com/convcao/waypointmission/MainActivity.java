@@ -147,8 +147,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private DispatchMessage dispatchMessage;
     private Schema schemaGoto, schemaPath;
 
-    private long publishPeriod;
-    private long lastPublishLocationOn;
+    private long publishPeriod, publishCameraPeriod;
+    private long lastPublishLocationOn, lastPublishCameraOn;
     private int mapPadding;
 
     private String server_ip;
@@ -359,6 +359,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         minimumArmHeight = Double.parseDouble(props.getProperty("minimum_height_to_arm"));
         mapPadding = Integer.parseInt(props.getProperty("map_padding"));
         publishPeriod = Long.parseLong(props.getProperty("publish_location_period"));
+        publishCameraPeriod = Long.parseLong(props.getProperty("publish_camera_period"));
         zoomLevel = Float.parseFloat(props.getProperty("zoomlevel"));
         dSpeed = Float.parseFloat(props.getProperty("speed"));
         dTimeout = Float.parseFloat(props.getProperty("timeout"));
@@ -373,13 +374,18 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         gotoRun.start();
 
         lastPublishLocationOn = System.currentTimeMillis();
+        lastPublishCameraOn = System.currentTimeMillis();
 
     }
 
 
     @Override
     public void onYuvDataReceived(final ByteBuffer yuvFrame, int dataSize, final int width, final int height) {
-        if (countIncomingFrames++ % 30 == 0 && yuvFrame != null) {
+        long currentTime = System.currentTimeMillis();
+        if (switchB.isChecked() && publisher.getSelectedItem().toString().equals("Location & camera") &&
+                ((currentTime - lastPublishCameraOn) >= publishCameraPeriod) && yuvFrame != null){
+            lastPublishCameraOn = currentTime;
+            System.gc();
             final byte[] bytes = new byte[dataSize];
             yuvFrame.get(bytes);
             savePhoto = new ScreenShot(width, height, MainActivity.this);

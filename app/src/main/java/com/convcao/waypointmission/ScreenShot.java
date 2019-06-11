@@ -44,8 +44,7 @@ public class ScreenShot extends AsyncTask<byte[], Void, byte[]> {
         //if (yuvFrame.length < width * height) {
             //DJILog.d(TAG, "yuvFrame size is too small " + yuvFrame.length);
         //    return;
-        //}
-        System.gc();
+        //
 
         byte[] y = new byte[width * height];
         byte[] u = new byte[width * height / 4];
