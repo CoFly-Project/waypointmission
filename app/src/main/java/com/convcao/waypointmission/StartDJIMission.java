@@ -171,13 +171,14 @@ public class StartDJIMission extends AsyncTask<ArrayList<Waypoint>, Void, Void> 
                 .autoFlightSpeed(speed)
                 .maxFlightSpeed(speed)
                 .flightPathMode(WaypointMissionFlightPathMode.NORMAL); //.addWaypoint(WPc).addWaypoint(WPe);
-        //.addWaypoint(fakeWP)
-        //.waypointCount(2);
+
+        if (!waypointMissionBuilder.isExitMissionOnRCSignalLostEnabled()){
+            waypointMissionBuilder.setExitMissionOnRCSignalLostEnabled(true);
+        }
 
         for (Waypoint wp: WPs) {
             waypointMissionBuilder.addWaypoint(wp);
         }
-
 
         try {
             if (!waypointMissionBuilder.isGimbalPitchRotationEnabled()) {
