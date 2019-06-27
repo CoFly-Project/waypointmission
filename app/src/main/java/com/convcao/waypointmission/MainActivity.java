@@ -16,6 +16,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
@@ -73,6 +74,7 @@ import dji.common.flightcontroller.FlightControllerState;
 import dji.common.gimbal.GimbalState;
 import dji.common.mission.waypoint.Waypoint;
 import dji.common.mission.waypoint.WaypointMissionFinishedAction;
+import dji.common.mission.waypoint.WaypointMissionFlightPathMode;
 import dji.common.mission.waypoint.WaypointMissionHeadingMode;
 
 import dji.common.product.Model;
@@ -916,7 +918,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     float missionSpeed = 1.0f;
                     float timeout = 10.0f ;
                     WaypointMissionHeadingMode mHeadingMode = WaypointMissionHeadingMode.CONTROL_BY_REMOTE_CONTROLLER;
-
+                    WaypointMissionFlightPathMode mFlightPathMode = WaypointMissionFlightPathMode.NORMAL;
                     boolean startTheDJI = false;
 
                     switch (type) {
@@ -952,6 +954,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                 mHeadingMode = WaypointMissionHeadingMode.CONTROL_BY_REMOTE_CONTROLLER;
                             }
 
+                            mFlightPathMode = WaypointMissionFlightPathMode.NORMAL;
 
                             if (gotoRecord.get("gimbalPitch") != null) {
                                 //fakeWP.gimbalPitch = -45.0f;//(int) gotoRecord.get("gimbalPitch");
@@ -996,6 +999,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                         waypoint.gimbalPitch = (float) wpRecord.get("gimbalPitch");
                                     }
 
+                                    //waypoint.cornerRadiusInMeters = 0.2f;
+
                                     wpList.add(waypoint);
                                     wpDisplayList.add(waypoint);
                                 }
@@ -1005,8 +1010,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                             }
 
 
-                            //Define heading-speed-timeout
+                            //Define heading-speed-timeout-FlightPathMode
                             mHeadingMode = WaypointMissionHeadingMode.AUTO;
+                            mFlightPathMode = WaypointMissionFlightPathMode.CURVED;
                             if (pathRecord.get("speed") != null) {
                                 missionSpeed = (float) pathRecord.get("speed");
                             } else {
@@ -1032,6 +1038,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                         float final_timeout = timeout;
                         float final_missionSpeed = missionSpeed;
                         WaypointMissionHeadingMode final_HeadingMode = mHeadingMode;
+                        WaypointMissionFlightPathMode final_flightPathMode = mFlightPathMode;
 
 
                         new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -1042,7 +1049,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                 PrepareMap(wpDisplayList);
 
                                 //DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
-                                adapter = new StartDJIMission(final_timeout, final_missionSpeed, final_HeadingMode);
+                                adapter = new StartDJIMission(final_timeout, final_missionSpeed,
+                                        final_HeadingMode, final_flightPathMode);
                                 adapter.execute(wpList);
 
                             }

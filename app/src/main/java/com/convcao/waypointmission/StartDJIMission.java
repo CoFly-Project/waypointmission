@@ -47,6 +47,7 @@ public class StartDJIMission extends AsyncTask<ArrayList<Waypoint>, Void, Void> 
     private WaypointMissionOperator instance;
     private WaypointMissionFinishedAction mFinishedAction;
     private WaypointMissionHeadingMode mHeadingMode;
+    private WaypointMissionFlightPathMode missionFlightPathMode;
     private FlightAssistant FA;
     private float speed, timeout;
     protected boolean locked = false;
@@ -62,9 +63,11 @@ public class StartDJIMission extends AsyncTask<ArrayList<Waypoint>, Void, Void> 
     protected static final String TAG = "StartDJIMission";
     protected static final String TAGtime = "StartDJIWPTrackTime";
 
-    public StartDJIMission(float timeout, float speed, WaypointMissionHeadingMode mHeadingMode) {
+    public StartDJIMission(float timeout, float speed, WaypointMissionHeadingMode mHeadingMode,
+                           WaypointMissionFlightPathMode missionFlightPathMode) {
         this.mHeadingMode = mHeadingMode;
         this.mFinishedAction = WaypointMissionFinishedAction.NO_ACTION; //TODO fix me in the future
+        this.missionFlightPathMode = missionFlightPathMode;
         this.FA = new FlightAssistant();
         this.status = WaypointMissionStatus.INACTIVE;
         this.speed = speed;
@@ -170,7 +173,7 @@ public class StartDJIMission extends AsyncTask<ArrayList<Waypoint>, Void, Void> 
                 .headingMode(mHeadingMode)
                 .autoFlightSpeed(speed)
                 .maxFlightSpeed(speed)
-                .flightPathMode(WaypointMissionFlightPathMode.NORMAL); //.addWaypoint(WPc).addWaypoint(WPe);
+                .flightPathMode(missionFlightPathMode);
 
         if (!waypointMissionBuilder.isExitMissionOnRCSignalLostEnabled()){
             waypointMissionBuilder.setExitMissionOnRCSignalLostEnabled(true);
