@@ -35,6 +35,12 @@
            "type" : "array",
            "items" : "bytes"
            }
+       },
+       {
+       "name": "cornerRadius",
+       "type": "float",
+       "unit": "m",
+       "doc": "Corner radius of each waypoint"
        }
     ]
 }

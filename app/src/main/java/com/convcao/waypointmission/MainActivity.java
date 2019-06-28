@@ -88,6 +88,7 @@ import dji.sdk.gimbal.Gimbal;
 import dji.sdk.mission.waypoint.WaypointMissionOperator;
 import dji.sdk.products.Aircraft;
 
+import static com.convcao.waypointmission.Dist.geo;
 import static org.apache.commons.io.IOUtils.copy;
 
 
@@ -123,7 +124,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private float droneVelocityZ;
 
     private double cameraLat, cameraLon;
-    private float cameraAlt, cameraGimbal, cameraVelocityX, cameraVelocityY, cameraVelocityZ;
+    private float cameraAlt, cameraGimbal, cameraVelocityX, cameraVelocityY, cameraVelocityZ, minimumWaypointCurve;
     private int cameraRotation;
 
     //private final Map<Integer, Marker> mMarkers = new ConcurrentHashMap<Integer, Marker>();
@@ -359,6 +360,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
 
         minimumArmHeight = Double.parseDouble(props.getProperty("minimum_height_to_arm"));
+        minimumWaypointCurve = Float.parseFloat(props.getProperty("minimum_waypoint_curve"));
         mapPadding = Integer.parseInt(props.getProperty("map_padding"));
         publishPeriod = Long.parseLong(props.getProperty("publish_location_period"));
         publishCameraPeriod = Long.parseLong(props.getProperty("publish_camera_period"));
@@ -978,10 +980,14 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
                             GenericRecord pathRecord = sentRecord;
 
+                            float cornerRadius = (float) pathRecord.get("cornerRadius");
 
                             //Retrieve all waypoints from inside schema
                             List allWPList = (List) pathRecord.get("waypoints");
                             try {
+
+                                int wpIndex = 0;
+                                double[] prevWP = new double[2];
 
                                 for (Object wpObject : allWPList) {
                                     ByteBuffer byteBuffer = (ByteBuffer) wpObject;
@@ -999,8 +1005,26 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                         waypoint.gimbalPitch = (float) wpRecord.get("gimbalPitch");
                                     }
 
-                                    //waypoint.cornerRadiusInMeters = 0.2f;
+                                    if (wpIndex==0 || wpIndex==(allWPList.size()-1)) {
 
+                                        waypoint.cornerRadiusInMeters = minimumWaypointCurve;
+                                    }
+                                    else{ //https://developer.dji.com/mobile-sdk/documentation/cn/faq/cn/api-reference/ios-api/Components/Missions/DJIWaypoint.html#djiwaypoint_cornerradiusinmeters_inline
+
+                                        double dist = geo(prevWP, new double[]{
+                                                waypoint.coordinate.getLatitude(),
+                                                waypoint.coordinate.getLongitude()});
+                                        if (2*cornerRadius < dist) {
+                                            waypoint.cornerRadiusInMeters = cornerRadius;
+                                        }
+                                        else{
+                                            waypoint.cornerRadiusInMeters = (float) (dist - cornerRadius - minimumWaypointCurve);
+                                        }
+                                    }
+
+                                    prevWP[0] = waypoint.coordinate.getLatitude();
+                                    prevWP[1] = waypoint.coordinate.getLongitude();
+                                    wpIndex++;
                                     wpList.add(waypoint);
                                     wpDisplayList.add(waypoint);
                                 }

@@ -175,6 +175,10 @@ public class StartDJIMission extends AsyncTask<ArrayList<Waypoint>, Void, Void> 
                 .maxFlightSpeed(speed)
                 .flightPathMode(missionFlightPathMode);
 
+        waypointMissionBuilder.flightPathMode(missionFlightPathMode);
+
+        Log.i(TAG,"Current Flight Mode: " + waypointMissionBuilder.getFlightPathMode().toString());
+
         if (!waypointMissionBuilder.isExitMissionOnRCSignalLostEnabled()){
             waypointMissionBuilder.setExitMissionOnRCSignalLostEnabled(true);
         }
