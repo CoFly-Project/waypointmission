@@ -988,6 +988,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
                                 int wpIndex = 0;
                                 double[] prevWP = new double[2];
+                                float prevCorner = minimumWaypointCurve;
 
                                 for (Object wpObject : allWPList) {
                                     ByteBuffer byteBuffer = (ByteBuffer) wpObject;
@@ -1011,19 +1012,25 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                     }
                                     else{ //https://developer.dji.com/mobile-sdk/documentation/cn/faq/cn/api-reference/ios-api/Components/Missions/DJIWaypoint.html#djiwaypoint_cornerradiusinmeters_inline
 
-                                        double dist = geo(prevWP, new double[]{
-                                                waypoint.coordinate.getLatitude(),
+                                        double dist = geo(prevWP, new double[]{waypoint.coordinate.getLatitude(),
                                                 waypoint.coordinate.getLongitude()});
-                                        if (2*cornerRadius < dist) {
+
+                                        if (prevCorner+cornerRadius < dist) {
                                             waypoint.cornerRadiusInMeters = cornerRadius;
+                                        }else if ((dist - 2.0*minimumWaypointCurve) > prevCorner){
+                                            waypoint.cornerRadiusInMeters = (float) (dist - minimumWaypointCurve - prevCorner);
                                         }
                                         else{
-                                            waypoint.cornerRadiusInMeters = (float) (dist - cornerRadius - minimumWaypointCurve);
+                                            float newRadius = (float) ((dist/2.0) - minimumWaypointCurve);
+                                            waypoint.cornerRadiusInMeters = newRadius;
+                                            wpList.get(wpList.size()-1).cornerRadiusInMeters = newRadius;
+                                            wpDisplayList.get(wpDisplayList.size()-1).cornerRadiusInMeters = newRadius;
                                         }
                                     }
 
                                     prevWP[0] = waypoint.coordinate.getLatitude();
                                     prevWP[1] = waypoint.coordinate.getLongitude();
+                                    prevCorner = waypoint.cornerRadiusInMeters;
                                     wpIndex++;
                                     wpList.add(waypoint);
                                     wpDisplayList.add(waypoint);
