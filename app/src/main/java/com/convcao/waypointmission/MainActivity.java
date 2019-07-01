@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.graphics.SurfaceTexture;
 import android.media.MediaCodec;
 import android.os.Build;
+import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -63,9 +64,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -380,6 +384,10 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         lastPublishLocationOn = System.currentTimeMillis();
         lastPublishCameraOn = System.currentTimeMillis();
 
+        //SimpleDateFormat dateFormat = new SimpleDateFormat("dd_MM_yyyy_hh_mm_ss", Locale.getDefault());
+        //String logDate = dateFormat.format(new Date());
+        // Applies the date and time to the name of the trace log.
+        //Debug.startMethodTracing("take-" + logDate);
     }
 
 

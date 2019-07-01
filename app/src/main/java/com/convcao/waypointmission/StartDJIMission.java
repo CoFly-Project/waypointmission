@@ -128,6 +128,7 @@ public class StartDJIMission extends AsyncTask<ArrayList<Waypoint>, Void, Void> 
             }
         }
 
+        Log.i(TAG, "Vgikame apo ti while");
         if (status != WaypointMissionStatus.ACTIVE) {
             //StopWaypointNavigation stopWP = new StopWaypointNavigation();
             //stopWP.execute();
@@ -171,10 +172,14 @@ public class StartDJIMission extends AsyncTask<ArrayList<Waypoint>, Void, Void> 
 
         WaypointMission.Builder waypointMissionBuilder = new WaypointMission.Builder().finishedAction(mFinishedAction)
                 .headingMode(mHeadingMode)
-                .autoFlightSpeed(speed)
-                .maxFlightSpeed(speed)
-                .flightPathMode(missionFlightPathMode);
+                .autoFlightSpeed(speed);
+                //.maxFlightSpeed(speed)
 
+        if (speed<2.0) {
+            waypointMissionBuilder.maxFlightSpeed(2.0f);
+        }else{
+            waypointMissionBuilder.maxFlightSpeed(speed);
+        }
         waypointMissionBuilder.flightPathMode(missionFlightPathMode);
 
         Log.i(TAG,"Current Flight Mode: " + waypointMissionBuilder.getFlightPathMode().toString());
