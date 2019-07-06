@@ -90,6 +90,18 @@ public class StartDJIMission extends AsyncTask<ArrayList<Waypoint>, Void, Void> 
     @Override
     protected Void doInBackground(ArrayList<Waypoint>... WPSarray) {
         ArrayList<Waypoint> WPS = WPSarray[0];
+
+        for (int i = 1; i < WPS.size(); i++) {
+            Log.i(TAG, "Distance WP"+(i-1)+"-WP"+i+": "+ Dist.geo(new double[]{
+                    WPS.get(i-1).coordinate.getLatitude(), WPS.get(i-1).coordinate.getLongitude()},
+                    new double[]{WPS.get(i).coordinate.getLatitude(), WPS.get(i).coordinate.getLongitude()}));
+        }
+
+        Log.i(TAG, "Heading mode: "+mHeadingMode.toString());
+        Log.i(TAG, "Speed: "+speed);
+        Log.i(TAG, "Timeout: "+timeout);
+        Log.i(TAG, "Flight Path Mode: "+missionFlightPathMode.toString());
+
         //this.WP1 = WPS[0];
         //this.WP2 = WPS[1];
         //Log.i(TAG, "Fake Waypoint Heading " + WP1.heading + ", Real Waypoint Heading: " + WP2.heading);
@@ -200,6 +212,11 @@ public class StartDJIMission extends AsyncTask<ArrayList<Waypoint>, Void, Void> 
             Log.i(TAG, "ERROR in enabling gimbal pitch rotation:" + e.toString());
         }
 
+        DJIError skata = waypointMissionBuilder.checkParameters();
+        if (skata != null) {
+            Log.i(TAG, skata.getDescription());
+        }
+
         DJIError error = getWaypointMissionOperator().loadMission(waypointMissionBuilder.build());
         int attempts = 1;
         while (error != null && attempts <= MAX_ATTEMPTS) {
@@ -229,7 +246,7 @@ public class StartDJIMission extends AsyncTask<ArrayList<Waypoint>, Void, Void> 
                                 Log.i(TAG, "(2/3) Mission uploaded successfully!");
                             } else {
                                 status = WaypointMissionStatus.FAIL_TO_UPLOAD;
-                                Log.i(TAG, djiError.toString());
+                                Log.i(TAG, "Attempting to UPLOAD the following error occurred:\n"+djiError.toString());
                             }
                         }
                     });
@@ -256,7 +273,7 @@ public class StartDJIMission extends AsyncTask<ArrayList<Waypoint>, Void, Void> 
                                     status = WaypointMissionStatus.ACTIVE;
                                     Log.i(TAG, "(3/3) Mission started successfully!");
                                 } else {
-                                    Log.i(TAG, djiError.getDescription());
+                                    Log.i(TAG, "Attempting to START the following error occurred:\n"+djiError.getDescription());
                                     status = WaypointMissionStatus.FAIL_TO_START;
                                 }
                             }
