@@ -166,7 +166,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     private StopWaypointNavigation WPAdapter;
 
-    private StartDJIMission adapter;
+    private StartDJIMission2 adapter;
 
     private MessageListener gotoRun;
 
@@ -1088,7 +1088,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                 PrepareMap(wpDisplayList);
 
                                 //DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
-                                adapter = new StartDJIMission(final_timeout, final_missionSpeed,
+                                adapter = new StartDJIMission2(final_timeout, final_missionSpeed,
                                         final_HeadingMode, final_flightPathMode);
                                 adapter.execute(wpList);
 
