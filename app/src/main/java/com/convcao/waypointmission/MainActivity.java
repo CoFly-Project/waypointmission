@@ -152,7 +152,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     private SchemaLoader schemaLoader;
     private DispatchMessage dispatchMessage;
-    private Schema schemaGoto, schemaPath;
+    private Schema schemaGoto, schemaPath, schemaAbort;
 
     private long publishPeriod, publishCameraPeriod;
     private long lastPublishLocationOn, lastPublishCameraOn;
@@ -171,7 +171,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private MessageListener gotoRun;
 
     private enum Command {
-        GOTO, PATH_FOLLOWING, UNKNOWN
+        GOTO, PATH_FOLLOWING, ABORT, UNKNOWN
     }
 
     private byte[] cameraView;
@@ -376,6 +376,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         schemaLoader.load();
         schemaGoto = schemaLoader.getSchema("goto");
         schemaPath = schemaLoader.getSchema("path");
+        schemaAbort = schemaLoader.getSchema("abort");
 
         gotoRun = new MessageListener(android_port);
         gotoRun.stop();
@@ -910,6 +911,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     } else if (parseItAs(new ByteArrayInputStream(inputStreamAsBytes), schemaPath)) {
                         type = Command.PATH_FOLLOWING;
                         sentRecord = constructRecord(new ByteArrayInputStream(inputStreamAsBytes), schemaPath);
+                    } else if (parseItAs(new ByteArrayInputStream(inputStreamAsBytes), schemaAbort)){
+                        type = Command.ABORT;
+                        sentRecord = constructRecord(new ByteArrayInputStream(inputStreamAsBytes), schemaAbort);
                     } else {
                         type = Command.UNKNOWN;
                     }
@@ -932,6 +936,12 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     boolean startTheDJI = false;
 
                     switch (type) {
+                        case ABORT:
+                            startTheDJI=false;
+                            WPAdapter = new StopWaypointNavigation();
+                            WPAdapter.execute();
+                            break;
+
                         case GOTO:
                             GenericRecord gotoRecord = sentRecord;
                             double gotoLat = (double) gotoRecord.get("latitude");

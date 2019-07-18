@@ -1,0 +1,24 @@
+{
+  "namespace": "com.convcao.dji.commands",
+  "name": "Abort",
+  "type": "record",
+  "doc": "Abort an ongoing mission",
+  "fields": [
+      {
+            "name": "destinationSystem",
+            "type": "string",
+            "doc": "Canonical name of the destination system"
+      },
+      {
+          "name": "sourceSystem",
+          "type": "string",
+          "doc": "Canonical name of the originating system"
+      },
+      {
+            "name": "time",
+            "type": "long",
+            "unit": "ms",
+            "doc": "Time elapsed since the Unix epoch"
+      }
+  ]
+}
