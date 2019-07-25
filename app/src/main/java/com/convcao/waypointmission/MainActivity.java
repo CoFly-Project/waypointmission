@@ -567,7 +567,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
 
     //Send GenericRecord location to the server
-    private void publishLocation(double locationLat, double locationLon, float alt, int heading, long time) {
+    public void publishLocation(double locationLat, double locationLon, float alt, int heading, long time) {
         GenericRecord location = schemaLoader.createGenericRecord("location");
         location.put("sourceSystem", droneCanonicalName);
         location.put("listeningPort", android_port);
@@ -1005,7 +1005,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                             try {
 
                                 int wpIndex = 0;
-                                double[] prevWP = new double[2];
+                                double[] prevWP = new double[3];
                                 float prevCorner = minimumWaypointCurve;
 
                                 for (Object wpObject : allWPList) {
@@ -1031,7 +1031,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                     else{ //https://developer.dji.com/mobile-sdk/documentation/cn/faq/cn/api-reference/ios-api/Components/Missions/DJIWaypoint.html#djiwaypoint_cornerradiusinmeters_inline
 
                                         double dist = geo(prevWP, new double[]{waypoint.coordinate.getLatitude(),
-                                                waypoint.coordinate.getLongitude()});
+                                                waypoint.coordinate.getLongitude(), waypoint.altitude});
 
                                         if (prevCorner+cornerRadius < dist) {
                                             waypoint.cornerRadiusInMeters = cornerRadius;
@@ -1048,6 +1048,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
                                     prevWP[0] = waypoint.coordinate.getLatitude();
                                     prevWP[1] = waypoint.coordinate.getLongitude();
+                                    prevWP[2] = waypoint.altitude;
                                     prevCorner = waypoint.cornerRadiusInMeters;
                                     wpIndex++;
                                     wpList.add(waypoint);
@@ -1099,7 +1100,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
                                 //DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
                                 adapter = new StartDJIMission2(final_timeout, final_missionSpeed,
-                                        final_HeadingMode, final_flightPathMode);
+                                        final_HeadingMode, final_flightPathMode, schemaLoader.getSchemaMap(),
+                                        droneCanonicalName, server_ip, server_port, connection_time_out);
                                 adapter.execute(wpList);
 
                             }
@@ -1153,6 +1155,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         private Schema getSchema(final String schemaId) {
             return schemaMap.get(schemaId);
         }
+
+        public Map<String, Schema> getSchemaMap() {return schemaMap;}
 
     }
 

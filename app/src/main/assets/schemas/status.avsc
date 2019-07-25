@@ -1,0 +1,31 @@
+{
+    "namespace": "com.convcao.dji.commands",
+    "name": "Status",
+    "type":"record",
+    "fields":[
+       {
+       "name": "destinationSystem",
+       "type": "string",
+       "doc": "Canonical name of the destination system"
+       },
+       {
+       "name": "sourceSystem",
+       "type": "string",
+       "doc": "Canonical name of the originating system"
+       },
+       {
+       "name": "time",
+       "type": "long",
+       "unit": "ms",
+       "doc": "Time elapsed since the Unix epoch"
+       },
+       {
+       "name" : "status",
+       "type" : {
+        "type" : "enum",
+        "name" : "ExperimentEnum",
+            "symbols" : ["UNKNOWN", "STARTED", "COMPLETED", "CANCELED", "FAILED" ]
+            }
+       }
+    ]
+}

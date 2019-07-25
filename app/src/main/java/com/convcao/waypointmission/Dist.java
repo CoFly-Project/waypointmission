@@ -14,7 +14,16 @@ public class Dist {
         Double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         distance = R * c * 1000; // convert to meters
 
-        return distance;
+        if (p1.length == 3) {
+            double height = p1[2] - p2[2];
+
+            distance = Math.pow(distance, 2) + Math.pow(height, 2);
+
+            return Math.sqrt(distance);
+        }else{
+            return distance;
+        }
+
     }
 
 }

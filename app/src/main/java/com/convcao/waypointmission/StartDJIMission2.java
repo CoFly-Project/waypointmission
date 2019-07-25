@@ -7,10 +7,13 @@ import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -44,6 +47,8 @@ public class StartDJIMission2 extends AsyncTask<ArrayList<Waypoint>, Void, Void>
         FAIL_TO_STOP, FAIL_TO_LOAD, FAIL_TO_UPLOAD, FAIL_TO_START
     }
 
+    private DispatchMessage dispatchMessage;
+
     private WaypointMissionOperator instance;
     private WaypointMissionFinishedAction mFinishedAction;
     private WaypointMissionHeadingMode mHeadingMode;
@@ -58,6 +63,12 @@ public class StartDJIMission2 extends AsyncTask<ArrayList<Waypoint>, Void, Void>
 
     private final long waitTime = 800;
 
+    private Map<String, Schema> schemas;
+    private String droneCanonicalName;
+    private String server_ip;
+    private int server_port;
+    private int connection_time_out;
+
     //private AtomicBoolean waypointNotReached=new AtomicBoolean(true);
     //private AtomicBoolean stopped = new AtomicBoolean(false);
     private boolean imageTaken = false;
@@ -66,7 +77,8 @@ public class StartDJIMission2 extends AsyncTask<ArrayList<Waypoint>, Void, Void>
     protected static final String TAGtime = "StartDJIWPTrackTime2";
 
     public StartDJIMission2(float timeout, float speed, WaypointMissionHeadingMode mHeadingMode,
-                           WaypointMissionFlightPathMode missionFlightPathMode) {
+                            WaypointMissionFlightPathMode missionFlightPathMode, Map<String, Schema> schemas,
+                            String droneCanonicalName, String server_ip, int server_port, int connection_time_out) {
         this.mHeadingMode = mHeadingMode;
         this.mFinishedAction = WaypointMissionFinishedAction.NO_ACTION; //TODO fix me in the future
         this.missionFlightPathMode = missionFlightPathMode;
@@ -75,6 +87,11 @@ public class StartDJIMission2 extends AsyncTask<ArrayList<Waypoint>, Void, Void>
         this.speed = speed;
         this.timeout = timeout;
         this.handler = new Handler();
+        this.schemas = schemas;
+        this.droneCanonicalName = droneCanonicalName;
+        this.server_ip = server_ip;
+        this.server_port = server_port;
+        this.connection_time_out = connection_time_out;
     }
 
     public WaypointMissionOperator getWaypointMissionOperator() {
@@ -157,6 +174,8 @@ public class StartDJIMission2 extends AsyncTask<ArrayList<Waypoint>, Void, Void>
 
         FlightController mFlightController = ((Aircraft) DJIApplication.getProductInstance()).getFlightController();
         FlightControllerState droneState = mFlightController.getState();
+
+        addListener();
 
         FA.setCollisionAvoidanceEnabled(true, null);
         FA.setActiveObstacleAvoidanceEnabled(true, null);
@@ -277,6 +296,7 @@ public class StartDJIMission2 extends AsyncTask<ArrayList<Waypoint>, Void, Void>
         if (status != WaypointMissionStatus.STOPPED) {
             locked = true;
             Log.i(TAG, "Stop previous mission");
+            removeListener();
             int current_attempt = 1;
             while (status != WaypointMissionStatus.STOPPED && current_attempt <= MAX_ATTEMPTS) {
                 stopExecution();
@@ -310,7 +330,6 @@ public class StartDJIMission2 extends AsyncTask<ArrayList<Waypoint>, Void, Void>
     }
 
 
-    /*
     //Add Listener for WaypointMissionOperator
     private void addListener() {
         if (getWaypointMissionOperator() != null) {
@@ -342,7 +361,7 @@ public class StartDJIMission2 extends AsyncTask<ArrayList<Waypoint>, Void, Void>
 
         @Override
         public void onExecutionStart() {
-
+            sendStatus(ExperimentEnum.STARTED);
         }
 
 
@@ -352,12 +371,25 @@ public class StartDJIMission2 extends AsyncTask<ArrayList<Waypoint>, Void, Void>
             //if (markerWP != null) {
             //    markerWP.remove();
             //}
-            Log.i(TAG,"I am done! Send photo");
-            waypointNotReached.set(false);
+            Log.i(TAG,"I am done!");
+            sendStatus(ExperimentEnum.COMPLETED);
         }
 
     };
-    */
+
+
+    private void sendStatus(ExperimentEnum status) {
+        GenericRecord statusSchema = new GenericData.Record(schemas.get("status"));
+        statusSchema.put("destinationSystem", "Drone Server");
+        statusSchema.put("sourceSystem", droneCanonicalName);
+        statusSchema.put("time", System.currentTimeMillis());
+        statusSchema.put("status", status);
+
+        dispatchMessage = new DispatchMessage(schemas.get("status"), server_ip,
+                server_port, connection_time_out);
+        dispatchMessage.execute(statusSchema);
+    }
+
 
 
     private double CalculateDistanceLatLon(double lat1, double lat2, double lon1,

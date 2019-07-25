@@ -64,7 +64,7 @@ dependencies {
     compile 'com.dji:dji-sdk:4.5.1'
     compile 'com.dji:dji-uxsdk:4.5.1'
     provided 'com.dji:dji-sdk-provided:4.5.1'
-    compile "org.apache.avro:avro:1.8.2"
+    compile "org.apache.avro:avro:1.7.7"
     implementation 'com.android.support:design:27.1.1'
     //implementation files('libs/socket.io-java-client.jar')
 }
