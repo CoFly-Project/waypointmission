@@ -504,9 +504,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             });
         }
 
-
         if (mFlightController != null) {
             mFlightController.setStateCallback(new FlightControllerState.Callback() {
+
 
                 @Override
                 public void onUpdate(FlightControllerState djiFlightControllerCurrentState) {

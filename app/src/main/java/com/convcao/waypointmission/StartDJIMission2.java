@@ -49,6 +49,8 @@ public class StartDJIMission2 extends AsyncTask<ArrayList<Waypoint>, Void, Void>
 
     private DispatchMessage dispatchMessage;
 
+    private boolean readyToFlight = true;
+
     private WaypointMissionOperator instance;
     private WaypointMissionFinishedAction mFinishedAction;
     private WaypointMissionHeadingMode mHeadingMode;
@@ -111,15 +113,15 @@ public class StartDJIMission2 extends AsyncTask<ArrayList<Waypoint>, Void, Void>
         ArrayList<Waypoint> WPS = WPSarray[0];
 
         for (int i = 1; i < WPS.size(); i++) {
-            Log.i(TAG, "Distance WP"+(i-1)+"-WP"+i+": "+ Dist.geo(new double[]{
-                            WPS.get(i-1).coordinate.getLatitude(), WPS.get(i-1).coordinate.getLongitude()},
+            Log.i(TAG, "Distance WP" + (i - 1) + "-WP" + i + ": " + Dist.geo(new double[]{
+                            WPS.get(i - 1).coordinate.getLatitude(), WPS.get(i - 1).coordinate.getLongitude()},
                     new double[]{WPS.get(i).coordinate.getLatitude(), WPS.get(i).coordinate.getLongitude()}));
         }
 
-        Log.i(TAG, "Heading mode: "+mHeadingMode.toString());
-        Log.i(TAG, "Speed: "+speed);
-        Log.i(TAG, "Timeout: "+timeout);
-        Log.i(TAG, "Flight Path Mode: "+missionFlightPathMode.toString());
+        Log.i(TAG, "Heading mode: " + mHeadingMode.toString());
+        Log.i(TAG, "Speed: " + speed);
+        Log.i(TAG, "Timeout: " + timeout);
+        Log.i(TAG, "Flight Path Mode: " + missionFlightPathMode.toString());
 
         //this.WP1 = WPS[0];
         //this.WP2 = WPS[1];
@@ -140,7 +142,8 @@ public class StartDJIMission2 extends AsyncTask<ArrayList<Waypoint>, Void, Void>
             }
 
             if (status == WaypointMissionStatus.STOPPED) { //If it stopped successfully
-                mainOperation(WPS, speed); //Goto(WP1, WP2, speed);
+
+                mainOperation(WPS, speed);
 
                 while (locked) { //Wait to start the mission
                     try {
@@ -169,11 +172,50 @@ public class StartDJIMission2 extends AsyncTask<ArrayList<Waypoint>, Void, Void>
         return null;
     }
 
-    public void mainOperation(ArrayList<Waypoint> WPs, float speed) { //public void Goto(Waypoint WPc, Waypoint WPe, float speed) {
+
+    private void mainOperation(ArrayList<Waypoint> WPs, float speed) { //public void Goto(Waypoint WPc, Waypoint WPe, float speed) {
         locked = true;
 
         FlightController mFlightController = ((Aircraft) DJIApplication.getProductInstance()).getFlightController();
         FlightControllerState droneState = mFlightController.getState();
+
+        readyToFlight = true;
+
+        if (!droneState.isFlying()) {
+
+            readyToFlight = false;
+
+            Log.i(TAG, "The aircraft is not in the air!");
+
+            if (droneState.areMotorsOn()){
+                Log.i(TAG, "The motors are on! We are going to turn them off to initiate take off");
+
+                mFlightController.turnOffMotors(new CommonCallbacks.CompletionCallback() {
+                    @Override
+                    public void onResult(DJIError djiError) {
+                        Log.i(TAG, "The motors have now turned off");
+                    }
+                });
+            }
+
+            mFlightController.startTakeoff(new CommonCallbacks.CompletionCallback() {
+                @Override
+                public void onResult(DJIError djiError) {
+                    readyToFlight = true;
+                    Log.i(TAG, "The aircraft has now being taken off");
+                }
+            });
+        }
+
+
+        while(!readyToFlight){
+            try {
+                Thread.sleep(waitTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
 
         addListener();
 
@@ -184,20 +226,20 @@ public class StartDJIMission2 extends AsyncTask<ArrayList<Waypoint>, Void, Void>
                 .headingMode(mHeadingMode)
                 .autoFlightSpeed(speed);
 
-        if (speed<2.0) {
+        if (speed < 2.0) {
             waypointMissionBuilder.maxFlightSpeed(2.0f);
-        }else{
+        } else {
             waypointMissionBuilder.maxFlightSpeed(speed);
         }
         waypointMissionBuilder.flightPathMode(missionFlightPathMode);
 
-        Log.i(TAG,"Current Flight Mode: " + waypointMissionBuilder.getFlightPathMode().toString());
+        Log.i(TAG, "Current Flight Mode: " + waypointMissionBuilder.getFlightPathMode().toString());
 
-        if (!waypointMissionBuilder.isExitMissionOnRCSignalLostEnabled()){
+        if (!waypointMissionBuilder.isExitMissionOnRCSignalLostEnabled()) {
             waypointMissionBuilder.setExitMissionOnRCSignalLostEnabled(true);
         }
 
-        for (Waypoint wp: WPs) {
+        for (Waypoint wp : WPs) {
             waypointMissionBuilder.addWaypoint(wp);
         }
 
@@ -243,7 +285,7 @@ public class StartDJIMission2 extends AsyncTask<ArrayList<Waypoint>, Void, Void>
                                 Log.i(TAG, "(2/3) Mission uploaded successfully!");
                             } else {
                                 status = WaypointMissionStatus.FAIL_TO_UPLOAD;
-                                Log.i(TAG, "Attempting to UPLOAD the following error occurred:\n"+djiError.toString());
+                                Log.i(TAG, "Attempting to UPLOAD the following error occurred:\n" + djiError.toString());
                             }
                         }
                     });
@@ -270,7 +312,7 @@ public class StartDJIMission2 extends AsyncTask<ArrayList<Waypoint>, Void, Void>
                                     status = WaypointMissionStatus.ACTIVE;
                                     Log.i(TAG, "(3/3) Mission started successfully!");
                                 } else {
-                                    Log.i(TAG, "Attempting to START the following error occurred:\n"+djiError.getDescription());
+                                    Log.i(TAG, "Attempting to START the following error occurred:\n" + djiError.getDescription());
                                     status = WaypointMissionStatus.FAIL_TO_START;
                                 }
                             }
@@ -371,7 +413,7 @@ public class StartDJIMission2 extends AsyncTask<ArrayList<Waypoint>, Void, Void>
             //if (markerWP != null) {
             //    markerWP.remove();
             //}
-            Log.i(TAG,"I am done!");
+            Log.i(TAG, "I am done!");
             sendStatus(ExperimentEnum.COMPLETED);
         }
 
@@ -389,7 +431,6 @@ public class StartDJIMission2 extends AsyncTask<ArrayList<Waypoint>, Void, Void>
                 server_port, connection_time_out);
         dispatchMessage.execute(statusSchema);
     }
-
 
 
     private double CalculateDistanceLatLon(double lat1, double lat2, double lon1,
