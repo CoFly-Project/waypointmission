@@ -243,16 +243,16 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
         switchB.setEnabled(false);
         infoB.setEnabled(true);
-        stop.setEnabled(false);
+        stop.setEnabled(true);
 
         switchB.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     infoB.setEnabled(false);
-                    stop.setEnabled(true);
+                    //stop.setEnabled(true);
                 } else {
                     infoB.setEnabled(true);
-                    stop.setEnabled(false);
+                    //stop.setEnabled(false);
                 }
             }
         });
