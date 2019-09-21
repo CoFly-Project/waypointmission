@@ -170,6 +170,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     private MessageListener gotoRun;
 
+    private int cameraID;
+
     private enum Command {
         GOTO, PATH_FOLLOWING, ABORT, UNKNOWN
     }
@@ -316,6 +318,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
         initUI();
         cameraView = new byte[1];
+        cameraID = 0;
         //First Person View
         // The callback for receiving the raw H264 video data for camera live view
         mReceivedVideoDataCallBack = new VideoFeeder.VideoDataCallback() {
@@ -598,6 +601,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         cameraSchema.put("heading", heading);
         cameraSchema.put("gimbalPitch", gimbal);
         cameraSchema.put("image", ByteBuffer.wrap(camera));
+        cameraSchema.put("id", cameraID++);
 
         dispatchMessage = new DispatchMessage(schemaLoader.getSchema("camera"), server_ip,
                 server_port, connection_time_out);
@@ -1084,7 +1088,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
                     if (startTheDJI) {
 
-
+                        cameraID = 0;
                         float final_timeout = timeout;
                         float final_missionSpeed = missionSpeed;
                         WaypointMissionHeadingMode final_HeadingMode = mHeadingMode;

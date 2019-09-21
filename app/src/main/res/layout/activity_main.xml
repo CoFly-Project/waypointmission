@@ -143,6 +143,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/buttons"
+        android:layout_marginTop="-2dp"
         custom:layout_constraintBottom_toBottomOf="parent"
         custom:layout_constraintStart_toStartOf="parent"
         custom:layout_constraintTop_toTopOf="parent" />

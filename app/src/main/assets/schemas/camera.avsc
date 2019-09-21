@@ -21,6 +21,10 @@
           "doc": "Time elapsed since the Unix epoch"
     },
     {
+          "name": "id",
+          "type": "int"
+    },
+    {
       "name": "latitude",
       "type": "double",
       "unit": "degrees",
