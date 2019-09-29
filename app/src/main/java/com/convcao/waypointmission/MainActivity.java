@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.media.MediaCodec;
 import android.os.Build;
@@ -26,6 +27,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -76,6 +78,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import dji.common.flightcontroller.FlightControllerState;
 import dji.common.gimbal.GimbalState;
+import dji.common.mission.activetrack.ActiveTrackMission;
+import dji.common.mission.activetrack.ActiveTrackMode;
 import dji.common.mission.waypoint.Waypoint;
 import dji.common.mission.waypoint.WaypointMissionFinishedAction;
 import dji.common.mission.waypoint.WaypointMissionFlightPathMode;
@@ -173,7 +177,11 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private int cameraID;
 
     private enum Command {
-        GOTO, PATH_FOLLOWING, ABORT, UNKNOWN
+        GOTO, PATH_FOLLOWING, ABORT, ACTIVE_TRACK, UNKNOWN
+    }
+
+    private enum TypeOfMission {
+        Waypoint, ActiveTrack, NoMission
     }
 
     private byte[] cameraView;
@@ -273,14 +281,6 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
     public void onTaskComplete(byte[] result) {
         cameraView = result;
-        cameraLat = droneLocationLat;
-        cameraLon = droneLocationLng;
-        cameraAlt = droneLocationAlt;
-        cameraRotation = droneRotation;
-        cameraGimbal = droneGimbal;
-        cameraVelocityX = droneVelocityX;
-        cameraVelocityY = droneVelocityY;
-        cameraVelocityZ = droneVelocityZ;
         cameraBytesUpdated = true;
     }
 
@@ -399,7 +399,15 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     public void onYuvDataReceived(final ByteBuffer yuvFrame, int dataSize, final int width, final int height) {
         long currentTime = System.currentTimeMillis();
         if (switchB.isChecked() && publisher.getSelectedItem().toString().equals("Location & camera") &&
-                ((currentTime - lastPublishCameraOn) >= publishCameraPeriod) && yuvFrame != null){
+                ((currentTime - lastPublishCameraOn) >= publishCameraPeriod) && yuvFrame != null) {
+            cameraLat = droneLocationLat;
+            cameraLon = droneLocationLng;
+            cameraAlt = droneLocationAlt;
+            cameraRotation = droneRotation;
+            cameraGimbal = droneGimbal;
+            cameraVelocityX = droneVelocityX;
+            cameraVelocityY = droneVelocityY;
+            cameraVelocityZ = droneVelocityZ;
             lastPublishCameraOn = currentTime;
             System.gc();
             final byte[] bytes = new byte[dataSize];
@@ -791,7 +799,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         LatLng currentPose = new LatLng(droneLocationLat, droneLocationLng);
         gMap.clear();
 
-        for (Marker marker: allMarkers) {
+        for (Marker marker : allMarkers) {
             marker.remove();
         }
 
@@ -804,7 +812,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         polylineOptions.clickable(false);
         polylineOptions.add(currentPose);
 
-        for (Waypoint wp: list) {
+        for (Waypoint wp : list) {
 
             double lat = wp.coordinate.getLatitude();
             double lon = wp.coordinate.getLongitude();
@@ -915,7 +923,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     } else if (parseItAs(new ByteArrayInputStream(inputStreamAsBytes), schemaPath)) {
                         type = Command.PATH_FOLLOWING;
                         sentRecord = constructRecord(new ByteArrayInputStream(inputStreamAsBytes), schemaPath);
-                    } else if (parseItAs(new ByteArrayInputStream(inputStreamAsBytes), schemaAbort)){
+                    } else if (parseItAs(new ByteArrayInputStream(inputStreamAsBytes), schemaAbort)) {
                         type = Command.ABORT;
                         sentRecord = constructRecord(new ByteArrayInputStream(inputStreamAsBytes), schemaAbort);
                     } else {
@@ -934,16 +942,20 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     ArrayList<Waypoint> wpDisplayList = new ArrayList<>();
 
                     float missionSpeed = 1.0f;
-                    float timeout = 10.0f ;
+                    float timeout = 10.0f;
                     WaypointMissionHeadingMode mHeadingMode = WaypointMissionHeadingMode.CONTROL_BY_REMOTE_CONTROLLER;
                     WaypointMissionFlightPathMode mFlightPathMode = WaypointMissionFlightPathMode.NORMAL;
-                    boolean startTheDJI = false;
 
+
+                    TypeOfMission typeOfMission = TypeOfMission.NoMission;
+                    ActiveTrackMission mActiveTrackMission = new ActiveTrackMission();
                     switch (type) {
                         case ABORT:
-                            startTheDJI=false;
+
                             WPAdapter = new StopWaypointNavigation();
                             WPAdapter.execute();
+                            typeOfMission = TypeOfMission.NoMission;
+
                             break;
 
                         case GOTO:
@@ -995,7 +1007,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
                             wpDisplayList.add(realWP);
 
-                            startTheDJI=true;
+                            typeOfMission = TypeOfMission.Waypoint;
 
                             break;
                         case PATH_FOLLOWING:
@@ -1028,25 +1040,23 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                         waypoint.gimbalPitch = (float) wpRecord.get("gimbalPitch");
                                     }
 
-                                    if (wpIndex==0 || wpIndex==(allWPList.size()-1)) {
+                                    if (wpIndex == 0 || wpIndex == (allWPList.size() - 1)) {
 
                                         waypoint.cornerRadiusInMeters = minimumWaypointCurve;
-                                    }
-                                    else{ //https://developer.dji.com/mobile-sdk/documentation/cn/faq/cn/api-reference/ios-api/Components/Missions/DJIWaypoint.html#djiwaypoint_cornerradiusinmeters_inline
+                                    } else { //https://developer.dji.com/mobile-sdk/documentation/cn/faq/cn/api-reference/ios-api/Components/Missions/DJIWaypoint.html#djiwaypoint_cornerradiusinmeters_inline
 
                                         double dist = geo(prevWP, new double[]{waypoint.coordinate.getLatitude(),
                                                 waypoint.coordinate.getLongitude(), waypoint.altitude});
 
-                                        if (prevCorner+cornerRadius < dist) {
+                                        if (prevCorner + cornerRadius < dist) {
                                             waypoint.cornerRadiusInMeters = cornerRadius;
-                                        }else if ((dist - 2.0*minimumWaypointCurve) > prevCorner){
+                                        } else if ((dist - 2.0 * minimumWaypointCurve) > prevCorner) {
                                             waypoint.cornerRadiusInMeters = (float) (dist - minimumWaypointCurve - prevCorner);
-                                        }
-                                        else{
-                                            float newRadius = (float) ((dist/2.0) - minimumWaypointCurve);
+                                        } else {
+                                            float newRadius = (float) ((dist / 2.0) - minimumWaypointCurve);
                                             waypoint.cornerRadiusInMeters = newRadius;
-                                            wpList.get(wpList.size()-1).cornerRadiusInMeters = newRadius;
-                                            wpDisplayList.get(wpDisplayList.size()-1).cornerRadiusInMeters = newRadius;
+                                            wpList.get(wpList.size() - 1).cornerRadiusInMeters = newRadius;
+                                            wpDisplayList.get(wpDisplayList.size() - 1).cornerRadiusInMeters = newRadius;
                                         }
                                     }
 
@@ -1058,8 +1068,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                     wpList.add(waypoint);
                                     wpDisplayList.add(waypoint);
                                 }
-
+                                typeOfMission = TypeOfMission.Waypoint;
                             } catch (Exception e) {
+                                typeOfMission = TypeOfMission.NoMission;
                                 Log.e(TAGsocket, "Error in reading waypoints inside the received path schema");
                             }
 
@@ -1078,38 +1089,71 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                                 timeout = dTimeout * wpList.size();
                             }
 
-                            startTheDJI=true;
                             break;
+
+                        case ACTIVE_TRACK:
+                            WPAdapter = new StopWaypointNavigation();
+                            WPAdapter.execute();
+
+                            //float left, float top, float right, float bottom
+                            RectF rectF = new RectF(0.1f, 0.1f, 0.2f, 0.2f);
+                            mActiveTrackMission = new ActiveTrackMission(rectF, ActiveTrackMode.TRACE);
+
+
+                            typeOfMission = TypeOfMission.ActiveTrack;
+                            break;
+
                         case UNKNOWN:
-                            startTheDJI=false;
+                            typeOfMission = TypeOfMission.NoMission;
                             break;
                     }
 
 
-                    if (startTheDJI) {
+                    switch (typeOfMission) {
 
-                        cameraID = 0;
-                        float final_timeout = timeout;
-                        float final_missionSpeed = missionSpeed;
-                        WaypointMissionHeadingMode final_HeadingMode = mHeadingMode;
-                        WaypointMissionFlightPathMode final_flightPathMode = mFlightPathMode;
+                        case Waypoint:
+                            cameraID = 0;
+                            float final_timeout = timeout;
+                            float final_missionSpeed = missionSpeed;
+                            WaypointMissionHeadingMode final_HeadingMode = mHeadingMode;
+                            WaypointMissionFlightPathMode final_flightPathMode = mFlightPathMode;
 
 
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
 
-                            @Override
-                            public void run() {
-                                // this will run in the main thread
-                                PrepareMap(wpDisplayList);
+                                @Override
+                                public void run() {
+                                    // this will run in the main thread
+                                    PrepareMap(wpDisplayList);
 
-                                //DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
-                                adapter = new StartDJIMission2(final_timeout, final_missionSpeed,
-                                        final_HeadingMode, final_flightPathMode, schemaLoader.getSchemaMap(),
-                                        droneCanonicalName, server_ip, server_port, connection_time_out);
-                                adapter.execute(wpList);
+                                    //DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
+                                    adapter = new StartDJIMission2(final_timeout, final_missionSpeed,
+                                            final_HeadingMode, final_flightPathMode, schemaLoader.getSchemaMap(),
+                                            droneCanonicalName, server_ip, server_port, connection_time_out);
+                                    adapter.execute(wpList);
 
-                            }
-                        });
+                                }
+                            });
+                            break;
+                        case ActiveTrack:
+
+                            ActiveTrackMission FinalActiveTrackMission = mActiveTrackMission;
+
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    // this will run in the main thread
+
+                                    //DJISDKManager.getInstance().getMissionControl().destroyWaypointMissionOperator();
+                                    StartActiveTrackMission mission = new StartActiveTrackMission();
+                                    mission.execute(FinalActiveTrackMission);
+
+                                }
+                            });
+                            break;
+                        case NoMission:
+                            break;
                     }
                 }
 
@@ -1118,13 +1162,21 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                 s.close();
                 ss.close();
             } catch (IOException e) {
-                setResultToToast("Error in reading GOTO commands");
+                setResultToToast("Error in closing communication with server");
                 Log.e(TAGsocket, "Cannot close server socket");
                 Log.e(TAGsocket, e.toString());
             }
 
-
         }
+
+//        private RectF getActiveTrackRect(View iv) {
+//            View parent = (View) iv.getParent();
+//            return new RectF(
+//                    ((float) iv.getLeft() + iv.getX()) / (float) parent.getWidth(),
+//                    ((float) iv.getTop() + iv.getY()) / (float) parent.getHeight(),
+//                    ((float) iv.getRight() + iv.getX()) / (float) parent.getWidth(),
+//                    ((float) iv.getBottom() + iv.getY()) / (float) parent.getHeight());
+//        }
 
     }
 
@@ -1160,7 +1212,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             return schemaMap.get(schemaId);
         }
 
-        public Map<String, Schema> getSchemaMap() {return schemaMap;}
+        public Map<String, Schema> getSchemaMap() {
+            return schemaMap;
+        }
 
     }
 
