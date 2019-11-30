@@ -400,14 +400,16 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         long currentTime = System.currentTimeMillis();
         if (switchB.isChecked() && publisher.getSelectedItem().toString().equals("Location & camera") &&
                 ((currentTime - lastPublishCameraOn) >= publishCameraPeriod) && yuvFrame != null) {
-            cameraLat = droneLocationLat;
-            cameraLon = droneLocationLng;
-            cameraAlt = droneLocationAlt;
-            cameraRotation = droneRotation;
+
+            FlightControllerState fstate = new FlightControllerState();
+            cameraLat = fstate.getAircraftLocation().getLatitude();
+            cameraLon = fstate.getAircraftLocation().getLongitude();
+            cameraAlt = fstate.getAircraftLocation().getAltitude();
+            cameraRotation = fstate.getAircraftHeadDirection();
             cameraGimbal = droneGimbal;
-            cameraVelocityX = droneVelocityX;
-            cameraVelocityY = droneVelocityY;
-            cameraVelocityZ = droneVelocityZ;
+            cameraVelocityX = fstate.getVelocityX();
+            cameraVelocityY = fstate.getVelocityY();
+            cameraVelocityZ = fstate.getVelocityZ();
             lastPublishCameraOn = currentTime;
             System.gc();
             final byte[] bytes = new byte[dataSize];
