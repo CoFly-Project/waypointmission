@@ -11,6 +11,8 @@ import android.os.Environment;
 import android.util.Log;
 
 
+import com.convcao.waypointmission.dto.ScreenShotResource;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,25 +20,43 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class ScreenShot extends AsyncTask<byte[], Void, byte[]> {
+public class ScreenShot extends AsyncTask<byte[], Void, ScreenShotResource> {
 
     protected static final String TAG = "ScreenShotClass;";
     private int width;
     private int height;
+    private double cameraLat;
+    private double cameraLon;
+    private float cameraAlt;
+    private int cameraRotation;
+    private float cameraVelocityX;
+    private float cameraVelocityY;
+    private float cameraVelocityZ;
+
     private ScreenShotCompleted mCallback;
     private Context mContext;
 
-    public ScreenShot(int  width, int height, Context context){
+    public ScreenShot(int width, int height, double cameraLat, double cameraLon, float cameraAlt,
+                      int cameraRotation, float cameraVelocityX, float cameraVelocityY,
+                      float cameraVelocityZ, Context mContext) {
         this.width = width;
         this.height = height;
-        this.mContext = context;
-        this.mCallback = (ScreenShotCompleted) context;
+        this.cameraLat = cameraLat;
+        this.cameraLon = cameraLon;
+        this.cameraAlt = cameraAlt;
+        this.cameraRotation = cameraRotation;
+        this.cameraVelocityX = cameraVelocityX;
+        this.cameraVelocityY = cameraVelocityY;
+        this.cameraVelocityZ = cameraVelocityZ;
+        this.mContext = mContext;
+        this.mCallback = (ScreenShotCompleted) mContext;
     }
 
 
     @Override
-    protected byte[] doInBackground(byte[]... record) {
-        return convertYuvDataToJPEG(record[0], width, height);
+    protected ScreenShotResource doInBackground(byte[]... record) {
+        return new ScreenShotResource(cameraLat, cameraLon, cameraAlt, cameraRotation,
+                cameraVelocityX, cameraVelocityY, cameraVelocityZ, convertYuvDataToJPEG(record[0], width, height));
     }
 
 
@@ -93,7 +113,7 @@ public class ScreenShot extends AsyncTask<byte[], Void, byte[]> {
     }
 
     @Override
-    protected void onPostExecute(byte[] result) {
+    protected void onPostExecute(ScreenShotResource result) {
         //This is where you return data back to caller
         mCallback.onTaskComplete(result);
     }

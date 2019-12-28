@@ -34,6 +34,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.convcao.waypointmission.dto.ScreenShotResource;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -77,6 +78,7 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import dji.common.flightcontroller.FlightControllerState;
+import dji.common.flightcontroller.LocationCoordinate3D;
 import dji.common.gimbal.GimbalState;
 import dji.common.mission.activetrack.ActiveTrackMission;
 import dji.common.mission.activetrack.ActiveTrackMode;
@@ -127,13 +129,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private float droneLocationAlt;
     private float droneGimbal;
     private int droneRotation = 0;
-    private float droneVelocityX;
-    private float droneVelocityY;
-    private float droneVelocityZ;
 
-    private double cameraLat, cameraLon;
-    private float cameraAlt, cameraGimbal, cameraVelocityX, cameraVelocityY, cameraVelocityZ, minimumWaypointCurve;
-    private int cameraRotation;
+    private float cameraGimbal, minimumWaypointCurve;
 
     //private final Map<Integer, Marker> mMarkers = new ConcurrentHashMap<Integer, Marker>();
     //private Marker markerWP = null;
@@ -279,15 +276,13 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
-    public void onTaskComplete(byte[] result) {
-        cameraView = result;
-        cameraBytesUpdated = true;
-    }
+    public void onTaskComplete(ScreenShotResource result) {
 
-    public void onWaypointReached() {
-        publishCameraInfo(droneLocationLat, droneLocationLng, droneLocationAlt, droneRotation,
-                droneGimbal, System.currentTimeMillis(), cameraView, droneVelocityX, droneVelocityY,
-                droneVelocityZ);
+        if (switchB.isChecked() && publisher.getSelectedItem().toString().equals("Location & camera")) {
+            publishCameraInfo(result.getCameraLat(), result.getCameraLon(), result.getCameraAlt(),
+                    result.getCameraRotation(), cameraGimbal, System.currentTimeMillis(), result.getImageJPEG(), result.getCameraVelocityX(),
+                    result.getCameraVelocityY(),  result.getCameraVelocityZ());
+        }
     }
 
     @Override
@@ -402,19 +397,20 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                 ((currentTime - lastPublishCameraOn) >= publishCameraPeriod) && yuvFrame != null) {
 
             FlightControllerState fstate = new FlightControllerState();
-            cameraLat = fstate.getAircraftLocation().getLatitude();
-            cameraLon = fstate.getAircraftLocation().getLongitude();
-            cameraAlt = fstate.getAircraftLocation().getAltitude();
-            cameraRotation = fstate.getAircraftHeadDirection();
+            double cameraLat = fstate.getAircraftLocation().getLatitude();
+            double cameraLon = fstate.getAircraftLocation().getLongitude();
+            float cameraAlt = fstate.getAircraftLocation().getAltitude();
+            int cameraRotation = fstate.getAircraftHeadDirection();
             cameraGimbal = droneGimbal;
-            cameraVelocityX = fstate.getVelocityX();
-            cameraVelocityY = fstate.getVelocityY();
-            cameraVelocityZ = fstate.getVelocityZ();
+            float cameraVelocityX = fstate.getVelocityX();
+            float cameraVelocityY = fstate.getVelocityY();
+            float cameraVelocityZ = fstate.getVelocityZ();
             lastPublishCameraOn = currentTime;
             System.gc();
             final byte[] bytes = new byte[dataSize];
             yuvFrame.get(bytes);
-            savePhoto = new ScreenShot(width, height, MainActivity.this);
+            savePhoto = new ScreenShot(width, height, cameraLat, cameraLon, cameraAlt, cameraRotation,
+                    cameraVelocityX, cameraVelocityY, cameraVelocityZ, MainActivity.this);
             savePhoto.execute(bytes);
         }
     }
@@ -523,25 +519,14 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
                 @Override
                 public void onUpdate(FlightControllerState djiFlightControllerCurrentState) {
-                    droneLocationLat = djiFlightControllerCurrentState.getAircraftLocation().getLatitude();
-                    droneLocationLng = djiFlightControllerCurrentState.getAircraftLocation().getLongitude();
-                    droneLocationAlt = djiFlightControllerCurrentState.getAircraftLocation().getAltitude();
-                    droneRotation = djiFlightControllerCurrentState.getAircraftHeadDirection();
-                    droneVelocityX = djiFlightControllerCurrentState.getVelocityX();
-                    droneVelocityY = djiFlightControllerCurrentState.getVelocityY();
-                    droneVelocityZ = djiFlightControllerCurrentState.getVelocityZ();
+                    double droneLocationLat = djiFlightControllerCurrentState.getAircraftLocation().getLatitude();
+                    double droneLocationLng = djiFlightControllerCurrentState.getAircraftLocation().getLongitude();
+                    float droneLocationAlt = djiFlightControllerCurrentState.getAircraftLocation().getAltitude();
+                    int droneRotation = djiFlightControllerCurrentState.getAircraftHeadDirection();
 
                     updateDroneLocation();
 
                     long currentTime = System.currentTimeMillis();
-
-                    if (switchB.isChecked() && publisher.getSelectedItem().toString().equals("Location & camera")
-                            && cameraBytesUpdated) {
-                        publishCameraInfo(cameraLat, cameraLon, cameraAlt,
-                                cameraRotation, cameraGimbal, currentTime, cameraView, cameraVelocityX,
-                                cameraVelocityY, cameraVelocityZ);
-                        cameraBytesUpdated = false;
-                    }
 
 
                     if (switchB.isChecked() && (currentTime - lastPublishLocationOn) >= publishPeriod) {
