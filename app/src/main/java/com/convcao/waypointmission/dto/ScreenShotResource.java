@@ -1,6 +1,8 @@
 package com.convcao.waypointmission.dto;
 
 
+import java.util.Arrays;
+
 public class ScreenShotResource {
 
     private double cameraLat;
@@ -53,5 +55,19 @@ public class ScreenShotResource {
 
     public byte[] getImageJPEG() {
         return imageJPEG;
+    }
+
+    @Override
+    public String toString() {
+        return "ScreenShotResource{" +
+                "cameraLat=" + cameraLat +
+                ", cameraLon=" + cameraLon +
+                ", cameraAlt=" + cameraAlt +
+                ", cameraRotation=" + cameraRotation +
+                ", cameraVelocityX=" + cameraVelocityX +
+                ", cameraVelocityY=" + cameraVelocityY +
+                ", cameraVelocityZ=" + cameraVelocityZ +
+                ", imageJPEG=" + Arrays.toString(imageJPEG) +
+                '}';
     }
 }

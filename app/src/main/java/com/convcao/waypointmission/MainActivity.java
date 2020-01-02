@@ -279,9 +279,11 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     public void onTaskComplete(ScreenShotResource result) {
 
         if (switchB.isChecked() && publisher.getSelectedItem().toString().equals("Location & camera")) {
+            Log.i(TAG, "tha steiloume screenshot");
+            Log.i(TAG, result.toString());
             publishCameraInfo(result.getCameraLat(), result.getCameraLon(), result.getCameraAlt(),
                     result.getCameraRotation(), cameraGimbal, System.currentTimeMillis(), result.getImageJPEG(), result.getCameraVelocityX(),
-                    result.getCameraVelocityY(),  result.getCameraVelocityZ());
+                    result.getCameraVelocityY(), result.getCameraVelocityZ());
         }
     }
 
@@ -583,6 +585,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     //Send Camera view to the server
     private void publishCameraInfo(double locationLat, double locationLon, float alt, int heading, float gimbal,
                                    long time, byte[] camera, float velocityX, float velocityY, float velocityZ) {
+
+
         GenericRecord cameraSchema = schemaLoader.createGenericRecord("camera");
         cameraSchema.put("sourceSystem", droneCanonicalName);
         cameraSchema.put("listeningPort", android_port);
@@ -597,6 +601,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         cameraSchema.put("gimbalPitch", gimbal);
         cameraSchema.put("image", ByteBuffer.wrap(camera));
         cameraSchema.put("id", cameraID++);
+
+        Log.i(TAG, "ftiaxame to avro schema");
 
         dispatchMessage = new DispatchMessage(schemaLoader.getSchema("camera"), server_ip,
                 server_port, connection_time_out);
