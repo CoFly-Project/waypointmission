@@ -525,6 +525,11 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     float droneLocationAlt = djiFlightControllerCurrentState.getAircraftLocation().getAltitude();
                     int droneRotation = djiFlightControllerCurrentState.getAircraftHeadDirection();
 
+                    MainActivity.this.droneLocationLat = droneLocationLat;
+                    MainActivity.this.droneLocationLng = droneLocationLng;
+                    MainActivity.this.droneLocationAlt = droneLocationAlt;
+                    MainActivity.this.droneRotation = droneRotation;
+
                     updateDroneLocation();
 
                     long currentTime = System.currentTimeMillis();
