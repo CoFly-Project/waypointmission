@@ -3,7 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/WaypointMission.iml" filepath="$PROJECT_DIR$/WaypointMission.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bitbucket-projects-waypointmission.iml" filepath="$PROJECT_DIR$/bitbucket-projects-waypointmission.iml" group="waypointmission" />
+      <module fileurl="file://$PROJECT_DIR$/waypointmission.iml" filepath="$PROJECT_DIR$/waypointmission.iml" group="waypointmission" />
+      <module fileurl="file://$PROJECT_DIR$/app/waypointmission-app.iml" filepath="$PROJECT_DIR$/app/waypointmission-app.iml" group="waypointmission/app" />
     </modules>
   </component>
 </project>

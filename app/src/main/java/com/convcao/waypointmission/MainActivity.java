@@ -11,14 +11,12 @@ import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.media.MediaCodec;
 import android.os.Build;
-import android.os.Debug;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
@@ -27,7 +25,6 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -35,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.convcao.waypointmission.dto.ScreenShotResource;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -54,10 +52,10 @@ import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.BinaryDecoder;
 import org.apache.avro.io.DatumReader;
-import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
-import org.apache.avro.io.JsonDecoder;
-import org.apache.avro.util.Utf8;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -66,19 +64,14 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import dji.common.flightcontroller.FlightControllerState;
-import dji.common.flightcontroller.LocationCoordinate3D;
 import dji.common.gimbal.GimbalState;
 import dji.common.mission.activetrack.ActiveTrackMission;
 import dji.common.mission.activetrack.ActiveTrackMode;
@@ -104,6 +97,9 @@ import static org.apache.commons.io.IOUtils.copy;
 
 public class MainActivity extends FragmentActivity implements TextureView.SurfaceTextureListener,
         View.OnClickListener, OnMapReadyCallback, ScreenShotCompleted, DJICodecManager.YuvDataCallback {
+
+    ObjectMapper mapper = new ObjectMapper();
+    Mission mission;
 
     Handler handler = new Handler();
     protected static final String TAG = "WaypointMissionActivity";
@@ -185,6 +181,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
     private boolean cameraBytesUpdated = false;
     private ScreenShot savePhoto;
     private int countIncomingFrames;
+
+    MQTTHelper mMQTTHelper;
 
     @Override
     protected void onResume() {
@@ -287,6 +285,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         }
     }
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -306,6 +306,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     }
                     , 1);
         }
+
+
 
         setContentView(R.layout.activity_main);
 
@@ -389,6 +391,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         //String logDate = dateFormat.format(new Date());
         // Applies the date and time to the name of the trace log.
         //Debug.startMethodTracing("take-" + logDate);
+
+        mMQTTHelper = new MQTTHelper(getApplicationContext(), props.getProperty("canonical_name"), props.getProperty("client_id"), props.getProperty("server_ip"));
+        startMqtt();
     }
 
 
@@ -407,12 +412,17 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             float cameraVelocityY = mFlightController.getState().getVelocityY();
             float cameraVelocityZ = mFlightController.getState().getVelocityZ();
             lastPublishCameraOn = currentTime;
-            System.gc();
+//            System.gc();
             final byte[] bytes = new byte[dataSize];
             yuvFrame.get(bytes);
-            savePhoto = new ScreenShot(width, height, cameraLat, cameraLon, cameraAlt, cameraRotation,
-                    cameraVelocityX, cameraVelocityY, cameraVelocityZ, MainActivity.this);
-            savePhoto.execute(bytes);
+
+            mMQTTHelper.publishToCameraTopic(cameraLat, cameraLon, cameraAlt, cameraGimbal,
+                    cameraRotation, cameraVelocityX, cameraVelocityY, cameraVelocityZ, bytes);
+
+
+//            savePhoto = new ScreenShot(width, height, cameraLat, cameraLon, cameraAlt, cameraRotation,
+//                    cameraVelocityX, cameraVelocityY, cameraVelocityZ, MainActivity.this);
+//            savePhoto.execute(bytes);
         }
     }
 
@@ -520,6 +530,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
                 @Override
                 public void onUpdate(FlightControllerState djiFlightControllerCurrentState) {
+
                     double droneLocationLat = djiFlightControllerCurrentState.getAircraftLocation().getLatitude();
                     double droneLocationLng = djiFlightControllerCurrentState.getAircraftLocation().getLongitude();
                     float droneLocationAlt = djiFlightControllerCurrentState.getAircraftLocation().getAltitude();
@@ -538,8 +549,10 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     if (switchB.isChecked() && (currentTime - lastPublishLocationOn) >= publishPeriod) {
 
                         lastPublishLocationOn = currentTime;
-                        publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt,
-                                droneRotation, currentTime);
+                        mMQTTHelper.publishToTelemetryTopic(droneLocationLat, droneLocationLng, droneLocationAlt,
+                                droneRotation);
+//                        publishLocation(droneLocationLat, droneLocationLng, droneLocationAlt,
+//                                droneRotation, currentTime);
 
 //                        if (publisher.getSelectedItem().toString().equals("Location & camera") && cameraBytesUpdated) {
 //                            publishCameraInfo(cameraLat, cameraLon, cameraAlt,
@@ -1213,6 +1226,50 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             return schemaMap;
         }
 
+    }
+
+    private void startMqtt() {
+
+
+        mMQTTHelper.setCallback(new MqttCallbackExtended() {
+            @Override
+            public void connectComplete(boolean reconnect, String serverURI) {
+
+            }
+
+            @Override
+            public void connectionLost(Throwable cause) {
+
+            }
+
+            @Override
+            public void messageArrived(String topic, MqttMessage message) throws Exception {
+                Log.w("Debug", message.toString());
+
+
+                if(topic.contains("missionStart")) {
+                    MissionStartMessage missionStartMessage = mapper.readValue(message.getPayload(), MissionStartMessage.class);
+                    mission = new Mission(missionStartMessage.getMissionId(), missionStartMessage.getSpeed(),
+                            missionStartMessage.getTimeout(), missionStartMessage.getCornerRadius(), missionStartMessage.getGimbalPitch(), missionStartMessage.getWaypoints());
+
+                    mission.deploy();
+                }
+
+                if(topic.contains("missionAbort")) {
+                    mission.abort();
+                }
+
+
+
+//                dataReceived.setText(missionStartMessage.toString());
+
+            }
+
+            @Override
+            public void deliveryComplete(IMqttDeliveryToken token) {
+
+            }
+        });
     }
 
 }

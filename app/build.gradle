@@ -11,6 +11,12 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         // Enabling multidex support.
         multiDexEnabled true
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath true
+            }
+        }
     }
     buildTypes {
         release {
@@ -66,5 +72,15 @@ dependencies {
     provided 'com.dji:dji-sdk-provided:4.5.1'
     compile "org.apache.avro:avro:1.7.7"
     implementation 'com.android.support:design:27.1.1'
+
+    implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0'
+    implementation 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1'
+//    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
+//
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.9.8'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.9.8'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
+
+    compileOnly "org.projectlombok:lombok:1.18.12"
     //implementation files('libs/socket.io-java-client.jar')
 }
