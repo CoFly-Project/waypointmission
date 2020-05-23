@@ -40,4 +40,5 @@ public class CameraMessage {
     private float gimbalPitch;
 
     private byte[] image;
+
 }

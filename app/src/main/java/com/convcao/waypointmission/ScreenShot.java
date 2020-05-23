@@ -32,13 +32,14 @@ public class ScreenShot extends AsyncTask<byte[], Void, ScreenShotResource> {
     private float cameraVelocityX;
     private float cameraVelocityY;
     private float cameraVelocityZ;
+    private float cameraGimbal;
 
     private ScreenShotCompleted mCallback;
     private Context mContext;
 
     public ScreenShot(int width, int height, double cameraLat, double cameraLon, float cameraAlt,
                       int cameraRotation, float cameraVelocityX, float cameraVelocityY,
-                      float cameraVelocityZ, Context mContext) {
+                      float cameraVelocityZ, float cameraGimbal, Context mContext) {
         this.width = width;
         this.height = height;
         this.cameraLat = cameraLat;
@@ -48,6 +49,7 @@ public class ScreenShot extends AsyncTask<byte[], Void, ScreenShotResource> {
         this.cameraVelocityX = cameraVelocityX;
         this.cameraVelocityY = cameraVelocityY;
         this.cameraVelocityZ = cameraVelocityZ;
+        this.cameraGimbal = cameraGimbal;
         this.mContext = mContext;
         this.mCallback = (ScreenShotCompleted) mContext;
     }
@@ -56,7 +58,7 @@ public class ScreenShot extends AsyncTask<byte[], Void, ScreenShotResource> {
     @Override
     protected ScreenShotResource doInBackground(byte[]... record) {
         return new ScreenShotResource(cameraLat, cameraLon, cameraAlt, cameraRotation,
-                cameraVelocityX, cameraVelocityY, cameraVelocityZ, convertYuvDataToJPEG(record[0], width, height));
+                cameraVelocityX, cameraVelocityY, cameraVelocityZ, cameraGimbal, convertYuvDataToJPEG(record[0], width, height));
     }
 
 

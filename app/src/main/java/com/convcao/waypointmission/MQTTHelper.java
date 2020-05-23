@@ -17,7 +17,15 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
+
+import static com.convcao.waypointmission.MainActivity.TAG;
 
 
 public class MQTTHelper {
@@ -28,7 +36,7 @@ public class MQTTHelper {
 final String serverIp;
 
 
-    final String canonicalName = "dji.phantom.4.pro.hawk.1";
+    final String canonicalName;
 
 //    final String clientId = "ExampleAndroidClient2";
 final String clientId;
@@ -45,15 +53,16 @@ final String clientId;
 
 //    ImageProvider mImageProvider;
 
-    public MQTTHelper(Context context, String canonicalName, String clientId, String serverIp) {
+    public MQTTHelper(Context context, String canonicalName, String clientId, String serverIp, String serverPort) {
 
 //        mImageProvider = new ImageProvider(context);
 
 //        this.canonicalName = canonicalName;
 ////        this.clientId = clientId;
 ////        this.serverIp = "tcp://" + serverIp + ":1883";
-        this.serverIp = "tcp://" + serverIp + ":1883";
+        this.serverIp = "tcp://" + serverIp + ":" + serverPort;
         this.clientId = clientId;
+        this.canonicalName = canonicalName;
 //
         this.missionStartTopic =  "missionStart/" + canonicalName;
         this.missionAbortTopic = "missionAbort/" + canonicalName;
@@ -169,6 +178,15 @@ final String clientId;
         TelemetryMessage telemetryMessage = new TelemetryMessage();
         telemetryMessage.setSourceSystem(canonicalName);
         telemetryMessage.setDestinationSystem("choosepath-backend");
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+//        Date latestTelemetry = new Date(currentTime);
+        Log.w(TAG, "in notify telemetry , current time: " + sdf.format(new Date()) );
+//                + "latestTelemetryMessageTimestamp: " + sdf.format(latestTelemetry));
+        Date currentTime = Calendar.getInstance().getTime();
+        Log.e(TAG, "TIME : " + currentTime);
+
+
         telemetryMessage.setTimestamp(System.currentTimeMillis());
         telemetryMessage.setLatitude(latitude);
         telemetryMessage.setLongitude(longitude);
@@ -185,7 +203,8 @@ final String clientId;
 
     public void publishToCameraTopic(double latitude, double longitude,
                                      double alt, float gimbalPitch, int heading,
-                                     float velocityX, float velocityY, float velocityZ, byte[] image) {
+                                     float velocityX, float velocityY, float velocityZ,
+                                     byte[] image) {
 
         CameraMessage cameraMessage = new CameraMessage();
         cameraMessage.setSourceSystem(canonicalName);
@@ -214,12 +233,12 @@ final String clientId;
         @Override
         public void run() {
             // Do something here on the main thread
-            publishToTelemetryTopic(mDroneState.getLatitude(), mDroneState.getLongitude(),
-                    mDroneState.getAltitude(), mDroneState.getHeading());
+//            publishToTelemetryTopic(mDroneState.getLatitude(), mDroneState.getLongitude(),
+//                    mDroneState.getAltitude(), mDroneState.getHeading());
 //            publishToCameraTopic();
             // Repeat this the same runnable code block again another 2 seconds
             // 'this' is referencing the Runnable object
-            mHandler.postDelayed(this, 500);
+//            mHandler.postDelayed(this, 500);
         }
     };
 

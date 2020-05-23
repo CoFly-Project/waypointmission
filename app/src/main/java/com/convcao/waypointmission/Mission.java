@@ -3,10 +3,17 @@ package com.convcao.waypointmission;
 import android.os.Handler;
 import android.util.Log;
 
+import org.apache.avro.generic.GenericRecord;
+
+import java.io.ByteArrayInputStream;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
+
+import static com.convcao.waypointmission.Dist.geo;
 
 @Getter
 @Setter
@@ -85,6 +92,57 @@ public class Mission {
         Log.d(TAG, "move: moved");
         index = (index + 1) ;
 
+    }
+
+    public static void transformWaypoints(List<Waypoint> wps, float minimumWaypointCurve , float gimbalPitch, float cornerRadius,
+                                          ArrayList<dji.common.mission.waypoint.Waypoint> waypointList,
+                                          ArrayList<dji.common.mission.waypoint.Waypoint> waypointDisplayList) {
+        try {
+
+            int wpIndex = 0;
+            double[] prevWP = new double[3];
+            float prevCorner = minimumWaypointCurve;
+
+            for (Waypoint wp : wps) {
+
+                dji.common.mission.waypoint.Waypoint waypoint = new dji.common.mission.waypoint.Waypoint(wp.getLatitude(),
+                       wp.getLongitude(), (float) wp.getAltitude());
+
+                waypoint.gimbalPitch = gimbalPitch;
+
+                if (wpIndex == 0 || wpIndex == (wps.size() - 1)) {
+
+                    waypoint.cornerRadiusInMeters = minimumWaypointCurve;
+                } else { //https://developer.dji.com/mobile-sdk/documentation/cn/faq/cn/api-reference/ios-api/Components/Missions/DJIWaypoint.html#djiwaypoint_cornerradiusinmeters_inline
+
+                    double dist = geo(prevWP, new double[]{waypoint.coordinate.getLatitude(),
+                            waypoint.coordinate.getLongitude(), waypoint.altitude});
+
+                    if (prevCorner + cornerRadius < dist) {
+                        waypoint.cornerRadiusInMeters = cornerRadius;
+                    } else if ((dist - 2.0 * minimumWaypointCurve) > prevCorner) {
+                        waypoint.cornerRadiusInMeters = (float) (dist - minimumWaypointCurve - prevCorner);
+                    } else {
+                        float newRadius = (float) ((dist / 2.0) - minimumWaypointCurve);
+                        waypoint.cornerRadiusInMeters = newRadius;
+                        waypointList.get(waypointList.size() - 1).cornerRadiusInMeters = newRadius;
+                        waypointDisplayList.get(waypointDisplayList.size() - 1).cornerRadiusInMeters = newRadius;
+                    }
+                }
+
+                prevWP[0] = waypoint.coordinate.getLatitude();
+                prevWP[1] = waypoint.coordinate.getLongitude();
+                prevWP[2] = waypoint.altitude;
+                prevCorner = waypoint.cornerRadiusInMeters;
+                wpIndex++;
+                waypointList.add(waypoint);
+                waypointDisplayList.add(waypoint);
+            }
+//            typeOfMission = MainActivity.TypeOfMission.Waypoint;
+        } catch (Exception e) {
+//            typeOfMission = MainActivity.TypeOfMission.NoMission;
+            e.printStackTrace();
+        }
     }
 
 

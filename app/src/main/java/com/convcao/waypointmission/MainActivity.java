@@ -64,7 +64,9 @@ import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -279,9 +281,12 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         if (switchB.isChecked() && publisher.getSelectedItem().toString().equals("Location & camera")) {
             Log.i(TAG, "tha steiloume screenshot");
             Log.i(TAG, result.toString());
-            publishCameraInfo(result.getCameraLat(), result.getCameraLon(), result.getCameraAlt(),
-                    result.getCameraRotation(), cameraGimbal, System.currentTimeMillis(), result.getImageJPEG(), result.getCameraVelocityX(),
-                    result.getCameraVelocityY(), result.getCameraVelocityZ());
+//            publishCameraInfo(result.getCameraLat(), result.getCameraLon(), result.getCameraAlt(),
+//                    result.getCameraRotation(), cameraGimbal, System.currentTimeMillis(), result.getImageJPEG(), result.getCameraVelocityX(),
+//                    result.getCameraVelocityY(), result.getCameraVelocityZ());
+
+            mMQTTHelper.publishToCameraTopic(result.getCameraLat(), result.getCameraLon(), result.getCameraAlt(), result.getCameraGimbal(), result.getCameraRotation(),
+                   result.getCameraVelocityX(), result.getCameraVelocityY(), result.getCameraVelocityZ(), result.getImageJPEG());
         }
     }
 
@@ -360,8 +365,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
         droneCanonicalName = props.getProperty("canonical_name");
         android_port = Integer.parseInt(props.getProperty("port"));
-        server_ip = props.getProperty("server_ip");
-        server_port = Integer.parseInt(props.getProperty("server_port"));
+//        server_ip = props.getProperty("server_ip");
+//        server_port = Integer.parseInt(props.getProperty("server_port"));
         connection_time_out = Integer.parseInt(props.getProperty("connection_time_out"));
 
 
@@ -380,9 +385,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         schemaPath = schemaLoader.getSchema("path");
         schemaAbort = schemaLoader.getSchema("abort");
 
-        gotoRun = new MessageListener(android_port);
-        gotoRun.stop();
-        gotoRun.start();
+//        gotoRun = new MessageListener(android_port);
+//        gotoRun.stop();
+//        gotoRun.start();
 
         lastPublishLocationOn = System.currentTimeMillis();
         lastPublishCameraOn = System.currentTimeMillis();
@@ -392,7 +397,8 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
         // Applies the date and time to the name of the trace log.
         //Debug.startMethodTracing("take-" + logDate);
 
-        mMQTTHelper = new MQTTHelper(getApplicationContext(), props.getProperty("canonical_name"), props.getProperty("client_id"), props.getProperty("server_ip"));
+        mMQTTHelper = new MQTTHelper(getApplicationContext(), props.getProperty("canonical_name"), props.getProperty("client_id"),
+                props.getProperty("mqtt_server_ip"), props.getProperty("mqtt_server_port"));
         startMqtt();
     }
 
@@ -416,13 +422,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
             final byte[] bytes = new byte[dataSize];
             yuvFrame.get(bytes);
 
-            mMQTTHelper.publishToCameraTopic(cameraLat, cameraLon, cameraAlt, cameraGimbal,
-                    cameraRotation, cameraVelocityX, cameraVelocityY, cameraVelocityZ, bytes);
-
-
-//            savePhoto = new ScreenShot(width, height, cameraLat, cameraLon, cameraAlt, cameraRotation,
-//                    cameraVelocityX, cameraVelocityY, cameraVelocityZ, MainActivity.this);
-//            savePhoto.execute(bytes);
+            savePhoto = new ScreenShot(width, height, cameraLat, cameraLon, cameraAlt, cameraRotation,
+                    cameraVelocityX, cameraVelocityY, cameraVelocityZ, cameraGimbal, MainActivity.this);
+            savePhoto.execute(bytes);
         }
     }
 
@@ -534,6 +536,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     double droneLocationLat = djiFlightControllerCurrentState.getAircraftLocation().getLatitude();
                     double droneLocationLng = djiFlightControllerCurrentState.getAircraftLocation().getLongitude();
                     float droneLocationAlt = djiFlightControllerCurrentState.getAircraftLocation().getAltitude();
+
                     int droneRotation = djiFlightControllerCurrentState.getAircraftHeadDirection();
 
                     MainActivity.this.droneLocationLat = droneLocationLat;
@@ -545,8 +548,9 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
                     long currentTime = System.currentTimeMillis();
 
-
                     if (switchB.isChecked() && (currentTime - lastPublishLocationOn) >= publishPeriod) {
+
+
 
                         lastPublishLocationOn = currentTime;
                         mMQTTHelper.publishToTelemetryTopic(droneLocationLat, droneLocationLng, droneLocationAlt,
@@ -769,12 +773,12 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                         connection_time_out = Integer.parseInt(((TextView) connectionSettings.findViewById(R.id.timeout))
                                 .getText().toString());
 
-                        if (android_port_temp != android_port) {
-                            android_port = android_port_temp;
-                            gotoRun.stop();
-                            gotoRun = new MessageListener(android_port);
-                            gotoRun.start();
-                        }
+//                        if (android_port_temp != android_port) {
+//                            android_port = android_port_temp;
+//                            gotoRun.stop();
+//                            gotoRun = new MessageListener(android_port);
+//                            gotoRun.start();
+//                        }
                     }
 
                 })
@@ -1249,14 +1253,27 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
 
                 if(topic.contains("missionStart")) {
                     MissionStartMessage missionStartMessage = mapper.readValue(message.getPayload(), MissionStartMessage.class);
-                    mission = new Mission(missionStartMessage.getMissionId(), missionStartMessage.getSpeed(),
-                            missionStartMessage.getTimeout(), missionStartMessage.getCornerRadius(), missionStartMessage.getGimbalPitch(), missionStartMessage.getWaypoints());
 
-                    mission.deploy();
+
+                    if(switchB.isChecked()){
+                        ArrayList<dji.common.mission.waypoint.Waypoint> waypointList = new ArrayList<>();
+                        ArrayList<dji.common.mission.waypoint.Waypoint> waypointDisplayList = new ArrayList<>();
+                        Mission.transformWaypoints(missionStartMessage.getWaypoints(), minimumWaypointCurve, missionStartMessage.getGimbalPitch(),
+                                missionStartMessage.getCornerRadius(), waypointList, waypointDisplayList);
+                        PrepareMap(waypointDisplayList);
+
+                        DJIMissionHandler djiMissionHandler = new DJIMissionHandler( missionStartMessage.getTimeout(),
+                                missionStartMessage.getSpeed(),WaypointMissionHeadingMode.AUTO, WaypointMissionFlightPathMode.CURVED, droneCanonicalName);
+                        djiMissionHandler.execute(waypointList);
+                    }
+
+
+
                 }
 
                 if(topic.contains("missionAbort")) {
-                    mission.abort();
+                    WPAdapter = new StopWaypointNavigation();
+                    WPAdapter.execute();
                 }
 
 

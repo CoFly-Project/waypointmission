@@ -12,9 +12,11 @@ public class ScreenShotResource {
     private float cameraVelocityX;
     private float cameraVelocityY;
     private float cameraVelocityZ;
+    private float cameraGimbal;
     private byte[] imageJPEG;
 
-    public ScreenShotResource(double cameraLat, double cameraLon, float cameraAlt, int cameraRotation, float cameraVelocityX, float cameraVelocityY, float cameraVelocityZ, byte[] imageJPEG) {
+    public ScreenShotResource(double cameraLat, double cameraLon, float cameraAlt, int cameraRotation, float cameraVelocityX, float cameraVelocityY, float cameraVelocityZ, float cameraGimbal,
+                              byte[] imageJPEG) {
         this.cameraLat = cameraLat;
         this.cameraLon = cameraLon;
         this.cameraAlt = cameraAlt;
@@ -22,6 +24,7 @@ public class ScreenShotResource {
         this.cameraVelocityX = cameraVelocityX;
         this.cameraVelocityY = cameraVelocityY;
         this.cameraVelocityZ = cameraVelocityZ;
+        this.cameraGimbal = cameraGimbal;
         this.imageJPEG = imageJPEG;
     }
 
@@ -51,6 +54,10 @@ public class ScreenShotResource {
 
     public float getCameraVelocityZ() {
         return cameraVelocityZ;
+    }
+
+    public float getCameraGimbal() {
+        return cameraGimbal;
     }
 
     public byte[] getImageJPEG() {
