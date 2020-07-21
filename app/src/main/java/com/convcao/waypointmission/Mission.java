@@ -3,12 +3,9 @@ package com.convcao.waypointmission;
 import android.os.Handler;
 import android.util.Log;
 
-import org.apache.avro.generic.GenericRecord;
-
-import java.io.ByteArrayInputStream;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +17,7 @@ import static com.convcao.waypointmission.Dist.geo;
 public class Mission {
 
     private static final String TAG = "Mission";
-    private int missionId;
+    private UUID missionId;
 
     //m/s
     private float speed;
@@ -40,7 +37,7 @@ public class Mission {
 
     private int index;
 
-    public Mission(int missionId, float speed, float timeout, float cornerRadius, float gimbalPitch, List<Waypoint> waypoints) {
+    public Mission(UUID missionId, float speed, float timeout, float cornerRadius, float gimbalPitch, List<Waypoint> waypoints) {
         Log.w(TAG, "Mission: waypoints" + waypoints.toString());
         this.missionId = missionId;
         this.speed = speed;

@@ -24,6 +24,7 @@ import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
+import java.util.UUID;
 
 import static com.convcao.waypointmission.MainActivity.TAG;
 
@@ -32,18 +33,11 @@ public class MQTTHelper {
 
     public MqttAndroidClient mMqttAndroidClient;
 
-//    final String serverUri = "tcp://192.168.1.8:1883";
-final String serverIp;
-
+    final String serverIp;
 
     final String canonicalName;
-
-//    final String clientId = "ExampleAndroidClient2";
-final String clientId;
-//    final String missionStartTopic = "missionStart/" + canonicalName;
+    final String clientId;
     private String missionStartTopic;
-//    final String missionAbortTopic = "missionAbort/" + canonicalName;
-
     private String missionAbortTopic;
     
     private DroneState mDroneState = DroneState.getInstance();
@@ -51,15 +45,8 @@ final String clientId;
 
     ObjectMapper mObjectMapper = new ObjectMapper();
 
-//    ImageProvider mImageProvider;
-
     public MQTTHelper(Context context, String canonicalName, String clientId, String serverIp, String serverPort) {
 
-//        mImageProvider = new ImageProvider(context);
-
-//        this.canonicalName = canonicalName;
-////        this.clientId = clientId;
-////        this.serverIp = "tcp://" + serverIp + ":1883";
         this.serverIp = "tcp://" + serverIp + ":" + serverPort;
         this.clientId = clientId;
         this.canonicalName = canonicalName;
@@ -67,7 +54,6 @@ final String clientId;
         this.missionStartTopic =  "missionStart/" + canonicalName;
         this.missionAbortTopic = "missionAbort/" + canonicalName;
 
-//        mMqttAndroidClient = new MqttAndroidClient(context, "tcp://" + serverIp + ":1883", clientId);
         mMqttAndroidClient = new MqttAndroidClient(context, this.serverIp, this.clientId);
 
 
@@ -156,6 +142,7 @@ final String clientId;
                 }
             });
 
+
         } catch (MqttException ex) {
             System.err.println("Exception whilst subscribing");
             ex.printStackTrace();
@@ -192,7 +179,6 @@ final String clientId;
         telemetryMessage.setLongitude(longitude);
         telemetryMessage.setAltitude(alt);
         telemetryMessage.setHeading(heading);
-        telemetryMessage.setMissionId(1);
 
         try {
             mMqttAndroidClient.publish("telemetry/" + canonicalName, new MqttMessage(mObjectMapper.writeValueAsBytes(telemetryMessage)));
@@ -227,6 +213,22 @@ final String clientId;
             e.printStackTrace();
         }
 
+    }
+
+    public void publishToMissionStatusTopic(UUID missionId, MissionStatus missionStatus) {
+        try {
+            MissionStatusMessage missionStatusMessage = new MissionStatusMessage();
+            missionStatusMessage.setMissionId(missionId);
+            missionStatusMessage.setDestinationSystem("choosepath-backend");
+            missionStatusMessage.setSourceSystem(canonicalName);
+            missionStatusMessage.setMissionStatus(missionStatus);
+            missionStatusMessage.setTimestamp(System.currentTimeMillis());
+
+            Log.i(TAG, "missionStatus/" + canonicalName + "      -> " + missionStatus);
+            mMqttAndroidClient.publish("missionStatus/" + canonicalName, new MqttMessage(mObjectMapper.writeValueAsBytes(missionStatusMessage)));
+        } catch (MqttException | JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
     private Runnable runnableCode = new Runnable() {

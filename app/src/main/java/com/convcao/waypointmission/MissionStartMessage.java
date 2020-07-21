@@ -1,6 +1,7 @@
 package com.convcao.waypointmission;
 
 import java.util.List;
+import java.util.UUID;
 
 import lombok.Data;
 
@@ -10,7 +11,7 @@ public class MissionStartMessage {
     //since Unix epoch
     private Long timestamp;
 
-    private int missionId;
+    private UUID missionId;
 
     private String destinationSystem;
 

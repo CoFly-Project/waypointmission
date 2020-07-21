@@ -1263,7 +1263,7 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                         PrepareMap(waypointDisplayList);
 
                         DJIMissionHandler djiMissionHandler = new DJIMissionHandler( missionStartMessage.getTimeout(),
-                                missionStartMessage.getSpeed(),WaypointMissionHeadingMode.AUTO, WaypointMissionFlightPathMode.CURVED, droneCanonicalName);
+                                missionStartMessage.getSpeed(),WaypointMissionHeadingMode.AUTO, WaypointMissionFlightPathMode.CURVED, droneCanonicalName, missionStartMessage.getMissionId(), mMQTTHelper);
                         djiMissionHandler.execute(waypointList);
                     }
 
@@ -1275,8 +1275,6 @@ public class MainActivity extends FragmentActivity implements TextureView.Surfac
                     WPAdapter = new StopWaypointNavigation();
                     WPAdapter.execute();
                 }
-
-
 
 //                dataReceived.setText(missionStartMessage.toString());
 

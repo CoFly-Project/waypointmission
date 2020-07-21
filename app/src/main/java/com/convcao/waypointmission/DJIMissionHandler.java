@@ -14,6 +14,7 @@ import org.apache.avro.generic.GenericRecord;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -21,6 +22,7 @@ import dji.common.camera.SettingsDefinitions;
 import dji.common.error.DJIError;
 import dji.common.flightcontroller.FlightControllerState;
 import dji.common.mission.waypoint.Waypoint;
+import dji.common.mission.waypoint.WaypointDownloadProgress;
 import dji.common.mission.waypoint.WaypointMission;
 import dji.common.mission.waypoint.WaypointMissionDownloadEvent;
 import dji.common.mission.waypoint.WaypointMissionExecutionEvent;
@@ -62,6 +64,8 @@ public class DJIMissionHandler extends AsyncTask<ArrayList<Waypoint>, Void, Void
     private WaypointMissionStatus status;
     private Handler handler;
     //private Waypoint WP1, WP2;
+    private UUID missionId;
+    private MQTTHelper mMQTTHelper;
 
     private final long waitTime = 800;
 
@@ -80,7 +84,7 @@ public class DJIMissionHandler extends AsyncTask<ArrayList<Waypoint>, Void, Void
 
     public DJIMissionHandler(float timeout, float speed, WaypointMissionHeadingMode mHeadingMode,
                             WaypointMissionFlightPathMode missionFlightPathMode,
-                            String droneCanonicalName) {
+                            String droneCanonicalName, UUID missionId, MQTTHelper mqttHelper) {
         this.mHeadingMode = mHeadingMode;
         this.mFinishedAction = WaypointMissionFinishedAction.NO_ACTION; //TODO fix me in the future
         this.missionFlightPathMode = missionFlightPathMode;
@@ -90,6 +94,8 @@ public class DJIMissionHandler extends AsyncTask<ArrayList<Waypoint>, Void, Void
         this.timeout = timeout;
         this.handler = new Handler();
         this.droneCanonicalName = droneCanonicalName;
+        this.missionId = missionId;
+        this.mMQTTHelper = mqttHelper;
     }
 
     public WaypointMissionOperator getWaypointMissionOperator() {
@@ -392,7 +398,10 @@ public class DJIMissionHandler extends AsyncTask<ArrayList<Waypoint>, Void, Void
     private WaypointMissionOperatorListener eventNotificationListener = new WaypointMissionOperatorListener() {
         @Override
         public void onDownloadUpdate(WaypointMissionDownloadEvent downloadEvent) {
-
+            WaypointDownloadProgress progress = downloadEvent.getProgress();
+            Log.e("inside ODU wp index", String.valueOf(progress.downloadedWaypointIndex));
+            Log.e("inside ODU wp count", String.valueOf(progress.totalWaypointCount));
+            Log.e("inside ODU dloadevent", downloadEvent.toString());
         }
 
         @Override
@@ -402,12 +411,18 @@ public class DJIMissionHandler extends AsyncTask<ArrayList<Waypoint>, Void, Void
 
         @Override
         public void onExecutionUpdate(WaypointMissionExecutionEvent executionEvent) {
-
+            WaypointMissionState state = executionEvent.getCurrentState();
+            Log.e("inside OEU state", state.toString());
+            Log.e("inside OEU wp index", String.valueOf(executionEvent.getProgress().targetWaypointIndex));
+            if(executionEvent.getProgress().targetWaypointIndex == 2) {
+                mMQTTHelper.publishToMissionStatusTopic(missionId, MissionStatus.ONROUTE);
+            }
+            Log.e("inside OEU executestate", String.valueOf(executionEvent.getProgress().executeState));
         }
 
         @Override
         public void onExecutionStart() {
-
+            mMQTTHelper.publishToMissionStatusTopic(missionId, MissionStatus.STARTED);
 //            sendStatus(ExperimentEnum.STARTED);
         }
 
@@ -418,6 +433,7 @@ public class DJIMissionHandler extends AsyncTask<ArrayList<Waypoint>, Void, Void
             //if (markerWP != null) {
             //    markerWP.remove();
             //}
+            mMQTTHelper.publishToMissionStatusTopic(missionId, MissionStatus.COMPLETED);
             Log.i(TAG, "I am done!");
 //            sendStatus(ExperimentEnum.COMPLETED);
         }

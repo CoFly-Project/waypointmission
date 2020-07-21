@@ -14,8 +14,6 @@ public class CameraMessage {
     @NonNull
     private Long timestamp;
 
-    private int missionId;
-
     private int imageId;
 
     private String destinationSystem;
