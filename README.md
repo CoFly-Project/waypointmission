@@ -20,7 +20,7 @@ cd C:\Users\USERNAME\AppData\Local\Android\Sdk\platform-tools
 
 Stop over-the-lan deguger:
 ```
-./adb kill-server
+.\adb kill-server
 ```
 ### Cite as
 ```
