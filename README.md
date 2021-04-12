@@ -18,7 +18,7 @@ cd C:\Users\USERNAME\AppData\Local\Android\Sdk\platform-tools
 ```
 
 
-Stop over-the-lan deguger:
+Stop over-the-lan debugger:
 ```
 .\adb kill-server
 ```
