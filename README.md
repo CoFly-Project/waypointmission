@@ -1,10 +1,28 @@
-WaypointMission
+# Android DJI Adaptor #
 
-how to run the over-the-lan debugger 
+Android application acting as Ground Control Station for DJI modile SDK compatible drones. 
 
-1)cd C:\Users\atkap\AppData\Local\Android\Sdk\platform-tools
-2).\adb tcpip 5555
-3).\adb connect 192.168.43.86:5555 or .\adb connect 192.168.1.13:5555
 
-to stop it
+### Example of waypoint mission visualization
+<img src="https://kapoutsis.info/wp-content/uploads/2021/04/waypoint_adroid_app.gif">
+
+### Run the over-the-lan debugger
+```
+cd C:\Users\USERNAME\AppData\Local\Android\Sdk\platform-tools
+```
+```
+.\adb tcpip 5555
+```
+```
+.\adb connect ANDROID_IP:5555
+```
+
+
+Stop over-the-lan deguger:
+```
 ./adb kill-server
+```
+### Cite as
+```
+
+```
