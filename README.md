@@ -4,7 +4,7 @@ Android application acting as Ground Control Station for DJI modile SDK compatib
 
 
 ### Example of waypoint mission visualization
-<img src="https://kapoutsis.info/wp-content/uploads/2021/04/waypoint_adroid_app_new.gif">
+![example.gif](https://kapoutsis.info/wp-content/uploads/2021/04/dji_adaptor_example.gif)
 
 ### Run the over-the-lan debugger
 ```
