@@ -8,7 +8,10 @@ Android application acting as Ground Control Station for DJI modile SDK compatib
 
 ### Run the over-the-lan debugger
 ```
-cd C:\Users\USERNAME\AppData\Local\Android\Sdk\platform-tools
+cd %USERPROFILE%\AppData\Local\Android\Sdk\platform-tools
+```
+```
+--> Connect android phone to the PC through usb cable
 ```
 ```
 .\adb tcpip 5555
@@ -16,7 +19,9 @@ cd C:\Users\USERNAME\AppData\Local\Android\Sdk\platform-tools
 ```
 .\adb connect ANDROID_IP:5555
 ```
-
+```
+--> Disconnect android phone from the PC
+```
 
 Stop over-the-lan debugger:
 ```
