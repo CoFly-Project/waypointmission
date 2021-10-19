@@ -17,11 +17,12 @@ cd %USERPROFILE%\AppData\Local\Android\Sdk\platform-tools
 .\adb tcpip 5555
 ```
 ```
+--> Disconnect android phone from the PC and find the ANDROID_IP
+```
+```
 .\adb connect ANDROID_IP:5555
 ```
-```
---> Disconnect android phone from the PC
-```
+
 
 Stop over-the-lan debugger:
 ```
